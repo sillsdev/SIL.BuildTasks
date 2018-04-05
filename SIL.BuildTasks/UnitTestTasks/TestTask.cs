@@ -161,7 +161,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 
 					if (process.ExitCode > 0 && _failTaskIfPositiveExitCode)
 						retVal = false;
-
+					
 					// Return true in this case - at least NUnit returns non-zero exit code when
 					// a test fails, but we don't want to stop the build.
 				}
@@ -261,7 +261,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 
 					if (Verbose)
 					{
-						Log.LogMessage(Importance, logContents);
+					Log.LogMessage(Importance, logContents);
 					}
 
 					// ensure only one thread writes to the log at any time
