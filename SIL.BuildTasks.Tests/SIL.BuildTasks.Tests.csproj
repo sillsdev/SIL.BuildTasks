@@ -282,6 +282,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArchiveTests.cs" />
+    <Compile Include="ConstrainStringByLine.cs" />
     <Compile Include="GenerateReleaseArtifactsTests.cs" />
     <Compile Include="UnitTestTasks\NUnit3Tests.cs" />
     <Compile Include="UnitTestTasks\NUnitTests.cs" />

@@ -14,13 +14,34 @@ namespace SIL.BuildTasks.Tests
 	public class MakePotTests
 	{
 
-
-		private class EnvironmentForTest : TemporaryFolder
+		private class EnvironmentForTest : IDisposable
 		{
-			public EnvironmentForTest() :
-				base("SIL.BuildTasks.Tests")
+			private string TempDir { get; }
+
+			public EnvironmentForTest()
 			{
+				TempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+				Directory.CreateDirectory(TempDir);
 			}
+
+			#region Disposable related
+
+			~EnvironmentForTest()
+			{
+				Dispose(false);
+			}
+
+			public void Dispose()
+			{
+				Dispose(true);
+				GC.SuppressFinalize(true);
+			}
+
+			private void Dispose(bool disposing)
+			{
+				Directory.Delete(TempDir, true);
+			}
+			#endregion
 
 			public static ITaskItem[] CreateTaskItemsForFilePath(string filePath)
 			{
@@ -31,12 +52,14 @@ namespace SIL.BuildTasks.Tests
 
 			public string MakePotFile(string input)
 			{
-				string csharpFilePath = System.IO.Path.Combine(Path, "csharp.cs");
+				string csharpFilePath = Path.Combine(TempDir, "csharp.cs");
 				File.WriteAllText(csharpFilePath, input);
 
 				var pot = new MakePot.MakePot();
-				pot.OutputFile = System.IO.Path.Combine(Path, "output.pot");
-				pot.CSharpFiles = EnvironmentForTest.CreateTaskItemsForFilePath(csharpFilePath);
+				pot.OutputFile = Path.Combine(TempDir, "output.pot");
+				pot.CSharpFiles = CreateTaskItemsForFilePath(csharpFilePath);
+				pot.ProjectId = "Testing";
+				pot.MsdIdBugsTo = "bugs@example.com";
 				pot.Execute();
 
 				return File.ReadAllText(pot.OutputFile);
@@ -199,7 +222,7 @@ somevar.MyLocalizableFunction('~ThirdLocalizableString', 'ThirdNotes');
 			string expected =
 @"msgid ''
 msgstr ''
-'Project-Id-Version: \n'
+'Project-Id-Version: Testing\n'
 'POT-Creation-Date: .*
 'PO-Revision-Date: \n'
 'Last-Translator: \n'
@@ -209,8 +232,8 @@ msgstr ''
 'Content-Type: text/plain; charset=UTF-8\n'
 'Content-Transfer-Encoding: 8bit\n'
 
-# Project-Id-Version: 
-# Report-Msgid-Bugs-To: 
+# Project-Id-Version: Testing
+# Report-Msgid-Bugs-To: bugs@example.com
 # POT-Creation-Date: .*
 # Content-Type: text/plain; charset=UTF-8
 
@@ -234,8 +257,6 @@ msgstr ''
 			{
 				Assert.That(e.MakePotFile(contents), ConstrainStringByLine.Matches(expected));
 			}
-
-
 		}
 
 		[Test]
@@ -248,7 +269,7 @@ somevar.Text = 'Backing Up...';
 			string expected =
 @"msgid ''
 msgstr ''
-'Project-Id-Version: \n'
+'Project-Id-Version: Testing\n'
 'POT-Creation-Date: .*
 'PO-Revision-Date: \n'
 'Last-Translator: \n'
@@ -258,8 +279,8 @@ msgstr ''
 'Content-Type: text/plain; charset=UTF-8\n'
 'Content-Transfer-Encoding: 8bit\n'
 
-# Project-Id-Version: 
-# Report-Msgid-Bugs-To: 
+# Project-Id-Version: Testing
+# Report-Msgid-Bugs-To: bugs@example.com
 # POT-Creation-Date: .*
 # Content-Type: text/plain; charset=UTF-8
 
@@ -287,7 +308,7 @@ somevar.Text = 'Backing Up...';
 			string expected =
 @"msgid ''
 msgstr ''
-'Project-Id-Version: \n'
+'Project-Id-Version: Testing\n'
 'POT-Creation-Date: .*
 'PO-Revision-Date: \n'
 'Last-Translator: \n'
@@ -297,8 +318,8 @@ msgstr ''
 'Content-Type: text/plain; charset=UTF-8\n'
 'Content-Transfer-Encoding: 8bit\n'
 
-# Project-Id-Version: 
-# Report-Msgid-Bugs-To: 
+# Project-Id-Version: Testing
+# Report-Msgid-Bugs-To: bugs@example.com
 # POT-Creation-Date: .*
 # Content-Type: text/plain; charset=UTF-8
 
@@ -325,7 +346,7 @@ somevar.Text = '';
 			string expected =
 @"msgid ''
 msgstr ''
-'Project-Id-Version: \n'
+'Project-Id-Version: Testing\n'
 'POT-Creation-Date: .*
 'PO-Revision-Date: \n'
 'Last-Translator: \n'
@@ -335,8 +356,8 @@ msgstr ''
 'Content-Type: text/plain; charset=UTF-8\n'
 'Content-Transfer-Encoding: 8bit\n'
 
-# Project-Id-Version: 
-# Report-Msgid-Bugs-To: 
+# Project-Id-Version: Testing
+# Report-Msgid-Bugs-To: bugs@example.com
 # POT-Creation-Date: .*
 # Content-Type: text/plain; charset=UTF-8
 
