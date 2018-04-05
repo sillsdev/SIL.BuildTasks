@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Copyright (c) 2018 SIL International
+// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
+using System.Collections;
 using Microsoft.Build.Framework;
 
 namespace SIL.BuildTasks.Tests

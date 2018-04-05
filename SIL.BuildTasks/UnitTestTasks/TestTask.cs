@@ -1,3 +1,5 @@
+// Copyright (c) 2018 SIL International
+// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -161,7 +163,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 
 					if (process.ExitCode > 0 && _failTaskIfPositiveExitCode)
 						retVal = false;
-					
+
 					// Return true in this case - at least NUnit returns non-zero exit code when
 					// a test fails, but we don't want to stop the build.
 				}

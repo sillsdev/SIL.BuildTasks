@@ -7,6 +7,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SIL.BuildTasks.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("SIL")]
+[assembly: AssemblyProduct("Palaso Library")]
+[assembly: AssemblyCopyright("Copyright © 2018 SIL International")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

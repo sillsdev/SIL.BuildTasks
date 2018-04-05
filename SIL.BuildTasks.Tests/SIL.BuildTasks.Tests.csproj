@@ -281,9 +281,6 @@
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\GlobalAssemblyInfo.cs">
-      <Link>Properties\GlobalAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="ArchiveTests.cs" />
     <Compile Include="GenerateReleaseArtifactsTests.cs" />
     <Compile Include="UnitTestTasks\NUnit3Tests.cs" />
@@ -299,10 +296,6 @@
     <ProjectReference Include="..\SIL.BuildTasks\SIL.BuildTasks.csproj">
       <Project>{1B4E2E6B-4424-4560-97E0-B0BD34BF85D8}</Project>
       <Name>SIL.BuildTasks</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SIL.TestUtilities\SIL.TestUtilities.csproj">
-      <Project>{D74CE910-D44A-44F5-8C0F-F5E50B26F85D}</Project>
-      <Name>SIL.TestUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

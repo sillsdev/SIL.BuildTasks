@@ -1,4 +1,5 @@
-﻿/* Copyright © 2012-2013 SIL International */
+﻿// Copyright (c) 2012-2018 SIL International
+// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;

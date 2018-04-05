@@ -1,3 +1,5 @@
+// Copyright (c) 2018 SIL International
+// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 /*
  * A custom task that walks a directory tree and creates a WiX fragment containing
  * components to recreate it in an installer.

@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿// Copyright (c) 2018 SIL International
+// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,6 +10,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SIL.BuildTasks")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("SIL")]
+[assembly: AssemblyProduct("Palaso Library")]
+[assembly: AssemblyCopyright("Copyright © 2018 SIL International")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
