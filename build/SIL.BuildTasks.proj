@@ -1,0 +1,84 @@
+<Project  ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTarget="Test">
+	<PropertyGroup>
+		<RootDir Condition="'$(RootDir)'==''">$(MSBuildProjectDirectory)/..</RootDir>
+		<Configuration Condition="'$(Configuration)'==''">Release</Configuration>
+		<useNUnit-x86 Condition="'$(OS)'=='Windows_NT'">true</useNUnit-x86>
+		<useNUnit-x86 Condition="'$(OS)'!='Windows_NT'">false</useNUnit-x86>
+		<Solution>SIL.BuildTasks.sln</Solution>
+		<SolutionPath>$(RootDir)/$(Solution)</SolutionPath>
+		<BuildingWithXBuild>$(_.EndsWith('xbuild'))</BuildingWithXBuild>
+	</PropertyGroup>
+
+	<UsingTask TaskName="NUnit" AssemblyFile="$(RootDir)/output/$(Configuration)/SIL.BuildTasks.dll" />
+	<UsingTask TaskName="NUnitTeamCity"
+		AssemblyFile="$(teamcity_dotnet_nunitlauncher_msbuild_task)"
+		Condition=" '$(teamcity_version)' != '' And '$(OS)'=='Windows_NT'"/>
+	<UsingTask TaskName="NUnitTeamCity"
+		AssemblyFile="$(agent_home_dir)/plugins/dotnetPlugin/bin/JetBrains.BuildServer.MSBuildLoggers.dll"
+		Condition=" '$(teamcity_version)' != '' And '$(OS)'!='Windows_NT'"/>
+
+	<Import Project="NuGet.targets"/>
+
+	<Target Name="Build">
+		<CallTarget Targets="Clean"/>
+		<CallTarget Targets="Compile"/>
+		<Message Text="Build Complete"/>
+	</Target>
+
+	<ItemGroup>
+		<ExistingObjectFiles
+			Include="$(RootDir)/output/$(Configuration)/**/*"
+			Exclude="$(RootDir)/.git/**/*"
+		/>
+	</ItemGroup>
+
+	<Target Name="Clean">
+		<Delete Files="@(ExistingObjectFiles)" />
+		<!-- HACK: xbuild has a bug with ** filespecs - it deletes the parent directory as well. -->
+		<Delete Condition="!$(BuildingWithXBuild)"
+			 Files="$(RootDir)/**/obj/**/*" />
+		<Exec Condition="$(BuildingWithXBuild)"
+			Command="find . %5c( -name obj -o -name bin -o -name test-results %5c) -type d -print0 | xargs -0 rm -rf"
+			WorkingDirectory="$(RootDir)" />
+	</Target>
+
+	<Target Name="Compile" DependsOnTargets="RestorePackages">
+		<MSBuild
+			Projects="$(SolutionPath)"
+			Targets="Build"
+			Properties="Configuration=$(Configuration)" />
+	</Target>
+
+	<Target Name="Test" DependsOnTargets="Build">
+		<CallTarget Targets="TestOnly"/>
+	</Target>
+
+	<Target Name="TestOnly" DependsOnTargets="RunNUnitTC;RunNUnit"/>
+
+	<Target Name="RunNUnitTC" Condition="'$(teamcity_version)' != ''">
+		<ItemGroup>
+			<TestAssemblies Include="$(RootDir)/output/$(Configuration)/*.Tests.dll"/>
+		</ItemGroup>
+
+		<NUnitTeamCity
+			Assemblies="@(TestAssemblies)"
+			ExcludeCategory="SkipOnTeamCity;ByHand$(ExtraExcludeCategories)"
+			NUnitVersion="NUnit-2.6.4" />
+	</Target>
+
+	<Target Name="RunNUnit" Condition="'$(teamcity_version)' == ''">
+		<ItemGroup>
+			<TestAssemblies Include="$(RootDir)/output/$(Configuration)/*.Tests.dll"/>
+		</ItemGroup>
+
+		<NUnit Assemblies="@(TestAssemblies)"
+			ToolPath="$(RootDir)/packages/NUnit.Runners.Net4.2.6.4/tools"
+			TestInNewThread="false"
+			ExcludeCategory="$(excludedCategories)$(ExtraExcludeCategories)"
+			WorkingDirectory="$(RootDir)/output/$(Configuration)"
+			Force32Bit="$(useNUnit-x86)"
+			Verbose="true"
+			OutputXmlFile="$(RootDir)/output/$(Configuration)/TestResults.xml"/>
+	</Target>
+
+</Project>
