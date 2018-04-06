@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using Microsoft.Build.Framework;
@@ -11,9 +12,14 @@ using Microsoft.Win32;
 
 namespace SIL.BuildTasks.UnitTestTasks
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// Run NUnit on a test assembly.
 	/// </summary>
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
 	public class NUnit : TestTask
 	{
 		public NUnit()
@@ -67,11 +73,9 @@ namespace SIL.BuildTasks.UnitTestTasks
 
 		protected override string GetWorkingDirectory()
 		{
-			if (!string.IsNullOrEmpty(WorkingDirectory))
-			{
-				return Path.GetFullPath(WorkingDirectory);
-			}
-			return Path.GetFullPath(Path.GetDirectoryName(Assemblies[0].ItemSpec));
+			// ReSharper disable once AssignNullToNotNullAttribute
+			return Path.GetFullPath(!string.IsNullOrEmpty(WorkingDirectory) ?
+				WorkingDirectory : Path.GetDirectoryName(Assemblies[0].ItemSpec));
 		}
 
 		/// <summary>
@@ -156,6 +160,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 			}
 		}
 
+		/// <inheritdoc />
 		/// <summary>
 		/// Gets the name of the executable to start.
 		/// </summary>
@@ -236,13 +241,15 @@ namespace SIL.BuildTasks.UnitTestTasks
 
 		private void EnsureToolPath()
 		{
-			if (!String.IsNullOrEmpty(ToolPath) &&
+			if (!string.IsNullOrEmpty(ToolPath) &&
 				File.Exists(Path.Combine(ToolPath, RealProgramName)))
 			{
 				return;
 			}
-			foreach (var dir in Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator))
+			// ReSharper disable once PossibleNullReferenceException
+			foreach (var dir in Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator))
 			{
+				// ReSharper disable once InvertIf
 				if (File.Exists(Path.Combine(dir, RealProgramName)))
 				{
 					ToolPath = dir;
@@ -251,38 +258,35 @@ namespace SIL.BuildTasks.UnitTestTasks
 			}
 			foreach (var dir in Directory.EnumerateDirectories(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)))
 			{
-				if (dir.StartsWith("NUnit"))
+				if (!dir.StartsWith("NUnit"))
+					continue;
+
+				// ReSharper disable once InvertIf
+				if (File.Exists(Path.Combine(dir, Path.Combine("bin", RealProgramName))))
 				{
-					if (File.Exists(Path.Combine(dir, Path.Combine("bin", RealProgramName))))
-					{
-						ToolPath = dir;
-						return;
-					}
+					ToolPath = dir;
+					return;
 				}
 			}
 			var keySoftware = Registry.CurrentUser.OpenSubKey("Software");
 			if (keySoftware != null && Environment.OSVersion.Platform == PlatformID.Win32NT)
 			{
 				var keyNUnitOrg = keySoftware.OpenSubKey("nunit.org");
-				if (keyNUnitOrg != null)
+				var keyNUnit = keyNUnitOrg?.OpenSubKey("Nunit");
+				if (keyNUnit != null)
 				{
-					var keyNUnit = keyNUnitOrg.OpenSubKey("Nunit");
-					if (keyNUnit != null)
+					foreach (var verName in keyNUnit.GetSubKeyNames())
 					{
-						foreach (var verName in keyNUnit.GetSubKeyNames())
-						{
-							var keyVer = keyNUnit.OpenSubKey(verName);
-							if (keyVer != null)
-							{
-								var path = keyVer.GetValue("InstallDir").ToString();
-								if (!String.IsNullOrEmpty(path) &&
-									File.Exists(Path.Combine(path, RealProgramName)))
-								{
-									ToolPath = path;
-									return;
-								}
-							}
-						}
+						var keyVer = keyNUnit.OpenSubKey(verName);
+						if (keyVer == null)
+							continue;
+
+						var path = keyVer.GetValue("InstallDir").ToString();
+						if (string.IsNullOrEmpty(path) || !File.Exists(Path.Combine(path, RealProgramName)))
+							continue;
+
+						ToolPath = path;
+						return;
 					}
 				}
 			}
@@ -309,7 +313,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 		protected override void ProcessOutput(bool fTimedOut, TimeSpan delta)
 		{
 			var lines = new List<string>();
-			foreach (var line in m_TestLog)
+			foreach (var line in TestLog)
 			{
 				var trimmedLine = line.Trim();
 				if (trimmedLine.StartsWith("***** "))
@@ -321,41 +325,42 @@ namespace SIL.BuildTasks.UnitTestTasks
 					Log.LogMessage(MessageImportance.Normal, trimmedLine);
 				}
 			}
-			if (fTimedOut)
+
+			if (!fTimedOut)
+				return;
+
+			// If the tests time out we have an invalid XML file. Create a valid XML file
+			// that contains as much as possible.
+			if (File.Exists(OutputXmlFile))
 			{
-				// If the tests time out we have an invalid XML file. Create a valid XML file
-				// that contains as much as possible.
-				if (File.Exists(OutputXmlFile))
-				{
-					var fi = new FileInfo(OutputXmlFile);
-					if (fi.Length > 0)
-						File.Move(OutputXmlFile, OutputXmlFile + "-partial");
-					else
-						File.Delete(OutputXmlFile);
-				}
-				using (var writer = new StreamWriter(OutputXmlFile))
-				{
-					var num = lines.Count;
-					writer.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-					writer.WriteLine("<test-results name=\"{0}\" total=\"{1}\" errors=\"{2}\" failures=\"{3}\" not-run=\"{4}\" inconclusive=\"{5}\" ignored=\"{6}\" skipped=\"{7}\" invalid=\"{8}\" date=\"{9}\" time=\"{10}\">",
-										FixturePath, num + 1, 0, 1, 0, num, 0, 0, 0,
-										DateTime.Now.ToShortDateString(), DateTime.Now.ToString("HH:mm:ss"));
-					writer.WriteLine("  <test-suite type=\"Assembly\" name=\"{0}\" executed=\"True\" result=\"Timeout\" success=\"False\" time=\"{1}\">",
-										FixturePath, delta.TotalSeconds.ToString("F3"));
-					writer.WriteLine("    <results>");
-					writer.WriteLine("      <test-suite name=\"Timeout\">");
-					writer.WriteLine("        <results>");
-					writer.WriteLine("          <test-case name=\"Timeout\" success=\"False\" time=\"{0}\" asserts=\"0\"/>", ((double)Timeout / 1000.0).ToString("F3"));
-					writer.WriteLine("        </results>");
-					writer.WriteLine("      </test-suite>");
-					writer.WriteLine("    </results>");
-					writer.WriteLine("  </test-suite>");
-					writer.WriteLine("<!-- tests tried before time ran out:");
-					foreach (var line in lines)
-						writer.WriteLine(line.Substring(6));
-					writer.WriteLine("-->");
-					writer.WriteLine("</test-results>");
-				}
+				var fi = new FileInfo(OutputXmlFile);
+				if (fi.Length > 0)
+					File.Move(OutputXmlFile, OutputXmlFile + "-partial");
+				else
+					File.Delete(OutputXmlFile);
+			}
+			using (var writer = new StreamWriter(OutputXmlFile))
+			{
+				var num = lines.Count;
+				writer.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+				writer.WriteLine("<test-results name=\"{0}\" total=\"{1}\" errors=\"{2}\" failures=\"{3}\" not-run=\"{4}\" inconclusive=\"{5}\" ignored=\"{6}\" skipped=\"{7}\" invalid=\"{8}\" date=\"{9}\" time=\"{10:HH:mm:ss}\">",
+					FixturePath, num + 1, 0, 1, 0, num, 0, 0, 0,
+					DateTime.Now.ToShortDateString(), DateTime.Now);
+				writer.WriteLine("  <test-suite type=\"Assembly\" name=\"{0}\" executed=\"True\" result=\"Timeout\" success=\"False\" time=\"{1:F3}\">",
+					FixturePath, delta.TotalSeconds);
+				writer.WriteLine("    <results>");
+				writer.WriteLine("      <test-suite name=\"Timeout\">");
+				writer.WriteLine("        <results>");
+				writer.WriteLine("          <test-case name=\"Timeout\" success=\"False\" time=\"{0:F3}\" asserts=\"0\"/>", Timeout / 1000.0);
+				writer.WriteLine("        </results>");
+				writer.WriteLine("      </test-suite>");
+				writer.WriteLine("    </results>");
+				writer.WriteLine("  </test-suite>");
+				writer.WriteLine("<!-- tests tried before time ran out:");
+				foreach (var line in lines)
+					writer.WriteLine(line.Substring(6));
+				writer.WriteLine("-->");
+				writer.WriteLine("</test-results>");
 			}
 		}
 
@@ -364,7 +369,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 			get
 			{
 				var suites = new ITaskItem[Assemblies.Length];
-				for (int i = 0; i < Assemblies.Length; i++)
+				for (var i = 0; i < Assemblies.Length; i++)
 				{
 					suites[i] = new TaskItem(Path.GetFileNameWithoutExtension(Assemblies[i].ItemSpec));
 				}

@@ -3,6 +3,8 @@
 // Parts based on code by MJ Hutchinson http://mjhutchinson.com/journal/2010/01/25/integrating_gtk_application_mac
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -33,32 +35,35 @@ namespace SIL.BuildTasks
 	//     </PropertyGroup>
 	//   </Target>
 	// </Project>
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class UnixName : Task
 	{
 		public override bool Execute()
 		{
-			Value = String.Empty;
-			if (Environment.OSVersion.Platform == PlatformID.Unix)
+			Value = string.Empty;
+			if (Environment.OSVersion.Platform != PlatformID.Unix)
+				return !Log.HasLoggedErrors;
+
+			var buf = IntPtr.Zero;
+			try
 			{
-				IntPtr buf = IntPtr.Zero;
-				try
-				{
-					buf = System.Runtime.InteropServices.Marshal.AllocHGlobal(8192);
-					// This is a hacktastic way of getting sysname from uname ()
-					if (uname(buf) == 0)
-						Value = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(buf);
-					else
-						Log.LogError("uname failed");
-				}
-				catch (Exception ex)
-				{
-					Log.LogError("Error calling uname: " + ex.Message);
-				}
-				finally
-				{
-					if (buf != IntPtr.Zero)
-						System.Runtime.InteropServices.Marshal.FreeHGlobal(buf);
-				}
+				buf = Marshal.AllocHGlobal(8192);
+				// This is a hacktastic way of getting sysname from uname ()
+				if (uname(buf) == 0)
+					Value = Marshal.PtrToStringAnsi(buf);
+				else
+					Log.LogError("uname failed");
+			}
+			catch (Exception ex)
+			{
+				Log.LogError("Error calling uname: " + ex.Message);
+			}
+			finally
+			{
+				if (buf != IntPtr.Zero)
+					Marshal.FreeHGlobal(buf);
 			}
 
 			return !Log.HasLoggedErrors;
@@ -67,7 +72,7 @@ namespace SIL.BuildTasks
 		[Output]
 		public string Value { get; set; }
 
-		[System.Runtime.InteropServices.DllImport("libc")]
-		static extern int uname(IntPtr buf);
+		[DllImport("libc")]
+		private static extern int uname(IntPtr buf);
 	}
 }

@@ -1,6 +1,7 @@
 // Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using Microsoft.Build.Framework;
@@ -15,21 +16,32 @@ namespace SIL.BuildTasks
 	/// may be sent in clear.
 	/// Adapted from http://stackoverflow.com/questions/1089452/how-can-i-use-msbuild-to-download-a-file
 	/// </summary>
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class DownloadFile : Task
 	{
+		/// <summary>
+		/// HTTP address to download from
+		/// </summary>
 		[Required]
-		public String Address // HTTP address to download from
-		{ get; set; }
+		public string Address { get; set; }
 
+		/// <summary>
+		/// Local file to which the downloaded file will be saved
+		/// </summary>
 		[Required]
-		public String LocalFilename // Local file to which the downloaded file will be saved
-		{ get; set; }
+		public string LocalFilename { get; set; }
 
-		public String Username // Credential for HTTP authentication
-		{ get; set; }
+		/// <summary>
+		/// Username credential for HTTP authentication
+		/// </summary>
+		public string Username { get; set; }
 
-		public String Password // Credential for HTTP authentication
-		{ get; set; }
+		/// <summary>
+		/// Password credential for HTTP authentication
+		/// </summary>
+		public string Password { get; set; }
 
 		public override bool Execute()
 		{
@@ -43,15 +55,13 @@ namespace SIL.BuildTasks
 					Log.LogWarning("Could not retrieve latest {0}. No network connection. Keeping existing file.", LocalFilename);
 					return true; // don't stop the build
 				}
-				else
-				{
-					Log.LogError("Could not retrieve latest {0}. No network connection.", Address);
-					return false; // Presumably can't continue
-				}
+
+				Log.LogError("Could not retrieve latest {0}. No network connection.", Address);
+				return false; // Presumably can't continue
 			}
 
 			bool success;
-			int read = DoDownloadFile(Address, LocalFilename, Username, Password, out success);
+			var read = DoDownloadFile(Address, LocalFilename, Username, Password, out success);
 
 			if (success)
 				Log.LogMessage(MessageImportance.Low, "{0} bytes written", read);
@@ -61,11 +71,11 @@ namespace SIL.BuildTasks
 			return success;
 		}
 
-		public int DoDownloadFile(String remoteFilename, String localFilename, String httpUsername, String httpPassword, out bool success)
+		public int DoDownloadFile(string remoteFilename, string localFilename, string httpUsername, string httpPassword, out bool success)
 		{
 			// Function will return the number of bytes processed
 			// to the caller. Initialize to 0 here.
-			int bytesProcessed = 0;
+			var bytesProcessed = 0;
 			success = true;
 
 			// Assign values to these objects here so that they can
@@ -79,12 +89,12 @@ namespace SIL.BuildTasks
 			try
 			{
 				// Create a request for the specified remote file name
-				WebRequest request = WebRequest.Create(remoteFilename);
+				var request = WebRequest.Create(remoteFilename);
 				// If a username or password have been given, use them
 				if (!string.IsNullOrEmpty(httpUsername) || !string.IsNullOrEmpty(httpPassword))
 				{
-					string username = httpUsername;
-					string password = httpPassword;
+					var username = httpUsername;
+					var password = httpPassword;
 					request.Credentials = new NetworkCredential(username, password);
 				}
 
@@ -107,7 +117,7 @@ namespace SIL.BuildTasks
 				do
 				{
 					// Read data (up to 1k) from the stream
-					bytesRead = remoteStream.Read(buffer, 0, buffer.Length);
+					bytesRead = remoteStream?.Read(buffer, 0, buffer.Length) ?? 0;
 
 					// Write the data to the local file
 					localStream.Write(buffer, 0, bytesRead);
@@ -132,9 +142,11 @@ namespace SIL.BuildTasks
 					}
 					return 0;
 				}
-				string html = "";
+
 				if (wex.Response != null)
 				{
+					string html;
+					// ReSharper disable once AssignNullToNotNullAttribute
 					using (var sr = new StreamReader(wex.Response.GetResponseStream()))
 						html = sr.ReadToEnd();
 					Log.LogError("Could not download from {0}. Server responds {1}", remoteFilename, html);
@@ -158,9 +170,9 @@ namespace SIL.BuildTasks
 				// Close the response and streams objects here
 				// to make sure they're closed even if an exception
 				// is thrown at some point
-				if (response != null) response.Close();
-				if (remoteStream != null) remoteStream.Close();
-				if (localStream != null) localStream.Close();
+				response?.Close();
+				remoteStream?.Close();
+				localStream?.Close();
 			}
 
 			// Return total bytes processed to caller.

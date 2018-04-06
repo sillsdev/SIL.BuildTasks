@@ -9,6 +9,7 @@
  */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 using Microsoft.Build.Framework;
@@ -16,6 +17,8 @@ using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.AWS
 {
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public abstract class AwsTaskBase : Task
 	{
 		/// <summary>
@@ -28,19 +31,19 @@ namespace SIL.BuildTasks.AWS
 		/// Get AWS credentials from the credential profile store
 		/// </summary>
 		/// <returns></returns>
-		protected virtual AWSCredentials GetAwsCredentials()
+		protected AWSCredentials GetAwsCredentials()
 		{
 			AWSCredentials awsCredentials;
-			if (new CredentialProfileStoreChain().TryGetAWSCredentials(CredentialStoreProfileName, out awsCredentials))
-			{
-				Log.LogMessage(MessageImportance.Normal, "Connecting to AWS using AwsAccessKeyId: {0}", awsCredentials.GetCredentials().AccessKey);
-				return awsCredentials;
-			}
+			if (!new CredentialProfileStoreChain().TryGetAWSCredentials(CredentialStoreProfileName, out awsCredentials))
+				throw new ApplicationException("Unable to get AWS credentials from the credential profile store");
 
-			throw new ApplicationException("Unable to get AWS credentials from the credential profile store");
+			Log.LogMessage(MessageImportance.Normal, "Connecting to AWS using AwsAccessKeyId: {0}",
+				awsCredentials.GetCredentials().AccessKey);
+			return awsCredentials;
+
 		}
 
-		protected virtual string Join(string[] values)
+		protected static string Join(string[] values)
 		{
 			return string.Join(";", values);
 		}

@@ -3,6 +3,7 @@
 using System;
 using System.Text;
 using NUnit.Framework;
+// ReSharper disable UnusedVariable
 
 namespace SIL.BuildTasks.Tests
 {
@@ -14,7 +15,7 @@ namespace SIL.BuildTasks.Tests
 		{
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
-			var types = buildTypeFileMaker.GetVersionTypes(GetFileContentsForType("Alpha"));
+			var types = UpdateBuildTypeFile.UpdateBuildTypeFile.GetVersionTypes(GetFileContentsForType("Alpha"));
 			Assert.AreEqual(4, types.Count);
 			Assert.IsTrue(types.Contains("Alpha"));
 			Assert.IsTrue(types.Contains("Beta"));
@@ -27,7 +28,7 @@ namespace SIL.BuildTasks.Tests
 		{
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
-			var types = buildTypeFileMaker.GetVersionTypes(GetFileContents("Fred", "Wilma", "BamBam", "Fred", "Barney", "Pebbles"));
+			var types = UpdateBuildTypeFile.UpdateBuildTypeFile.GetVersionTypes(GetFileContents("Fred", "Wilma", "BamBam", "Fred", "Barney", "Pebbles"));
 			Assert.AreEqual(5, types.Count);
 			Assert.IsTrue(types.Contains("Wilma"));
 			Assert.IsTrue(types.Contains("BamBam"));
@@ -41,7 +42,7 @@ namespace SIL.BuildTasks.Tests
 		{
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
-			string contents = buildTypeFileMaker.GetUpdatedFileContents(GetFileContentsForType("Alpha"), "ReleaseCandidate");
+			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("Alpha"), "ReleaseCandidate");
 			Assert.AreEqual(GetFileContentsForType("ReleaseCandidate"), contents);
 		}
 
@@ -50,7 +51,7 @@ namespace SIL.BuildTasks.Tests
 		{
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
-			string contents = buildTypeFileMaker.GetUpdatedFileContents(GetFileContentsForType("ReleaseCandidate"), "Production");
+			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("ReleaseCandidate"), "Production");
 			Assert.AreEqual(GetFileContentsForType("Production"), contents);
 		}
 
@@ -59,18 +60,18 @@ namespace SIL.BuildTasks.Tests
 		{
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
-			string contents = buildTypeFileMaker.GetUpdatedFileContents(GetFileContentsForType("Bogus"), "Beta");
+			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("Bogus"), "Beta");
 			Assert.AreEqual(GetFileContentsForType("Bogus"), contents);
 		}
 
-		private string GetFileContentsForType(string type)
+		private static string GetFileContentsForType(string type)
 		{
 			return GetFileContents(type, "Alpha", "Beta", "ReleaseCandidate", "Production");
 		}
 
-		private string GetFileContents(string existingType, params string[] types)
+		private static string GetFileContents(string existingType, params string[] types)
 		{
-			StringBuilder bldr = new StringBuilder();
+			var bldr = new StringBuilder();
 			bldr.Append("namespace SIL.BuildTasks.Tests");
 			bldr.Append(Environment.NewLine);
 			bldr.Append("{");

@@ -1,15 +1,17 @@
 ﻿// Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
+
 using System.IO;
 using NUnit.Framework.Constraints;
 
-namespace SIL.TestUtilities
+namespace SIL.BuildTasks.Tests
 {
 
-	///<summary>
-	/// Matches the text under test with the given text to match. Evaluating it line by line (including
-	/// regular expressions).
-	///</summary>
+	/// <inheritdoc />
+	/// <summary>
+	///  Matches the text under test with the given text to match. Evaluating it line by line (including
+	///  regular expressions).
+	/// </summary>
 	public class ConstrainStringByLine : Constraint
 	{
 		private string _actualLine;
@@ -28,12 +30,12 @@ namespace SIL.TestUtilities
 			ExpectedString = expectedString;
 		}
 
-		private string ExpectedString { get; set; }
+		private string ExpectedString { get; }
 
 		public override bool Matches(object actualObject)
 		{
-			bool result = true;
-			string actualString = actualObject as string;
+			var result = true;
+			var actualString = actualObject as string;
 			if (actualString == null)
 			{
 				return false;

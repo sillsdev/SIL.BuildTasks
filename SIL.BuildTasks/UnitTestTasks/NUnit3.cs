@@ -2,13 +2,18 @@
 // This software is licensed under the MIT license (http://opensource.org/licenses/MIT)
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace SIL.BuildTasks.UnitTestTasks
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// Run NUnit3 on a test assembly.
 	/// </summary>
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class NUnit3 : NUnit
 	{
 		private bool? _useNUnit3Xml;
@@ -44,6 +49,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 			}
 		}
 
+		/// <inheritdoc />
 		/// <summary>
 		/// Gets the name (without path) of the NUnit executable. When running on Mono this is
 		/// different from ProgramNameAndPath() which returns the executable we'll start.
@@ -95,7 +101,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 			return bldr.ToString();
 		}
 
-		private string BuildCategoriesString(string categoryString, string condition, string joiner)
+		private static string BuildCategoriesString(string categoryString, string condition, string joiner)
 		{
 			var bldr = new StringBuilder();
 

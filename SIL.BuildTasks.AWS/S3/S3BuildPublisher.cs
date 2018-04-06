@@ -9,6 +9,7 @@
  */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Amazon.Runtime;
 using Microsoft.Build.Framework;
 
@@ -18,6 +19,9 @@ namespace SIL.BuildTasks.AWS.S3
 	/// MSBuild task to publish a set of files to a S3 bucket.
 	/// </summary>
 	/// <remarks>If made public the files will be available at https://s3.amazonaws.com/bucket_name/folder/file_name</remarks>
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class S3BuildPublisher : AwsTaskBase
 	{
 		#region Properties
@@ -72,10 +76,7 @@ namespace SIL.BuildTasks.AWS.S3
 			if (SourceFiles != null && SourceFolder != null)
 				throw new ArgumentException("Only SourceFiles or SourceFolder can be set.");
 
-			if (SourceFolder != null)
-				return ProcessDirectory();
-
-			return ProcessFiles();
+			return SourceFolder != null ? ProcessDirectory() : ProcessFiles();
 		}
 
 		#region Private methods

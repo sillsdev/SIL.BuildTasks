@@ -1,13 +1,17 @@
 // Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
-using System;
+
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.Archive
 {
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class Archive : Task
 	{
 		[Required]
@@ -25,59 +29,53 @@ namespace SIL.BuildTasks.Archive
 
 		public override bool Execute()
 		{
-			string filePathString = FlattenFilePaths(InputFilePaths, ' ', false);
+			var filePathString = FlattenFilePaths(InputFilePaths, ' ', false);
 
-			var startInfo = new ProcessStartInfo(ExecutableName());
-			startInfo.Arguments = Arguments() + " " + filePathString;
-			startInfo.WorkingDirectory = String.IsNullOrEmpty(WorkingDir) ? BasePath : WorkingDir;
+			var startInfo = new ProcessStartInfo(ExecutableName()) {
+				Arguments = Arguments() + " " + filePathString,
+				WorkingDirectory = string.IsNullOrEmpty(WorkingDir) ? BasePath : WorkingDir
+			};
 			var process = Process.Start(startInfo);
-			process.WaitForExit();
+			process?.WaitForExit();
 			return true;
 		}
 
 		internal string ExecutableName()
 		{
-			switch (Command)
-			{
-				case "Tar":
-					return "tar";
-			}
-			return String.Empty;
+			return Command == "Tar" ? "tar" : string.Empty;
 		}
 
 		internal string Arguments()
 		{
-			switch (Command)
-			{
-				case "Tar":
-					return "-cvzf " + OutputFileName;
-			}
-			return String.Empty;
+			if (Command == "Tar")
+				return "-cvzf " + OutputFileName;
+
+			return string.Empty;
 		}
 
 		internal string TrimBaseFromFilePath(string filePath)
 		{
-			string result = filePath;
-			if (result.StartsWith(BasePath))
-			{
-				result = filePath.Substring(BasePath.Length);
-				if (result.StartsWith("/") || result.StartsWith("\\"))
-					result = result.TrimStart(new[] {'/', '\\'});
-			}
+			var result = filePath;
+			if (!result.StartsWith(BasePath))
+				return result;
+
+			result = filePath.Substring(BasePath.Length);
+			if (result.StartsWith("/") || result.StartsWith("\\"))
+				result = result.TrimStart('/', '\\');
 			return result;
 		}
 
-		internal string FlattenFilePaths(ITaskItem[] items, char delimeter, bool withQuotes)
+		internal string FlattenFilePaths(IEnumerable<ITaskItem> items, char delimeter, bool withQuotes)
 		{
 			var sb = new StringBuilder();
-			bool haveStarted = false;
+			var haveStarted = false;
 			foreach (var item in items)
 			{
 				if (haveStarted)
 				{
 					sb.Append(delimeter);
 				}
-				string filePath = TrimBaseFromFilePath(item.ItemSpec);
+				var filePath = TrimBaseFromFilePath(item.ItemSpec);
 				if (filePath.Contains(" ") || withQuotes)
 				{
 					sb.Append('"');
@@ -92,19 +90,5 @@ namespace SIL.BuildTasks.Archive
 			}
 			return sb.ToString();
 		}
-
-		private void SafeLog(string msg, params object[] args)
-		{
-			try
-			{
-				Debug.WriteLine(string.Format(msg,args));
-				Log.LogMessage(msg,args);
-			}
-			catch (Exception)
-			{
-				//swallow... logging fails in the unit test environment, where the log isn't really set up
-			}
-		}
-
 	}
 }

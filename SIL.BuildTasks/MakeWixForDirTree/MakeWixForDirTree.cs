@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,35 +24,27 @@ using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.MakeWixForDirTree
 {
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class MakeWixForDirTree : Task, ILogger
 	{
+		private const string FileNameOfGuidDatabase = ".guidsForInstaller.xml";
 
-		static public string kFileNameOfGuidDatabase = ".guidsForInstaller.xml";
+		#region Private data
 
-	#region Private data
-
-		private string _rootDir;
-		private string _outputFilePath;
-		private string[] _filesAndDirsToExclude = null;
 		private Regex _fileMatchPattern = new Regex(@".*");
 		private Regex _ignoreFilePattern = new Regex(@"IGNOREME");
-		private string _installerSourceDirectory;
 
 		//todo: this should just be a list
-		private Dictionary<string, string> m_exclude = new Dictionary<string, string>();
+		private readonly Dictionary<string, string> _exclude = new Dictionary<string, string>();
 
-		private bool m_checkOnly = false;
+		private readonly List<string> _components = new List<string>();
+		private readonly Dictionary<string, int> _suffixes = new Dictionary<string, int>();
+		private readonly DateTime _refDate = DateTime.MinValue;
+		private bool _filesChanged;
 
-		private List<string> m_components = new List<string>();
-		private Dictionary<string, int> m_suffixes = new Dictionary<string, int>();
-		private DateTime m_refDate = DateTime.MinValue;
-		private bool m_filesChanged = false;
-		private bool _hasLoggedErrors=false;
-		private string _directoryReferenceId;
-		private string _componentGroupId;
-		private bool _giveAllPermissions;
-
-		private const string XMLNS = "http://schemas.microsoft.com/wix/2006/wi";
+		private const string Xmlns = "http://schemas.microsoft.com/wix/2006/wi";
 
 		#endregion
 
@@ -60,31 +53,17 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 
 		[Required]
-		public string RootDirectory
-		{
-			get { return _rootDir; }
-			set { _rootDir = value; }
-		}
-
+		public string RootDirectory { get; set; }
 
 		/// <summary>
 		/// Subfolders and files to exclude. Kinda wonky. Using Ignore makes more sense.
 		/// </summary>
-		public string[] Exclude
-		{
-			get { return _filesAndDirsToExclude; }
-			set { _filesAndDirsToExclude = value; }
-		}
+		public string[] Exclude { get; set; }
 
 		/// <summary>
 		/// Allow normal non-administrators to write and delete the files
 		/// </summary>
-		public bool GiveAllPermissions
-		{
-			get { return _giveAllPermissions; }
-			set { _giveAllPermissions = value; }
-		}
-
+		public bool GiveAllPermissions { get; set; }
 
 		/*
 		 * Regex pattern to match files. Defaults to .*
@@ -107,44 +86,31 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		/// <summary>
 		/// Whether to just check that all the metadata is uptodate or not. If this is true then no file is output.
 		/// </summary>
-		public bool CheckOnly
-		{
-			get { return m_checkOnly; }
-			set { m_checkOnly = value; }
-		}
+		public bool CheckOnly { get; set; }
 
 		/// <summary>
 		/// Directory where the installer source (.wixproj) is located.
 		/// If provided, is used to determine relative path of the components
 		/// </summary>
-		public string InstallerSourceDirectory
-		{
-			get { return _installerSourceDirectory; }
-			set { _installerSourceDirectory = value; }
-		}
-
+		public string InstallerSourceDirectory { get; set; }
 
 		[Output, Required]
-		public string OutputFilePath
-		{
-			get { return _outputFilePath; }
-			set { _outputFilePath = value; }
-		}
+		public string OutputFilePath { get; set; }
 
 		public override bool Execute()
 		{
 
-			if (!Directory.Exists(_rootDir))
+			if (!Directory.Exists(RootDirectory))
 			{
-				LogError("Directory not found: " + _rootDir);
+				LogError("Directory not found: " + RootDirectory);
 				return false;
 			}
 
-			LogMessage(MessageImportance.High, "Creating Wix fragment for " + _rootDir);
+			LogMessage(MessageImportance.High, "Creating Wix fragment for " + RootDirectory);
 			//make it an absolute path
-			_outputFilePath = Path.GetFullPath(_outputFilePath);
-			if (!string.IsNullOrEmpty(_installerSourceDirectory))
-				_installerSourceDirectory = Path.GetFullPath(_installerSourceDirectory);
+			OutputFilePath = Path.GetFullPath(OutputFilePath);
+			if (!string.IsNullOrEmpty(InstallerSourceDirectory))
+				InstallerSourceDirectory = Path.GetFullPath(InstallerSourceDirectory);
 
 			/* hatton removed this... it would leave deleted files referenced in the wxs file
 			 if (File.Exists(_outputFilePath))
@@ -162,32 +128,32 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			*/
 			//instead, start afresh every time.
 
-			if(File.Exists(_outputFilePath))
+			if(File.Exists(OutputFilePath))
 			{
-				File.Delete(_outputFilePath);
+				File.Delete(OutputFilePath);
 			}
 
 			SetupExclusions();
 
 			try
 			{
-				XmlDocument doc = new XmlDocument();
-				XmlElement elemWix = doc.CreateElement("Wix", XMLNS);
+				var doc = new XmlDocument();
+				var elemWix = doc.CreateElement("Wix", Xmlns);
 				doc.AppendChild(elemWix);
 
-				XmlElement elemFrag = doc.CreateElement("Fragment", XMLNS);
+				var elemFrag = doc.CreateElement("Fragment", Xmlns);
 				elemWix.AppendChild(elemFrag);
 
-				XmlElement elemDirRef = doc.CreateElement("DirectoryRef", XMLNS);
+				var elemDirRef = doc.CreateElement("DirectoryRef", Xmlns);
 				elemDirRef.SetAttribute("Id", DirectoryReferenceId);
 				elemFrag.AppendChild(elemDirRef);
 
 				// recurse through the tree add elements
-				ProcessDir(elemDirRef, Path.GetFullPath(_rootDir), DirectoryReferenceId);
+				ProcessDir(elemDirRef, Path.GetFullPath(RootDirectory), DirectoryReferenceId);
 
 				// write out components into a group
-				XmlElement elemGroup = doc.CreateElement("ComponentGroup", XMLNS);
-				elemGroup.SetAttribute("Id", _componentGroupId);
+				var elemGroup = doc.CreateElement("ComponentGroup", Xmlns);
+				elemGroup.SetAttribute("Id", ComponentGroupId);
 
 				elemFrag.AppendChild(elemGroup);
 
@@ -209,37 +175,41 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		/// Note that the *.* here should uninstall even files that were in the previous install but not this one.
 		/// </summary>
 		/// <param name="elemFrag"></param>
-		private void InsertFileDeletionInstruction(XmlElement elemFrag)
+		private static void InsertFileDeletionInstruction(XmlNode elemFrag)
 		{
 			//awkwardly, wix only allows this in <component>, not <directory>. Further, the directory deletion equivalent (RemoveFolder) can only delete completely empty folders.
-			var node = elemFrag.OwnerDocument.CreateElement("RemoveFile", XMLNS);
-			node.SetAttribute("Id", "_"+Guid.NewGuid().ToString().Replace("-",""));
-			node.SetAttribute("On", "both");//both = install time and uninstall time "uninstall");
+			var node = elemFrag.OwnerDocument?.CreateElement("RemoveFile", Xmlns);
+			if (node == null)
+				return;
+
+			node.SetAttribute("Id", "_" + Guid.NewGuid().ToString().Replace("-", ""));
+			node.SetAttribute("On", "both"); //both = install time and uninstall time "uninstall");
 			node.SetAttribute("Name", "*.*");
 			elemFrag.AppendChild(node);
 		}
 
-		private void WriteDomToFile(XmlDocument doc)
+		private void WriteDomToFile(XmlNode doc)
 		{
-// write the XML out onlystringles have been modified
-			if (!m_checkOnly && m_filesChanged)
+			// write the XML out onlystringles have been modified
+			if (CheckOnly || !_filesChanged)
+				return;
+
+			var settings = new XmlWriterSettings {
+				Indent = true,
+				IndentChars = "    ",
+				Encoding = Encoding.UTF8
+			};
+			using (var xmlWriter = XmlWriter.Create(OutputFilePath, settings))
 			{
-				var settings = new XmlWriterSettings();
-				settings.Indent = true;
-				settings.IndentChars = "    ";
-				settings.Encoding = Encoding.UTF8;
-				using (var xmlWriter = XmlWriter.Create(_outputFilePath, settings))
-				{
-					doc.WriteTo(xmlWriter);
-				}
+				doc.WriteTo(xmlWriter);
 			}
 		}
 
-		private void AddComponentRefsToDom(XmlDocument doc, XmlElement elemGroup)
+		private void AddComponentRefsToDom(XmlDocument doc, XmlNode elemGroup)
 		{
-			foreach (string c in m_components)
+			foreach (var c in _components)
 			{
-				XmlElement elem = doc.CreateElement("ComponentRef", XMLNS);
+				var elem = doc.CreateElement("ComponentRef", Xmlns);
 				elem.SetAttribute("Id", c);
 				elemGroup.AppendChild(elem);
 			}
@@ -247,50 +217,37 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 		private void SetupExclusions()
 		{
-			if (_filesAndDirsToExclude != null)
+			if (Exclude == null)
+				return;
+
+			foreach (var s in Exclude)
 			{
-				foreach (string s in _filesAndDirsToExclude)
-				{
-					string key;
-					if (Path.IsPathRooted(s))
-						key = s.ToLower();
-					else
-						key = Path.GetFullPath(Path.Combine(_rootDir, s)).ToLower();
-					m_exclude.Add(key, s);
-				}
+				var key = Path.IsPathRooted(s)
+					? s.ToLower()
+					: Path.GetFullPath(Path.Combine(RootDirectory, s)).ToLower();
+				_exclude.Add(key, s);
 			}
 		}
 
-		public bool HasLoggedErrors
-		{
-			get { return _hasLoggedErrors; }
-		}
+		public bool HasLoggedErrors { get; private set; }
 
 		/// <summary>
 		///   will show up as: DirectoryRef Id="this property"
 		/// </summary>
-		public string DirectoryReferenceId
-		{
-			get { return _directoryReferenceId; }
-			set { _directoryReferenceId = value; }
-		}
+		public string DirectoryReferenceId { get; set; }
 
-		public string ComponentGroupId
-		{
-			get { return _componentGroupId; }
-			set { _componentGroupId = value; }
-		}
+		public string ComponentGroupId { get; set; }
 
 		public void LogErrorFromException(Exception e)
 		{
-			_hasLoggedErrors = true;
+			HasLoggedErrors = true;
 			Log.LogErrorFromException(e);
 		}
 
 
 		public void LogError(string s)
 		{
-			_hasLoggedErrors = true;
+			HasLoggedErrors = true;
 			Log.LogError(s);
 		}
 
@@ -300,59 +257,65 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			Log.LogWarning(s);
 		}
 
-		private void ProcessDir(XmlElement parent, string dirPath, string outerDirectoryId)
+		private void ProcessDir(XmlNode parent, string dirPath, string outerDirectoryId)
 		{
 			LogMessage(MessageImportance.Low, "Processing dir {0}", dirPath);
 
-			XmlDocument doc = parent.OwnerDocument;
-			List<string> files = new List<string>();
+			var doc = parent.OwnerDocument;
+			var files = new List<string>();
 
-			IdToGuidDatabase guidDatabase = IdToGuidDatabase.Create(Path.Combine(dirPath, kFileNameOfGuidDatabase), this); ;
+			var guidDatabase = IdToGuidDatabase.Create(Path.Combine(dirPath, FileNameOfGuidDatabase), this);
 
-			SetupDirectoryPermissions(dirPath, parent, outerDirectoryId, doc, guidDatabase);
+			SetupDirectoryPermissions(parent, outerDirectoryId, doc, guidDatabase);
 
 			// Build a list of the files in this directory removing any that have been exluded
-			foreach (string f in Directory.GetFiles(dirPath))
+			// ReSharper disable once LoopCanBeConvertedToQuery
+			foreach (var f in Directory.GetFiles(dirPath))
 			{
-				if (_fileMatchPattern.IsMatch(f) && !_ignoreFilePattern.IsMatch(f) && !_ignoreFilePattern.IsMatch(Path.GetFileName(f)) && !m_exclude.ContainsKey(f.ToLower())
-					&& !f.Contains(kFileNameOfGuidDatabase) )
+				if (_fileMatchPattern.IsMatch(f) && !_ignoreFilePattern.IsMatch(f) && !_ignoreFilePattern.IsMatch(Path.GetFileName(f)) && !_exclude.ContainsKey(f.ToLower())
+					&& !f.Contains(FileNameOfGuidDatabase) )
 					files.Add(f);
 			}
 
 			// Process all files
-			bool isFirst = true;
-			foreach (string path in files)
+			var isFirst = true;
+			foreach (var path in files)
 			{
 				ProcessFile(parent, path, doc, guidDatabase, isFirst, outerDirectoryId);
 				isFirst = false;
 			}
 
 			// Recursively process any subdirectories
-			foreach (string d in Directory.GetDirectories(dirPath))
+			foreach (var d in Directory.GetDirectories(dirPath))
 			{
-				string shortName = Path.GetFileName(d);
-				if (!m_exclude.ContainsKey(d.ToLower()) && shortName != ".svn" && shortName != "CVS")
-				{
-					string id = GetSafeDirectoryId(d, outerDirectoryId);
+				var shortName = Path.GetFileName(d);
+				if (_exclude.ContainsKey(d.ToLower()) || shortName == ".svn" || shortName == "CVS")
+					continue;
 
-					XmlElement elemDir = doc.CreateElement("Directory", XMLNS);
-					elemDir.SetAttribute("Id", id);
-					elemDir.SetAttribute("Name", shortName);
-					parent.AppendChild(elemDir);
+				var id = GetSafeDirectoryId(d, outerDirectoryId);
 
-					ProcessDir(elemDir, d, id);
+				var elemDir = doc?.CreateElement("Directory", Xmlns);
+				if (elemDir == null)
+					continue;
 
-					if (elemDir.ChildNodes.Count == 0)
-						parent.RemoveChild(elemDir);
-				}
+				elemDir.SetAttribute("Id", id);
+				elemDir.SetAttribute("Name", shortName);
+				parent.AppendChild(elemDir);
+
+				ProcessDir(elemDir, d, id);
+
+				if (elemDir.ChildNodes.Count == 0)
+					parent.RemoveChild(elemDir);
 			}
 		}
 
-		private void SetupDirectoryPermissions(string dirPath, XmlElement parent, string parentDirectoryId, XmlDocument doc, IdToGuidDatabase guidDatabase)
+		private void SetupDirectoryPermissions(XmlNode parent, string parentDirectoryId,
+			XmlDocument doc, IdToGuidDatabase guidDatabase)
 		{
-			if (_giveAllPermissions)
-			{
-				/*	Need to add one of these in order to set the permissions on the directory
+			if (!GiveAllPermissions)
+				return;
+
+			/*	Need to add one of these in order to set the permissions on the directory
 					 * <Component Id="biatahCacheDir" Guid="492F2725-9DF9-46B1-9ACE-E84E70AFEE99">
 							<CreateFolder Directory="biatahCacheDir">
 								<Permission GenericAll="yes" User="Everyone" />
@@ -360,26 +323,25 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 						</Component>
 					 */
 
-				string id = GetSafeDirectoryId(string.Empty, parentDirectoryId);
+			var id = GetSafeDirectoryId(string.Empty, parentDirectoryId);
 
-				XmlElement componentElement = doc.CreateElement("Component", XMLNS);
-				componentElement.SetAttribute("Id", id);
-				componentElement.SetAttribute("Guid", guidDatabase.GetGuid(id, this.CheckOnly));
+			var componentElement = doc.CreateElement("Component", Xmlns);
+			componentElement.SetAttribute("Id", id);
+			componentElement.SetAttribute("Guid", guidDatabase.GetGuid(id, CheckOnly));
 
-				XmlElement createFolderElement = doc.CreateElement("CreateFolder", XMLNS);
-				createFolderElement.SetAttribute("Directory", id);
-				AddPermissionElement(doc, createFolderElement);
+			var createFolderElement = doc.CreateElement("CreateFolder", Xmlns);
+			createFolderElement.SetAttribute("Directory", id);
+			AddPermissionElement(doc, createFolderElement);
 
-				componentElement.AppendChild(createFolderElement);
-				parent.AppendChild(componentElement);
+			componentElement.AppendChild(createFolderElement);
+			parent.AppendChild(componentElement);
 
-				m_components.Add(id);
-			}
+			_components.Add(id);
 		}
 
 		private string GetSafeDirectoryId(string directoryPath, string parentDirectoryId)
 		{
-			string id = parentDirectoryId;
+			var id = parentDirectoryId;
 			//bit of a hack... we don't want our id to have this prefix.dir form fo the top level,
 			//where it is going to be referenced by other wix files, that will just be expecting the id
 			//the msbuild target gave for the id of this directory
@@ -387,7 +349,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			//I don't have it quite right, though. See the test file, where you get
 			// <Component Id="common.bin.bin" (the last bin is undesirable)
 
-			if (Path.GetFullPath(_rootDir) != directoryPath)
+			if (Path.GetFullPath(RootDirectory) != directoryPath)
 			{
 				id+="." + Path.GetFileName(directoryPath);
 				id = id.TrimEnd('.'); //for the case where directoryPath is intentionally empty
@@ -396,57 +358,53 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			return id;
 		}
 
-		private void ProcessFile(XmlElement parent, string path, XmlDocument doc, IdToGuidDatabase guidDatabase, bool isFirst, string directoryId)
+		private void ProcessFile(XmlNode parent, string path, XmlDocument doc, IdToGuidDatabase guidDatabase, bool isFirst, string directoryId)
 		{
-
-			string guid;
-			string name = Path.GetFileName(path);
-			string id = directoryId+"."+name; //includ the parent directory id so that files with the same name (e.g. "index.html") found twice in the system will get different ids.
+			var name = Path.GetFileName(path);
+			var id = directoryId+"."+name; //includ the parent directory id so that files with the same name (e.g. "index.html") found twice in the system will get different ids.
 
 			const int kMaxLength = 50; //I have so far not found out what the max really is
 			if (id.Length > kMaxLength)
 			{
 				id = id.Substring(id.Length - kMaxLength, kMaxLength); //get the last chunk of it
 			}
-			if (!Char.IsLetter(id[0]) && id[0] != '_')//probably not needed now that we're prepending the parent directory id, accept maybe at the root?
+			if (!char.IsLetter(id[0]) && id[0] != '_')//probably not needed now that we're prepending the parent directory id, accept maybe at the root?
 				id = '_' + id;
 			id = Regex.Replace(id, @"[^\p{Lu}\p{Ll}\p{Nd}._]", "_");
 
 			LogMessage(MessageImportance.Normal, "Adding file {0} with id {1}", path, id);
-			string key = id.ToLower();
-			if (m_suffixes.ContainsKey(key))
+			var key = id.ToLower();
+			if (_suffixes.ContainsKey(key))
 			{
-				int suffix = m_suffixes[key] + 1;
-				m_suffixes[key] = suffix;
+				var suffix = _suffixes[key] + 1;
+				_suffixes[key] = suffix;
 				id += suffix.ToString();
 			}
 			else
 			{
-				m_suffixes[key] = 0;
+				_suffixes[key] = 0;
 			}
 
 			// Create <Component> and <File> for this file
-			XmlElement elemComp = doc.CreateElement("Component", XMLNS);
+			var elemComp = doc.CreateElement("Component", Xmlns);
 			elemComp.SetAttribute("Id", id);
-			guid = guidDatabase.GetGuid(id,this.CheckOnly);
+			var guid = guidDatabase.GetGuid(id,CheckOnly);
 			if (guid == null)
-				m_filesChanged = true;        // this file is new
+				_filesChanged = true;        // this file is new
 			else
 				elemComp.SetAttribute("Guid", guid.ToUpper());
 			parent.AppendChild(elemComp);
 
-			XmlElement elemFile = doc.CreateElement("File", XMLNS);
+			var elemFile = doc.CreateElement("File", Xmlns);
 			elemFile.SetAttribute("Id", id);
 			elemFile.SetAttribute("Name", name);
 			if (isFirst)
 			{
 				elemFile.SetAttribute("KeyPath", "yes");
 			}
-			string relativePath;
-			if (String.IsNullOrEmpty(_installerSourceDirectory))
-				relativePath = PathUtil.RelativePathTo(Path.GetDirectoryName(_outputFilePath), path);
-			else
-				relativePath = PathUtil.RelativePathTo(_installerSourceDirectory, path);
+
+			var relativePath = PathUtil.RelativePathTo(string.IsNullOrEmpty(InstallerSourceDirectory) ?
+				Path.GetDirectoryName(OutputFilePath) : InstallerSourceDirectory, path);
 			elemFile.SetAttribute("Source", relativePath);
 
 			if (GiveAllPermissions)
@@ -454,27 +412,21 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				AddPermissionElement(doc, elemFile);
 			}
 
-
 			elemComp.AppendChild(elemFile);
 			InsertFileDeletionInstruction(elemComp);
-			m_components.Add(id);
+			_components.Add(id);
 
 			// check whether the file is newer
-			if (File.GetLastWriteTime(path) > m_refDate)
-				m_filesChanged = true;
+			if (File.GetLastWriteTime(path) > _refDate)
+				_filesChanged = true;
 		}
 
-		private void AddPermissionElement(XmlDocument doc, XmlElement elementToAddPermissionTo)
+		private static void AddPermissionElement(XmlDocument doc, XmlNode elementToAddPermissionTo)
 		{
-			XmlElement persmission = doc.CreateElement("Permission", XMLNS);
+			var persmission = doc.CreateElement("Permission", Xmlns);
 			persmission.SetAttribute("GenericAll", "yes");
 			persmission.SetAttribute("User", "Everyone");
 			elementToAddPermissionTo.AppendChild(persmission);
-		}
-
-		private void LogMessage(string message, params object[] args)
-		{
-			LogMessage(MessageImportance.Normal, message, args);
 		}
 
 		public void LogMessage(MessageImportance importance, string message)
@@ -500,21 +452,6 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				// Swallow exceptions for testing
 			}
 		}
-
-		private void LogError(string message, params object[] args)
-		{
-			try
-			{
-				Log.LogError(message, args);
-			}
-			catch (InvalidOperationException)
-			{
-				// Swallow exceptions for testing
-			}
-		}
-
-
-
 		#endregion
 	}
 }

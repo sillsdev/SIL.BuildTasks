@@ -2,6 +2,7 @@
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -10,9 +11,11 @@ using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.MakePot
 {
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class MakePot: Task
 	{
-		readonly Dictionary<string, List<string>> _entries = new Dictionary<string, List<string>>();
+		private readonly Dictionary<string, List<string>> _entries = new Dictionary<string, List<string>>();
 
 		public ITaskItem[] CSharpFiles { get; set; }
 
@@ -37,19 +40,19 @@ namespace SIL.BuildTasks.MakePot
 
 		public override bool Execute()
 		{
-			using (StreamWriter writer = File.CreateText(OutputFile))
+			using (var writer = File.CreateText(OutputFile))
 			{
 				writer.NewLine = "\n";
 				if (XmlFiles != null)
 				{
-					foreach (ITaskItem file in XmlFiles)
+					foreach (var file in XmlFiles)
 					{
 						ProcessXmlFile(file);
 					}
 				}
 				if (CSharpFiles != null)
 				{
-					foreach (ITaskItem file in CSharpFiles)
+					foreach (var file in CSharpFiles)
 					{
 						ProcessSrcFile(file.ItemSpec);
 					}
@@ -66,7 +69,7 @@ namespace SIL.BuildTasks.MakePot
 		{
 			WritePotHeader(writer);
 
-			foreach (KeyValuePair<string, List<string>> pair in _entries)
+			foreach (var pair in _entries)
 			{
 				WriteEntry(pair.Key, pair.Value, writer);
 			}
@@ -98,7 +101,7 @@ namespace SIL.BuildTasks.MakePot
 			/* As noted above the commented version below isn't read by POEdit, however it is preserved in the comments */
 			writer.WriteLine("# Project-Id-Version: {0}", ProjectId);
 			writer.WriteLine("# Report-Msgid-Bugs-To: {0}", MsdIdBugsTo);
-			writer.WriteLine("# POT-Creation-Date: {0}", DateTime.UtcNow.ToString("s"));
+			writer.WriteLine("# POT-Creation-Date: {0:s}", DateTime.UtcNow);
 			writer.WriteLine("# Content-Type: text/plain; charset=UTF-8");
 			writer.WriteLine();
 
@@ -114,9 +117,10 @@ namespace SIL.BuildTasks.MakePot
 			LogMessage("Processing {0}", fileSpec.ItemSpec);
 			var doc = new XmlDocument();
 			doc.Load(fileSpec.ItemSpec);
+			// ReSharper disable once PossibleNullReferenceException
 			foreach (XmlNode node in doc.SelectNodes(XpathToStrings))
 			{
-				AddStringInstance(node.InnerText, String.Empty);
+				AddStringInstance(node.InnerText, string.Empty);
 			}
 		}
 
@@ -129,8 +133,7 @@ namespace SIL.BuildTasks.MakePot
 		{
 			try
 			{
-				if (Log != null)
-					Log.LogMessage(importance.ToString(), message, args);
+				Log?.LogMessage(importance.ToString(), message, args);
 			}
 			catch (InvalidOperationException)
 			{
@@ -163,30 +166,30 @@ namespace SIL.BuildTasks.MakePot
 		internal void ProcessSrcFile(string filePath)
 		{
 			LogMessage("Processing {0}", filePath);
-			string contents = File.ReadAllText(filePath);
+			var contents = File.ReadAllText(filePath);
 
 			foreach (Match match in MatchesInCSharpString(contents))
 			{
-				string str = UnescapeString(match.Groups["key"].Value);
-				if (String.IsNullOrEmpty(str))
+				var str = UnescapeString(match.Groups["key"].Value);
+				if (string.IsNullOrEmpty(str))
 				{
 					continue;
 				}
 				if (!_entries.ContainsKey(str)) //first time we've encountered this string?
 				{
-					this.LogMessage(MessageImportance.Low, "Found '{0}'", str);
+					LogMessage(MessageImportance.Low, "Found '{0}'", str);
 					_entries.Add(str, new List<string>());
 				}
-				string comments = "#: " + filePath;
+				var comments = "#: " + filePath;
 
 				//catch the second parameter from calls like this:
 				//            StringCataGet("~Note", "The label for the field showing a note.");
 
-				if (!String.IsNullOrEmpty(match.Groups["note"].Value))
+				if (!string.IsNullOrEmpty(match.Groups["note"].Value))
 				{
-					string comment = match.Groups["note"].Value;
-					this.LogMessage(MessageImportance.Low, "  with comment '{0}'", comment);
-					comments += System.Environment.NewLine + "#. " + comment;
+					var comment = match.Groups["note"].Value;
+					LogMessage(MessageImportance.Low, "  with comment '{0}'", comment);
+					comments += Environment.NewLine + "#. " + comment;
 				}
 				_entries[str].Add(comments);//add this reference
 			}
@@ -211,14 +214,14 @@ namespace SIL.BuildTasks.MakePot
 
 		public static string EscapeString(string s)
 		{
-			string result = s.Replace("\\", "\\\\"); // This must be first
+			var result = s.Replace("\\", "\\\\"); // This must be first
 			result = result.Replace("\"", "\\\"");
 			return result;
 		}
 
 		public static string UnescapeString(string s)
 		{
-			string result = s.Replace("\\'", "'");
+			var result = s.Replace("\\'", "'");
 			result = result.Replace("\\\"", "\"");
 			result = result.Replace("\\\\", "\\");
 			return result;

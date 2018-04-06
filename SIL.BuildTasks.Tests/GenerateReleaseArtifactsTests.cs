@@ -73,17 +73,18 @@ namespace SIL.BuildTasks.Tests
 					if (document != null)
 					{
 						nameTable = document.NameTable;
-						namespaceUri = document.DocumentElement.NamespaceURI;
+						namespaceUri = document.DocumentElement?.NamespaceURI;
 					}
 					else
 					{
-						nameTable = node.OwnerDocument.NameTable;
+						nameTable = node.OwnerDocument?.NameTable;
 						namespaceUri = node.NamespaceURI;
 					}
 					if(string.IsNullOrEmpty(namespaceUri))
 					{
 						return null;
 					}
+					// ReSharper disable once AssignNullToNotNullAttribute
 					var nsmgr = new XmlNamespaceManager(nameTable);
 					nsmgr.AddNamespace(prefix, namespaceUri);
 					return nsmgr;
@@ -105,19 +106,19 @@ namespace SIL.BuildTasks.Tests
 					xPath = xPath.Replace(axis+"::", "#"+axis);
 				}
 
-				char[] validLeadCharacters = "@/".ToCharArray();
-				char[] quoteChars = "\'\"".ToCharArray();
+				var validLeadCharacters = "@/".ToCharArray();
+				var quoteChars = "\'\"".ToCharArray();
 
-				List<string> pathParts = xPath.Split("/".ToCharArray()).ToList();
-				string result = string.Join("/",
-					pathParts.Select(
-						x =>
-							(string.IsNullOrEmpty(x) ||
-							x.IndexOfAny(validLeadCharacters) == 0 ||
-							(x.IndexOf(':') > 0 &&
-							(x.IndexOfAny(quoteChars) < 0 || x.IndexOfAny(quoteChars) > x.IndexOf(':'))))
-								? x
-								: prefix + ":" + x).ToArray());
+				var pathParts = xPath.Split("/".ToCharArray()).ToList();
+				var result = string.Join("/",
+					pathParts.Select(x =>
+						// ReSharper disable once ArrangeRedundantParentheses
+						(string.IsNullOrEmpty(x) ||
+						x.IndexOfAny(validLeadCharacters) == 0 ||
+						x.IndexOf(':') > 0 &&
+						(x.IndexOfAny(quoteChars) < 0 || x.IndexOfAny(quoteChars) > x.IndexOf(':')))
+							? x
+							: prefix + ":" + x).ToArray());
 
 				foreach (var axis in axes)
 				{
@@ -131,19 +132,17 @@ namespace SIL.BuildTasks.Tests
 				return result;
 			}
 
-			private XmlNodeList SafeSelectNodes(XmlNode node, string path)
+			private static XmlNodeList SafeSelectNodes(XmlNode node, string path)
 			{
 				const string prefix = "pfx";
-				XmlNamespaceManager nsmgr = GetNsmgr(node, prefix);
+				var nsmgr = GetNsmgr(node, prefix);
 				if(nsmgr!=null) // skip this pfx business if there is no namespace anyhow (as in html5)
 				{
 					path = GetPrefixedPath(path, prefix);
 				}
 				var x= node.SelectNodes(path, nsmgr);
 
-				if (x == null)
-					return new NullXMlNodeList();
-				return x;
+				return x ?? new NullXMlNodeList();
 			}
 
 
@@ -174,7 +173,7 @@ namespace SIL.BuildTasks.Tests
 
 		private sealed class MockEngine : IBuildEngine
 		{
-			public List<string> LoggedMessages = new List<string>();
+			public readonly List<string> LoggedMessages = new List<string>();
 
 			public void LogErrorEvent(BuildErrorEventArgs e)
 			{
@@ -202,10 +201,10 @@ namespace SIL.BuildTasks.Tests
 				throw new NotImplementedException();
 			}
 
-			public bool ContinueOnError { get; private set; }
-			public int LineNumberOfTaskNode { get; private set; }
-			public int ColumnNumberOfTaskNode { get; private set; }
-			public string ProjectFileOfTaskNode { get; private set; }
+			public bool ContinueOnError => false;
+			public int LineNumberOfTaskNode => 0;
+			public int ColumnNumberOfTaskNode => 0;
+			public string ProjectFileOfTaskNode => null;
 		}
 
 		/// <summary>
@@ -214,14 +213,15 @@ namespace SIL.BuildTasks.Tests
 		/// </summary>
 		private sealed class TwoTempFilesForTest : IDisposable
 		{
-			public string FirstFile { get; set; }
-			public string SecondFile;
+			public string FirstFile { get; }
+			public string SecondFile { get; }
 
 			public TwoTempFilesForTest(string firstFile, string secondFile)
 			{
 				FirstFile = firstFile;
 				SecondFile = secondFile;
 			}
+
 			public void Dispose()
 			{
 				try
@@ -247,9 +247,10 @@ namespace SIL.BuildTasks.Tests
 		public void MissingMarkdownReturnsFalse()
 		{
 			var mockEngine = new MockEngine();
-			var testMarkdown = new GenerateReleaseArtifacts();
-			testMarkdown.MarkdownFile = Path.GetRandomFileName();
-			testMarkdown.BuildEngine = mockEngine;
+			var testMarkdown = new GenerateReleaseArtifacts {
+				MarkdownFile = Path.GetRandomFileName(),
+				BuildEngine = mockEngine
+			};
 			Assert.That(testMarkdown.CreateHtmFromMarkdownFile(), Is.False);
 			Assert.That(mockEngine.LoggedMessages[0], Is.StringMatching("The given markdown file .* does not exist\\."));
 		}
@@ -355,7 +356,7 @@ namespace SIL.BuildTasks.Tests
 				testMarkdown.MarkdownFile = tempFiles.FirstFile;
 				testMarkdown.VersionNumber = "2.3.10";
 				testMarkdown.StampMarkdownFile = true;
-				var day = string.Format("{0:dd/MMM/yyyy}", DateTime.Now);
+				var day = $"{DateTime.Now:dd/MMM/yyyy}";
 				Assert.That(testMarkdown.StampMarkdownFileWithVersion(), Is.True);
 				var newContents = File.ReadAllLines(tempFiles.FirstFile);
 				Assert.That(newContents.Length == 3);
@@ -369,7 +370,7 @@ namespace SIL.BuildTasks.Tests
 			var testMarkdown = new GenerateReleaseArtifacts();
 			using(var tempFiles = new TwoTempFilesForTest(Path.Combine(Path.GetTempPath(), "Test.md"), null))
 			{
-				var devVersionLine = "## DEV_VERSION_NUMBER: DEV_RELEASE_DATE";
+				const string devVersionLine = "## DEV_VERSION_NUMBER: DEV_RELEASE_DATE";
 				File.WriteAllLines(tempFiles.FirstFile,
 					new[] {devVersionLine, "*with some random content", "*does some things"});
 				testMarkdown.MarkdownFile = tempFiles.FirstFile;
@@ -428,7 +429,7 @@ namespace SIL.BuildTasks.Tests
 					"  4. compresses images transparent when importing.",
 					"  9. saves copyright/license back to the original files",
 					"    * extra indented list",
-					"* Fix insertion of unwanted space before bolded, underlined, and italicized portions of words",
+					"* Fix insertion of unwanted space before bolded, underlined, and italicized portions of words"
 				});
 				var debianChangelog = tempFiles.SecondFile;
 				File.WriteAllLines(debianChangelog, new[]

@@ -32,19 +32,15 @@ namespace SIL.BuildTasks.Tests
 
 		public IDictionary CloneCustomMetadata()
 		{
+			// ReSharper disable once AssignNullToNotNullAttribute
 			return null;
 		}
 
 		public string ItemSpec { get; set; }
 
-		public ICollection MetadataNames
-		{
-			get { return null; }
-		}
+		// ReSharper disable once AssignNullToNotNullAttribute
+		public ICollection MetadataNames => null;
 
-		public int MetadataCount
-		{
-			get { return 0; }
-		}
+		public int MetadataCount => 0;
 	}
 }

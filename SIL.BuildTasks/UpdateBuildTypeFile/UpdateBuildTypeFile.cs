@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.UpdateBuildTypeFile
 {
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class UpdateBuildTypeFile : Task
 	{
 		[Required]
@@ -34,10 +37,10 @@ namespace SIL.BuildTasks.UpdateBuildTypeFile
 			return true;
 		}
 
-		public string GetUpdatedFileContents(string contents, string newType)
+		public static string GetUpdatedFileContents(string contents, string newType)
 		{
-			StringBuilder bldr = new StringBuilder(@"VersionType\.(");
-			bool first = true;
+			var bldr = new StringBuilder(@"VersionType\.(");
+			var first = true;
 			foreach (var versionType in GetVersionTypes(contents))
 			{
 				if (!first)
@@ -48,19 +51,19 @@ namespace SIL.BuildTasks.UpdateBuildTypeFile
 				first = false;
 			}
 			bldr.Append(")");
-			Regex regex = new Regex(bldr.ToString(), RegexOptions.Compiled);
+			var regex = new Regex(bldr.ToString(), RegexOptions.Compiled);
 			return regex.Replace(contents, "VersionType." + newType);
 		}
 
-		public List<string> GetVersionTypes(string contents)
+		public static List<string> GetVersionTypes(string contents)
 		{
-			int i = contents.IndexOf("public enum VersionType", StringComparison.Ordinal);
+			var i = contents.IndexOf("public enum VersionType", StringComparison.Ordinal);
 			if (i < 0)
 				throw new Exception("File does not contain a public definition for an enum named VersionType!");
 			var iStart = contents.IndexOf("{", i, StringComparison.Ordinal) + 1;
 			var iEnd = contents.IndexOf("}", iStart, StringComparison.Ordinal);
 			var versionTypeEnumBody = contents.Substring(iStart, iEnd - iStart);
-			Regex regex = new Regex(@"(?:((?!\d)\w+(?:\.(?!\d)\w+)*)\.)?((?!\d)\w+)", RegexOptions.Compiled);
+			var regex = new Regex(@"(?:((?!\d)\w+(?:\.(?!\d)\w+)*)\.)?((?!\d)\w+)", RegexOptions.Compiled);
 			return (from object type in regex.Matches(versionTypeEnumBody) select type.ToString()).ToList();
 		}
 

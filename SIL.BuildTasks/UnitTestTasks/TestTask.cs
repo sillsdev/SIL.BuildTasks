@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -19,16 +20,21 @@ namespace SIL.BuildTasks.UnitTestTasks
 	/// timeouts.  In fact, anything based on ToolTask (at least in Mono 10.4) didn't handle
 	/// timeouts properly in my testing.  This code does handle timeouts properly.
 	/// </remarks>
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
 	public abstract class TestTask : Task
 	{
-		private StreamReader m_StdError;
-		private StreamReader m_StdOut;
-		protected List<string> m_TestLog = new List<string>();
+		private StreamReader _stdError;
+		private StreamReader _stdOut;
+		protected readonly List<string> TestLog = new List<string>();
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		public TestTask()
+		protected TestTask()
 		{
 			// more than 24 days should be a high enough value as default :-)
 			Timeout = int.MaxValue;
@@ -58,10 +64,13 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// <value><c>true</c> if verbose; otherwise, <c>false</c>.</value>
 		public bool Verbose { get; set; }
 
+		// ReSharper disable once InconsistentNaming
 		protected bool _failTaskIfPositiveExitCode;
 
+		// ReSharper disable once InconsistentNaming
 		protected bool _failTaskIfNegativeExitCode;
 
+		// ReSharper disable once InconsistentNaming
 		private MessageImportance Importance;
 
 		/// <summary>
@@ -83,13 +92,13 @@ namespace SIL.BuildTasks.UnitTestTasks
 			if (FudgeFactor >= 0 && Timeout < int.MaxValue)
 				Timeout *= FudgeFactor;
 
-			bool retVal = true;
+			var retVal = true;
 			if (Timeout == int.MaxValue)
 				Log.LogMessage(MessageImportance.Normal, "Running {0}", TestProgramName);
 			else
 			{
 				Log.LogMessage(MessageImportance.Normal, "Running {0} (timeout = {1} seconds)",
-					TestProgramName, ((double) Timeout/1000.0).ToString("F1"));
+					TestProgramName, (Timeout/1000.0).ToString("F1"));
 			}
 
 			Thread outputThread = null;
@@ -103,8 +112,8 @@ namespace SIL.BuildTasks.UnitTestTasks
 				outputThread = new Thread(StreamReaderThread_Output);
 				errorThread = new Thread(StreamReaderThread_Error);
 
-				m_StdOut = process.StandardOutput;
-				m_StdError = process.StandardError;
+				_stdOut = process.StandardOutput;
+				_stdError = process.StandardError;
 
 				outputThread.Start();
 				errorThread.Start();
@@ -116,7 +125,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 				outputThread.Join(2000);
 				errorThread.Join(2000);
 
-				bool fTimedOut = !process.WaitForExit(0);	// returns false immediately if still running.
+				var fTimedOut = !process.WaitForExit(0);	// returns false immediately if still running.
 				if (fTimedOut)
 				{
 					try
@@ -130,7 +139,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 					}
 				}
 
-				TimeSpan delta = DateTime.Now - dtStart;
+				var delta = DateTime.Now - dtStart;
 				Log.LogMessage(MessageImportance.Normal, "Total time for running {0} = {1}", TestProgramName, delta);
 
 				try
@@ -194,7 +203,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// <summary>
 		/// Starts the process and handles errors.
 		/// </summary>
-		protected virtual Process StartProcess()
+		private Process StartProcess()
 		{
 			var process = new Process
 				{
@@ -225,7 +234,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 			}
 			catch (Exception ex)
 			{
-				throw new Exception(String.Format("Got exception starting {0}", process.StartInfo.FileName), ex);
+				throw new Exception($"Got exception starting {process.StartInfo.FileName}", ex);
 			}
 		}
 
@@ -247,11 +256,11 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// <summary>
 		/// Reads from the standard output stream until the external program is ended.
 		/// </summary>
-		protected void StreamReaderThread_Output()
+		private void StreamReaderThread_Output()
 		{
 			try
 			{
-				var reader = m_StdOut;
+				var reader = _stdOut;
 
 				while (true)
 				{
@@ -269,7 +278,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 					// ensure only one thread writes to the log at any time
 					lock (LockObject)
 					{
-						m_TestLog.Add(logContents);
+						TestLog.Add(logContents);
 					}
 				}
 			}
@@ -282,11 +291,11 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// <summary>
 		/// Reads from the standard error stream until the external program is ended.
 		/// </summary>
-		protected void StreamReaderThread_Error()
+		private void StreamReaderThread_Error()
 		{
 			try
 			{
-				var reader = m_StdError;
+				var reader = _stdError;
 
 				while (true)
 				{
@@ -319,7 +328,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 					// ensure only one thread writes to the log at any time
 					lock (LockObject)
 					{
-						m_TestLog.Add(logContents);
+						TestLog.Add(logContents);
 					}
 				}
 			}

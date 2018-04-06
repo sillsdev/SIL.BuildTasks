@@ -4,7 +4,7 @@ using SIL.BuildTasks.UnitTestTasks;
 namespace SIL.BuildTasks.Tests.UnitTestTasks
 {
 	[TestFixture]
-	class NUnit3Tests
+	public class NUnit3Tests
 	{
 		[TestCase("", "", "")]
 		[TestCase(" ", "", "")]
@@ -44,12 +44,11 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 		[TestCase(false)]
 		public void FailTaskIfAnyTestsFail_SetByUser_NotAffectedByTeamCityProperty(bool failTaskIfAnyTestsFail)
 		{
-			var nUnit3 = new NUnit3
-			{
-				FailTaskIfAnyTestsFail = failTaskIfAnyTestsFail
+			var nUnit3 = new NUnit3 {
+				FailTaskIfAnyTestsFail = failTaskIfAnyTestsFail,
+				TeamCity = true
 			};
 
-			nUnit3.TeamCity = true;
 			Assert.AreEqual(failTaskIfAnyTestsFail, nUnit3.FailTaskIfAnyTestsFail);
 			nUnit3.TeamCity = false;
 			Assert.AreEqual(failTaskIfAnyTestsFail, nUnit3.FailTaskIfAnyTestsFail);

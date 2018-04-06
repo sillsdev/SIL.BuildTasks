@@ -50,9 +50,13 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 					continue;
 				}
 
-				var relativeDir = dir.Substring(sourceDir.Length).TrimStart('\\', '/');
+				var relativeDir = dir?.Substring(sourceDir.Length).TrimStart('\\', '/');
+				if (relativeDir == null)
+					continue;
+
 				var targetDir = Path.Combine(_nunitDir, relativeDir);
 				Directory.CreateDirectory(targetDir);
+				// ReSharper disable once AssignNullToNotNullAttribute
 				File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)));
 			}
 		}

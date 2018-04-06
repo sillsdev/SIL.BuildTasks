@@ -7,9 +7,8 @@ using System.IO;
 //from Paul Welter: http://weblogs.asp.net/pwelter34/archive/2006/02/08/create-a-relative-path-code-snippet.aspx
 namespace SIL.BuildTasks.MakeWixForDirTree
 {
-	public class PathUtil
+	public static class PathUtil
 	{
-
 		/// <summary>
 
 		/// Creates a relative path from one file
@@ -43,138 +42,55 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		/// </returns>
 
 		/// <exception cref="ArgumentNullException"></exception>
-
-		public static string RelativePathTo(
-
-			string fromDirectory, string toPath)
+		public static string RelativePathTo(string fromDirectory, string toPath)
 		{
-
 			if (fromDirectory == null)
-
-				throw new ArgumentNullException("fromDirectory");
-
-
+				throw new ArgumentNullException(nameof(fromDirectory));
 
 			if (toPath == null)
+				throw new ArgumentNullException(nameof(toPath));
 
-				throw new ArgumentNullException("toPath");
-
-
-
-			bool isRooted = Path.IsPathRooted(fromDirectory)
-
-				&& Path.IsPathRooted(toPath);
-
-
+			var isRooted = Path.IsPathRooted(fromDirectory) && Path.IsPathRooted(toPath);
 
 			if (isRooted)
 			{
-
-				bool isDifferentRoot = string.Compare(
-
-					Path.GetPathRoot(fromDirectory),
-
-					Path.GetPathRoot(toPath), true) != 0;
-
-
-
-				if (isDifferentRoot)
-
+				if (string.Compare(Path.GetPathRoot(fromDirectory),
+						Path.GetPathRoot(toPath), StringComparison.OrdinalIgnoreCase) != 0)
 					return toPath;
-
 			}
 
-
-
-			StringCollection relativePath = new StringCollection();
-
-			string[] fromDirectories = fromDirectory.Split(
-
-				Path.DirectorySeparatorChar);
-
-
-
-			string[] toDirectories = toPath.Split(
-
-				Path.DirectorySeparatorChar);
-
-
-
-			int length = Math.Min(
-
-				fromDirectories.Length,
-
-				toDirectories.Length);
-
-
-
-			int lastCommonRoot = -1;
-
-
+			var relativePath = new StringCollection();
+			var fromDirectories = fromDirectory.Split(Path.DirectorySeparatorChar);
+			var toDirectories = toPath.Split(Path.DirectorySeparatorChar);
+			var length = Math.Min(fromDirectories.Length, toDirectories.Length);
+			var lastCommonRoot = -1;
 
 			// find common root
-
-			for (int x = 0; x < length; x++)
+			for (var x = 0; x < length; x++)
 			{
-
-				if (string.Compare(fromDirectories[x],
-
-					toDirectories[x], true) != 0)
-
+				if (string.Compare(fromDirectories[x], toDirectories[x], StringComparison.OrdinalIgnoreCase) != 0)
 					break;
 
-
-
 				lastCommonRoot = x;
-
 			}
 
 			if (lastCommonRoot == -1)
-
 				return toPath;
 
-
-
 			// add relative folders in from path
-
-			for (int x = lastCommonRoot + 1; x < fromDirectories.Length; x++)
-
+			for (var x = lastCommonRoot + 1; x < fromDirectories.Length; x++)
 				if (fromDirectories[x].Length > 0)
-
 					relativePath.Add("..");
 
-
-
 			// add to folders to path
-
-			for (int x = lastCommonRoot + 1; x < toDirectories.Length; x++)
-
+			for (var x = lastCommonRoot + 1; x < toDirectories.Length; x++)
 				relativePath.Add(toDirectories[x]);
 
-
-
 			// create relative path
-
-			string[] relativeParts = new string[relativePath.Count];
-
+			var relativeParts = new string[relativePath.Count];
 			relativePath.CopyTo(relativeParts, 0);
 
-
-
-			string newPath = string.Join(
-
-				Path.DirectorySeparatorChar.ToString(),
-
-				relativeParts);
-
-
-
-			return newPath;
-
+			return string.Join(Path.DirectorySeparatorChar.ToString(), relativeParts);
 		}
-
-
-
 	}
-
 }

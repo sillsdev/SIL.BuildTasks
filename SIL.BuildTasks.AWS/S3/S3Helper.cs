@@ -9,6 +9,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -20,7 +21,7 @@ namespace SIL.BuildTasks.AWS.S3
 	/// <summary>
 	/// Helper class to connect to Amazon aws S3 and store files.
 	/// </summary>
-	public class S3Helper : IDisposable
+	public sealed class S3Helper : IDisposable
 	{
 		private bool _disposed;
 
@@ -44,10 +45,9 @@ namespace SIL.BuildTasks.AWS.S3
 
 		#region Properties
 
-		protected IAmazonS3 Client
+		private IAmazonS3 Client
 		{
 			get;
-			set;
 		}
 
 		#endregion
@@ -57,9 +57,9 @@ namespace SIL.BuildTasks.AWS.S3
 		/// <summary>
 		/// Publish a file to a S3 bucket, in the folder specified, optionally making it publically readable.
 		/// </summary>
-		public void Publish(string[] files, string bucketName, string folder, bool isPublicRead, string contentType = null, string contentEncoding = null)
+		public void Publish(IEnumerable<string> files, string bucketName, string folder, bool isPublicRead, string contentType = null, string contentEncoding = null)
 		{
-			string destinationFolder = GetDestinationFolder(folder);
+			var destinationFolder = GetDestinationFolder(folder);
 
 			StoreFiles(files, bucketName, destinationFolder, isPublicRead, contentType, contentEncoding);
 		}
@@ -71,7 +71,7 @@ namespace SIL.BuildTasks.AWS.S3
 		{
 			destinationFolder = GetDestinationFolder(destinationFolder);
 
-			TransferUtility directoryTransferUtility = new TransferUtility(Client);
+			var directoryTransferUtility = new TransferUtility(Client);
 			directoryTransferUtility.UploadDirectory(new TransferUtilityUploadDirectoryRequest
 			{
 				Directory = sourceDirectory,
@@ -86,20 +86,20 @@ namespace SIL.BuildTasks.AWS.S3
 
 		#region Private Methods
 
-		private void StoreFiles(string[] files, string bucketName, string destinationFolder, bool isPublicRead,
+		private void StoreFiles(IEnumerable<string> files, string bucketName, string destinationFolder, bool isPublicRead,
 			string contentType = null, string contentEncoding = null)
 		{
-			foreach (string file in files)
+			foreach (var file in files)
 			{
 				// Use the filename as the key (aws filename).
-				string key = Path.GetFileName(file);
+				var key = Path.GetFileName(file);
 				StoreFile(file, destinationFolder + key, bucketName, isPublicRead, contentType, contentEncoding);
 			}
 		}
 
-		private string GetDestinationFolder(string folder)
+		private static string GetDestinationFolder(string folder)
 		{
-			string destinationFolder = folder ?? string.Empty;
+			var destinationFolder = folder ?? string.Empty;
 
 			// Append a folder seperator if a folder has been specified without one.
 			if (!string.IsNullOrEmpty(destinationFolder) && !destinationFolder.EndsWith("/"))
@@ -112,9 +112,9 @@ namespace SIL.BuildTasks.AWS.S3
 
 		private void StoreFile(string file, string key, string bucketName, bool isPublicRead, string contentType = null, string contentEncoding = null)
 		{
-			S3CannedACL acl = isPublicRead ? S3CannedACL.PublicRead : S3CannedACL.Private;
+			var acl = isPublicRead ? S3CannedACL.PublicRead : S3CannedACL.Private;
 
-			var request = new PutObjectRequest() { CannedACL = acl, FilePath = file, BucketName = bucketName, Key = key };
+			var request = new PutObjectRequest { CannedACL = acl, FilePath = file, BucketName = bucketName, Key = key };
 			if (contentType != null) // probably harmless to just set to null, but feels safer not to set at all if not specified.
 				request.ContentType = contentType;
 			if (contentEncoding != null)
@@ -133,21 +133,21 @@ namespace SIL.BuildTasks.AWS.S3
 			GC.SuppressFinalize(this);
 		}
 
-		protected virtual void Dispose(bool disposing)
+		private void Dispose(bool disposing)
 		{
 			if (_disposed)
+				return;
+
+			if (!disposing)
+				return;
+
+			try
 			{
-				if (!disposing)
-				{
-					try
-					{
-						Client?.Dispose();
-					}
-					finally
-					{
-						_disposed = true;
-					}
-				}
+				Client?.Dispose();
+			}
+			finally
+			{
+				_disposed = true;
 			}
 		}
 

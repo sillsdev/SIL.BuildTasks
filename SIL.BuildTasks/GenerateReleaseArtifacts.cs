@@ -2,6 +2,7 @@
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -30,6 +31,8 @@ namespace SIL.BuildTasks
 	 * by creating a new file or by replacing the <div class='releasenotes'> in an existing .htm with a generated one, and updates the changelog
 	 * with the new entry
 	 */
+	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 	public class GenerateReleaseArtifacts : Task
 	{
 		[Required]
@@ -81,7 +84,9 @@ namespace SIL.BuildTasks
 			if (string.IsNullOrEmpty(Urgency))
 				Urgency = "low";
 			var oldChangeLog = Path.ChangeExtension(DebianChangelog, ".old");
+			// ReSharper disable once AssignNullToNotNullAttribute
 			File.Delete(oldChangeLog);
+			// ReSharper disable once AssignNullToNotNullAttribute
 			File.Move(DebianChangelog, oldChangeLog);
 			WriteMostRecentMarkdownEntryToChangelog();
 			File.AppendAllLines(DebianChangelog, File.ReadAllLines(oldChangeLog));
@@ -95,10 +100,11 @@ namespace SIL.BuildTasks
 				ChangelogAuthorInfo = "Annonymous <annonymous@sil.org>";
 			}
 			var markdownLines = File.ReadAllLines(MarkdownFile);
-			var newEntryLines = new List<string>();
+			var newEntryLines = new List<string> {
+				$"{ProductName} ({VersionNumber}) {Stability}; urgency={Urgency}",
+				string.Empty
+			};
 			// Write out the first markdown line as the changelog version line
-			newEntryLines.Add(string.Format("{0} ({1}) {2}; urgency={3}", ProductName, VersionNumber, Stability, Urgency));
-			newEntryLines.Add(string.Empty);
 			for(var i = 1; i < markdownLines.Length; ++i)
 			{
 				if(markdownLines[i].StartsWith("##"))
@@ -107,17 +113,18 @@ namespace SIL.BuildTasks
 			}
 			newEntryLines.Add(string.Empty);
 			// The debian changelog needs RFC 2822 format (Thu, 15 Oct 2015 08:25:16 -0500), which is not quite what .NET can provide
-			var debianDate = string.Format("{0:ddd, dd MMM yyyy HH'|'mm'|'ss zzz}", DateTime.Now).Replace(":", "").Replace('|', ':');
-			newEntryLines.Add(string.Format(" -- {0}  {1}", ChangelogAuthorInfo, debianDate));
+			var debianDate = $"{DateTime.Now:ddd, dd MMM yyyy HH'|'mm'|'ss zzz}".Replace(":", "").Replace('|', ':');
+			newEntryLines.Add($" -- {ChangelogAuthorInfo}  {debianDate}");
 			newEntryLines.Add(string.Empty);
 			File.AppendAllLines(DebianChangelog, newEntryLines);
 		}
 
-		private static void ConvertMarkdownLineToChangelogLine(string markdownLine, List<string> newEntryLines)
+		private static void ConvertMarkdownLineToChangelogLine(string markdownLine, ICollection<string> newEntryLines)
 		{
 			if (string.IsNullOrEmpty(markdownLine))
 				return;
 
+			// ReSharper disable once SwitchStatementMissingSomeCases
 			switch(markdownLine[0])
 			{
 				case '*':
@@ -133,10 +140,10 @@ namespace SIL.BuildTasks
 				case '8':
 				case '9':
 				case '0': // treat all unordered and ordered list items the same in the changelog
-					newEntryLines.Add(string.Format("  *{0}", markdownLine.Substring(1)));
+					newEntryLines.Add($"  *{markdownLine.Substring(1)}");
 					break;
 				case ' ': // Handle lists within lists, only second level items are handled, any further indentation is currently ignored
-					newEntryLines.Add(string.Format("    *{0}", markdownLine.Trim().Substring(1).Trim('.')));
+					newEntryLines.Add($"    *{markdownLine.Trim().Substring(1).Trim('.')}");
 				break;
 			}
 		}
@@ -148,12 +155,12 @@ namespace SIL.BuildTasks
 		/// <returns></returns>
 		internal bool StampMarkdownFileWithVersion()
 		{
-			if (StampMarkdownFile && Release)
-			{
-				var markdownLines = File.ReadAllLines(MarkdownFile);
-				markdownLines[0] = string.Format("## {0} {1:dd/MMM/yyyy}", VersionNumber, DateTime.Today);
-				File.WriteAllLines(MarkdownFile, markdownLines);
-			}
+			if (!StampMarkdownFile || !Release)
+				return true;
+
+			var markdownLines = File.ReadAllLines(MarkdownFile);
+			markdownLines[0] = $"## {VersionNumber} {DateTime.Today:dd/MMM/yyyy}";
+			File.WriteAllLines(MarkdownFile, markdownLines);
 			return true;
 		}
 
@@ -165,7 +172,7 @@ namespace SIL.BuildTasks
 		{
 			if(!File.Exists(MarkdownFile))
 			{
-				Log.LogError(string.Format("The given markdown file ({0}) does not exist.", MarkdownFile));
+				Log.LogError($"The given markdown file ({MarkdownFile}) does not exist.");
 				return false;
 			}
 			var markDownTransformer = new Markdown();
@@ -176,14 +183,14 @@ namespace SIL.BuildTasks
 				{
 					var htmlDoc = XDocument.Load(HtmlFile);
 					var releaseNotesElement = htmlDoc.XPathSelectElement("//*[@class='releasenotes']");
-					if(releaseNotesElement != null)
-					{
-						releaseNotesElement.RemoveNodes();
-						var mdDocument = XDocument.Parse(string.Format("<div>{0}</div>", markdownHtml));
-						// ReSharper disable once PossibleNullReferenceException - Will either throw or work
-						releaseNotesElement.Add(mdDocument.Root.Elements());
-						htmlDoc.Save(HtmlFile);
-					}
+					if (releaseNotesElement == null)
+						return true;
+
+					releaseNotesElement.RemoveNodes();
+					var mdDocument = XDocument.Parse($"<div>{markdownHtml}</div>");
+					// ReSharper disable once PossibleNullReferenceException - Will either throw or work
+					releaseNotesElement.Add(mdDocument.Root.Elements());
+					htmlDoc.Save(HtmlFile);
 				}
 				else
 				{
@@ -200,8 +207,7 @@ namespace SIL.BuildTasks
 
 		private void WriteBasicHtmlFromMarkdown(string markdownHtml)
 		{
-			File.WriteAllText(HtmlFile, string.Format("<html><div class='releasenotes'>{0}</div></html>",
-				markdownHtml));
+			File.WriteAllText(HtmlFile, $"<html><div class='releasenotes'>{markdownHtml}</div></html>");
 		}
 	}
 }

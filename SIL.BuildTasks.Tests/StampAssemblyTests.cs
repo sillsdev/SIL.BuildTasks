@@ -12,23 +12,23 @@ namespace SIL.BuildTasks.Tests
 		public void GetExistingAssemblyVersion_Normal_GetsAllFourParts()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""1.*.3.44"")]
 [assembly: AssemblyFileVersion(""1.0.0.0"")]";
 
 			var v = stamper.GetExistingAssemblyVersion(content);
-			Assert.AreEqual("1", v.parts[0]);
-			Assert.AreEqual("*", v.parts[1]);
-			Assert.AreEqual("3", v.parts[2]);
-			Assert.AreEqual("44", v.parts[3]);
+			Assert.AreEqual("1", v.Parts[0]);
+			Assert.AreEqual("*", v.Parts[1]);
+			Assert.AreEqual("3", v.Parts[2]);
+			Assert.AreEqual("44", v.Parts[3]);
 		}
 
 		[Test]
 		public void GetModifiedContents_LastTwoLeftToBuildScript_CorrectMerge()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""0.7.*.*"")]
 [assembly: AssemblyFileVersion(""1.0.0.0"")]";
@@ -41,7 +41,7 @@ namespace SIL.BuildTasks.Tests
 		public void GetModifiedContents_LastPartIsHash_HashReplacedWithZero()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""0.7.*.0"")]
 [assembly: AssemblyFileVersion(""1.0.0.0"")]";
@@ -57,8 +57,7 @@ namespace SIL.BuildTasks.Tests
 		public void GetModifiedContents_ExistingHasShortForm_TreatsMissingAsStar()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content =
-				@"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""1.2.*"")]
 [assembly: AssemblyFileVersion(""1.2.*"")]";
@@ -74,8 +73,7 @@ namespace SIL.BuildTasks.Tests
 		public void GetModifiedContents_ExistingAllStars_UseZeroAsNeeded()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content =
-				@"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""*.*.*.*"")]
 [assembly: AssemblyFileVersion(""*.*.*.*"")]";
@@ -88,8 +86,7 @@ namespace SIL.BuildTasks.Tests
 		public void GetModifiedContents_Existing1000_UseZeroAsNeeded()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content =
-				@"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""1.0.0.0"")]
 [assembly: AssemblyFileVersion(""1.0.0.0"")]";
@@ -107,8 +104,7 @@ namespace SIL.BuildTasks.Tests
 		public void GetModifiedContents_ExistingHasNumbersButCallSpecifiesWholeVersion_UsesTheIncomingVersion()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content =
-				@"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""0.0.9.789"")]
 [assembly: AssemblyFileVersion(""0.0.9.789"")]";
@@ -167,7 +163,7 @@ using System.Runtime.InteropServices;
 		public void GetModifiedContents_FileVersionFollowsParam()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""9.9.9.99"")]
 [assembly: AssemblyFileVersion(""8.8.8.88"")]";
@@ -183,7 +179,7 @@ using System.Runtime.InteropServices;
 		public void GetModifiedContents_FileVersionMatchesVersionWhenMissing()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""9.9.9.99"")]
 [assembly: AssemblyFileVersion(""8.8.8.88"")]";
@@ -203,7 +199,7 @@ using System.Runtime.InteropServices;
 		public void GetModifiedContents_ActualICUConfigTest()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"// You can specify all the values or you can default the Revision and Build Numbers
+			const string content = @"// You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 [assembly: AssemblyVersion(""4.2.1.0"")]
 [assembly: AssemblyFileVersion(""4.2.1.0"")]";
@@ -218,7 +214,7 @@ using System.Runtime.InteropServices;
 		public void GetModifiedContents_InformationalVersionKeepsHashFromIncomingVersion_NoFileVersion()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"
+			const string content = @"
 [assembly: AssemblyVersion(""0.7.*.0"")]
 [assembly: AssemblyFileVersion(""1.0.0.0"")]
 [assembly: AssemblyInformationalVersion(""2.3.4.5"")]";
@@ -233,7 +229,7 @@ using System.Runtime.InteropServices;
 		public void GetModifiedContents_InformationalVersionKeepsHashFromIncomingVersion_BothParams()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"
+			const string content = @"
 [assembly: AssemblyVersion(""0.7.*.0"")]
 [assembly: AssemblyFileVersion(""1.0.0.0"")]
 [assembly: AssemblyInformationalVersion(""2.3.4.5"")]";
@@ -248,7 +244,7 @@ using System.Runtime.InteropServices;
 		public void GetModifiedContents_MSBuildProps()
 		{
 			var stamper = new StampAssemblies.StampAssemblies();
-			var content = @"
+			const string content = @"
 <Version>1.2.*</Version>
 <AssemblyVersion>0.7.*.0</AssemblyVersion>
 <FileVersion>1.0.0.0</FileVersion>

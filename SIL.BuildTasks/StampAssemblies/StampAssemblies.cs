@@ -2,6 +2,7 @@
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
@@ -9,6 +10,8 @@ using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.StampAssemblies
 {
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class StampAssemblies : Task
 	{
 		private enum VersionFormat
@@ -20,12 +23,12 @@ namespace SIL.BuildTasks.StampAssemblies
 
 		public class VersionParts
 		{
-			public string[] parts = new string[4];
+			public string[] Parts = new string[4];
 			public string Prerelease { get; set; }
 
 			public override string ToString()
 			{
-				string str = string.Join(".", parts);
+				var str = string.Join(".", Parts);
 				if (!string.IsNullOrEmpty(Prerelease))
 					str += "-" + Prerelease;
 				return str;
@@ -54,7 +57,7 @@ namespace SIL.BuildTasks.StampAssemblies
 
 				SafeLog("StampAssemblies: Stamping {0}", inputAssemblyPath);
 
-				bool isCode = Path.GetExtension(path).Equals(".cs", StringComparison.InvariantCultureIgnoreCase);
+				var isCode = Path.GetExtension(path).Equals(".cs", StringComparison.InvariantCultureIgnoreCase);
 				// ENHANCE: add property for InformationalVersion
 				contents = GetModifiedContents(contents, isCode, Version, FileVersion, PackageVersion);
 				File.WriteAllText(path, contents);
@@ -87,6 +90,7 @@ namespace SIL.BuildTasks.StampAssemblies
 			}
 		}
 
+		// ReSharper disable once UnusedMember.Global
 		public string GetModifiedContents(string contents, string versionStr, string fileVersionStr)
 		{
 			return GetModifiedContents(contents, true, versionStr, fileVersionStr, null);
@@ -96,16 +100,15 @@ namespace SIL.BuildTasks.StampAssemblies
 			string packageVersionStr)
 		{
 			// ENHANCE: add property for InformationalVersion
-			VersionParts version = ParseVersionString(versionStr);
-			VersionParts fileVersion = fileVersionStr != null ? ParseVersionString(fileVersionStr) : version;
-			VersionParts infoVersion = ParseVersionString(versionStr, VersionFormat.Info);
-			VersionParts packageVersion = packageVersionStr != null
+			var version = ParseVersionString(versionStr);
+			var fileVersion = fileVersionStr != null ? ParseVersionString(fileVersionStr) : version;
+			var infoVersion = ParseVersionString(versionStr, VersionFormat.Info);
+			var packageVersion = packageVersionStr != null
 				? ParseVersionString(packageVersionStr, VersionFormat.Semantic)
 				: version;
 
-			if (isCode)
-				return ModifyCodeAttributes(contents, version, fileVersion, infoVersion);
-			return ModifyMSBuildProps(contents, version, fileVersion, infoVersion, packageVersion);
+			return isCode ? ModifyCodeAttributes(contents, version, fileVersion, infoVersion)
+				: ModifyMsBuildProps(contents, version, fileVersion, infoVersion, packageVersion);
 		}
 
 		private string ModifyCodeAttributes(string contents, VersionParts version, VersionParts fileVersion,
@@ -121,7 +124,7 @@ namespace SIL.BuildTasks.StampAssemblies
 			return contents;
 		}
 
-		private string ModifyMSBuildProps(string contents, VersionParts version, VersionParts fileVersion,
+		private string ModifyMsBuildProps(string contents, VersionParts version, VersionParts fileVersion,
 			VersionParts infoVersion, VersionParts packageVersion)
 		{
 			const string regexTemplate = "<{0}>(.+)</{0}>";
@@ -150,19 +153,19 @@ namespace SIL.BuildTasks.StampAssemblies
 			}
 		}
 
-		public string MergeTemplates(VersionParts incoming, VersionParts existing)
+		private static string MergeTemplates(VersionParts incoming, VersionParts existing)
 		{
-			VersionParts result = new VersionParts
+			var result = new VersionParts
 			{
-				parts = (string[]) existing.parts.Clone(),
+				Parts = (string[]) existing.Parts.Clone(),
 				Prerelease = incoming.Prerelease ?? existing.Prerelease
 			};
-			for (int i = 0; i < result.parts.Length; i++)
+			for (var i = 0; i < result.Parts.Length; i++)
 			{
-				if (incoming.parts[i] != "*")
-					result.parts[i] = incoming.parts[i];
-				else if (existing.parts[i] == "*")
-					result.parts[i] = "0";
+				if (incoming.Parts[i] != "*")
+					result.Parts[i] = incoming.Parts[i];
+				else if (existing.Parts[i] == "*")
+					result.Parts[i] = "0";
 			}
 			return result.ToString();
 		}
@@ -172,9 +175,7 @@ namespace SIL.BuildTasks.StampAssemblies
 			try
 			{
 				var result = Regex.Match(contents, $@"\[assembly\: {whichAttribute}\(""(.+)""");
-				if (result == Match.Empty)
-					return null;
-				return ParseVersionString(result.Groups[1].Value);
+				return result == Match.Empty ? null : ParseVersionString(result.Groups[1].Value);
 			}
 			catch (Exception e)
 			{
@@ -190,12 +191,13 @@ namespace SIL.BuildTasks.StampAssemblies
 			return GetExistingAssemblyVersion("AssemblyVersion", contents);
 		}
 
+		// ReSharper disable once UnusedMember.Global
 		public VersionParts GetExistingAssemblyFileVersion(string contents)
 		{
 			return GetExistingAssemblyVersion("AssemblyFileVersion", contents);
 		}
 
-		public VersionParts ParseVersionString(string contents, bool allowHashAsRevision = false)
+		private static VersionParts ParseVersionString(string contents, bool allowHashAsRevision = false)
 		{
 			return ParseVersionString(contents, allowHashAsRevision ? VersionFormat.Info : VersionFormat.File);
 		}
@@ -205,11 +207,11 @@ namespace SIL.BuildTasks.StampAssemblies
 			VersionParts v;
 			if (format == VersionFormat.Semantic)
 			{
-				Match result = Regex.Match(contents, @"([\d\*]+)\.([\d\*]+)\.([\d\*]+)(?:\-(.*))?");
+				var result = Regex.Match(contents, @"([\d\*]+)\.([\d\*]+)\.([\d\*]+)(?:\-(.*))?");
 
 				v = new VersionParts
 				{
-					parts = new[]
+					Parts = new[]
 					{
 						result.Groups[1].Value,
 						result.Groups[2].Value,
@@ -220,7 +222,7 @@ namespace SIL.BuildTasks.StampAssemblies
 			}
 			else
 			{
-				Match result = Regex.Match(contents, @"(.+)\.(.+)\.(.+)\.(.+)");
+				var result = Regex.Match(contents, @"(.+)\.(.+)\.(.+)\.(.+)");
 				if (!result.Success)
 				{
 					//handle 1.0.*  (I'm not good enough with regex to
@@ -235,7 +237,7 @@ namespace SIL.BuildTasks.StampAssemblies
 
 				v = new VersionParts
 				{
-					parts = new[]
+					Parts = new[]
 					{
 						result.Groups[1].Value,
 						result.Groups[2].Value,
@@ -244,18 +246,18 @@ namespace SIL.BuildTasks.StampAssemblies
 					}
 				};
 
-				if (format == VersionFormat.File && v.parts.Length == 4
-					&& v.parts[3].IndexOfAny(new[] { 'a', 'b', 'c', 'd', 'e', 'f' }) != -1)
+				if (format == VersionFormat.File && v.Parts.Length == 4
+					&& v.Parts[3].IndexOfAny(new[] { 'a', 'b', 'c', 'd', 'e', 'f' }) != -1)
 				{
 					// zero out hash code which we can't have in numeric version numbers
-					v.parts[3] = "0";
+					v.Parts[3] = "0";
 				}
 			}
 
-			for (int i = 0; i < v.parts.Length; i++)
+			for (var i = 0; i < v.Parts.Length; i++)
 			{
-				if (string.IsNullOrEmpty(v.parts[i]))
-					v.parts[i] = "*";
+				if (string.IsNullOrEmpty(v.Parts[i]))
+					v.Parts[i] = "*";
 			}
 
 			return v;

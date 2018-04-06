@@ -1,70 +1,49 @@
 // Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
+
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.SubString
 {
+	[SuppressMessage("ReSharper", "UnusedMember.Global")]
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class Split : Task
 	{
-		private int _outputSubString;
-		private string _delimiter;
-		private string _input;
-		private string _returnProperty;
-		private int _maxSplit;
-
 		public Split()
 		{
-			_input = "";
-			_delimiter = ":";
-			_outputSubString = 0;
-			_maxSplit = 999;
+			Input = "";
+			Delimiter = ":";
+			OutputSubString = 0;
+			MaxSplit = 999;
 
-			_returnProperty = "";
+			ReturnValue = "";
 
 		}
 
 		[Required]
-		public string Input
-		{
-			get { return _input; }
-			set { _input = value; }
-		}
+		public string Input { get; set; }
 
-		public string Delimiter
-		{
-			get { return _delimiter.ToString(); }
-			set { _delimiter = value; }
-		}
+		public string Delimiter { get; set; }
 
-		public int OutputSubString
-		{
-			get { return _outputSubString; }
-			set { _outputSubString = value; }
-		}
+		public int OutputSubString { get; set; }
 
-		public int MaxSplit
-		{
-			get { return _maxSplit; }
-			set { _maxSplit = value; }
-		}
+		public int MaxSplit { get; set; }
 
 		[Output]
-		public string ReturnValue
-		{
-			get { return _returnProperty; }
-		}
+		public string ReturnValue { get; private set; }
 
 		public override bool Execute()
 		{
-			bool retval = false;
-			string[] result = _input.Split(_delimiter.ToCharArray(), _maxSplit);
-			if (_outputSubString < result.Length)
-			{
-				_returnProperty = result[_outputSubString];
-				retval = true;
-			}
-			return retval;
+			var result = Input.Split(Delimiter.ToCharArray(), MaxSplit);
+			if (OutputSubString >= result.Length)
+				return false;
+
+			ReturnValue = result[OutputSubString];
+			return true;
 		}
 
 	}

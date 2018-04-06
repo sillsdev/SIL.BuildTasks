@@ -20,10 +20,9 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 {
 	internal class IdToGuidDatabase
 	{
-		private ILogger _logger;
-		private string _filename;
-		private bool _changed = false;
-		private Dictionary<string, string> _guids = new Dictionary<string, string>();
+		private readonly ILogger _logger;
+		private readonly string _filename;
+		private readonly Dictionary<string, string> _guids = new Dictionary<string, string>();
 
 
 		#region Construction
@@ -36,73 +35,52 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 		public static IdToGuidDatabase Create(string filename, ILogger owner)
 		{
-			if (File.Exists(filename))
+			if (!File.Exists(filename))
+				return new IdToGuidDatabase(filename, owner);
+
+			var settings = new XmlReaderSettings {
+				IgnoreComments = true,
+				IgnoreWhitespace = true
+			};
+			using (var rdr = XmlReader.Create(filename, settings))
 			{
-				//  try
+				var m = new IdToGuidDatabase(filename, owner);
+
+				// skip XML declaration
+				do
 				{
-					XmlReaderSettings settings = new XmlReaderSettings();
-					settings.IgnoreComments = true;
-					settings.IgnoreWhitespace = true;
-					using (XmlReader rdr = XmlTextReader.Create(filename, settings))
+					if (!rdr.Read())
+						throw new XmlException("Unexpected EOF");
+				} while (rdr.NodeType != XmlNodeType.Element);
+
+				if (rdr.Name != "InstallerMetadata")
+					return m;
+
+				while (rdr.Read())
+				{
+					if (rdr.NodeType == XmlNodeType.Element && rdr.Name == "File")
 					{
-						IdToGuidDatabase m = new IdToGuidDatabase(filename, owner);
+						var id = rdr.GetAttribute("Id");
+						var guid = rdr.GetAttribute("Guid");
+						if (id == null || guid == null)
+							throw new XmlException("Unexpected format");
 
-						// skip XML declaration
-						do
-						{
-							if (!rdr.Read())
-								throw new XmlException("Unexpected EOF");
-						} while (rdr.NodeType != XmlNodeType.Element);
-
-						if (rdr.Name == "InstallerMetadata")
-						{
-							while (rdr.Read())
-							{
-								if (rdr.NodeType == XmlNodeType.Element && rdr.Name == "File")
-								{
-									string id = rdr.GetAttribute("Id");
-									string guid = rdr.GetAttribute("Guid");
-									if (id == null || guid == null)
-										throw new XmlException("Unexpected format");
-									m[id] = guid;
-								}
-								else if (rdr.NodeType == XmlNodeType.EndElement)
-								{
-									break;
-								}
-								else
-								{
-									throw new XmlException("Unexpected format");
-								}
-							}
-						}
-
-						return m;
+						m[id] = guid;
+					}
+					else if (rdr.NodeType == XmlNodeType.EndElement)
+					{
+						break;
+					}
+					else
+					{
+						throw new XmlException("Unexpected format");
 					}
 				}
-//                catch (Exception e)
-//                {
-//                    // fallthrough
-//                    throw e;
-//                }
+
+				return m;
 			}
-
-			return new IdToGuidDatabase(filename, owner);
 		}
-
 		#endregion
-
-
-
-		public bool Changed
-		{
-			get { return _changed; }
-		}
-
-		public string FileName
-		{
-			get { return _filename; }
-		}
 
 		private string this[string id]
 		{
@@ -114,7 +92,6 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			set
 			{
 				_guids[id] = value;
-				_changed = true;
 			}
 		}
 
@@ -123,39 +100,40 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 		public string GetGuid(string id, bool justCheckDontCreate)
 		{
-			string guid = this[id];
+			var guid = this[id];
 
-			if (guid == null)
+			if (guid != null)
+				return guid.ToUpper();
+
+			if (justCheckDontCreate)
 			{
-				if (justCheckDontCreate)
-				{
-					_logger.LogError("No GUID for " + id + " in " + _filename);
-					// on an error we do not save the generated GUID
-				}
-				else
-				{
-					_logger.LogMessage(MessageImportance.Low, "No GUID for " + id + " in " + _filename);
-					guid = Guid.NewGuid().ToString();
-					this[id] = guid;
-					Write();
-				}
+				_logger.LogError("No GUID for " + id + " in " + _filename);
+				// on an error we do not save the generated GUID
+			}
+			else
+			{
+				_logger.LogMessage(MessageImportance.Low, "No GUID for " + id + " in " + _filename);
+				guid = Guid.NewGuid().ToString();
+				this[id] = guid;
+				Write();
 			}
 
-			return guid.ToUpper();
+			return guid?.ToUpper();
 		}
 
 		private void Write()
 		{
-			XmlWriterSettings settings = new XmlWriterSettings();
-			settings.Indent = true;
-			settings.IndentChars = "  ";
-			settings.Encoding = Encoding.UTF8;
+			var settings = new XmlWriterSettings {
+				Indent = true,
+				IndentChars = "  ",
+				Encoding = Encoding.UTF8
+			};
 
-			using (XmlWriter writer = XmlTextWriter.Create(_filename, settings))
+			using (var writer = XmlWriter.Create(_filename, settings))
 			{
 				writer.WriteComment("This file is generated and then updated by an MSBuild task.  It preserves the automatically-generated guids assigned files that will be installed on user machines. So it should be held in source control.");
 				writer.WriteStartElement("InstallerMetadata");
-				foreach (string id in _guids.Keys)
+				foreach (var id in _guids.Keys)
 				{
 					writer.WriteStartElement("File");
 					writer.WriteAttributeString("Id", id);
@@ -171,10 +149,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 	public interface ILogger
 	{
-		void LogErrorFromException(Exception e);
-
 		void LogError(string s);
-		void LogWarning(string s);
 		void LogMessage( MessageImportance messageImportance,string s);
 	}
 }

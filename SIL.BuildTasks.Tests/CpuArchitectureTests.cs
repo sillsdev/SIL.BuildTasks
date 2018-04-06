@@ -9,24 +9,21 @@ namespace SIL.BuildTasks.Tests
 	public class CpuArchitectureTests
 	{
 		[Test]
-		public void Test_CpuArchitecture()
+		[Platform(Exclude = "Win")]
+		public void CpuArchitecture_Linux()
 		{
 			var task = new CpuArchitecture();
-			Assert.IsTrue(task.Execute());
-			if (Environment.OSVersion.Platform == System.PlatformID.Unix)
-			{
-				if (Environment.Is64BitOperatingSystem)
-					Assert.AreEqual("x86_64", task.Value);
-				else
-					Assert.AreEqual("i686", task.Value);
-			}
-			else
-			{
-				if (Environment.Is64BitOperatingSystem)
-					Assert.AreEqual("x64", task.Value);
-				else
-					Assert.AreEqual("x86", task.Value);
-			}
+			Assert.That(task.Execute(), Is.True);
+			Assert.That(task.Value, Is.EqualTo(Environment.Is64BitOperatingSystem ? "x86_64" : "i686"));
+		}
+
+		[Test]
+		[Platform(Include = "Win")]
+		public void CpuArchitecture_Windows()
+		{
+			var task = new CpuArchitecture();
+			Assert.That(task.Execute(), Is.True);
+			Assert.That(task.Value, Is.EqualTo(Environment.Is64BitOperatingSystem ? "x64" : "x86"));
 		}
 	}
 }

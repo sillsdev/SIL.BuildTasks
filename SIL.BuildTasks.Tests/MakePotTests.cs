@@ -6,7 +6,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using NUnit.Framework;
-using SIL.TestUtilities;
 
 namespace SIL.BuildTasks.Tests
 {
@@ -34,16 +33,19 @@ namespace SIL.BuildTasks.Tests
 			public void Dispose()
 			{
 				Dispose(true);
+				// ReSharper disable once GCSuppressFinalizeForTypeWithoutDestructor
 				GC.SuppressFinalize(true);
 			}
 
 			private void Dispose(bool disposing)
 			{
-				Directory.Delete(TempDir, true);
+				if (disposing)
+					Directory.Delete(TempDir, true);
 			}
+
 			#endregion
 
-			public static ITaskItem[] CreateTaskItemsForFilePath(string filePath)
+			private static ITaskItem[] CreateTaskItemsForFilePath(string filePath)
 			{
 				var items = new ITaskItem[1];
 				items[0] = new MockTaskItem(filePath);
@@ -52,14 +54,15 @@ namespace SIL.BuildTasks.Tests
 
 			public string MakePotFile(string input)
 			{
-				string csharpFilePath = Path.Combine(TempDir, "csharp.cs");
+				var csharpFilePath = Path.Combine(TempDir, "csharp.cs");
 				File.WriteAllText(csharpFilePath, input);
 
-				var pot = new MakePot.MakePot();
-				pot.OutputFile = Path.Combine(TempDir, "output.pot");
-				pot.CSharpFiles = CreateTaskItemsForFilePath(csharpFilePath);
-				pot.ProjectId = "Testing";
-				pot.MsdIdBugsTo = "bugs@example.com";
+				var pot = new MakePot.MakePot {
+					OutputFile = Path.Combine(TempDir, "output.pot"),
+					CSharpFiles = CreateTaskItemsForFilePath(csharpFilePath),
+					ProjectId = "Testing",
+					MsdIdBugsTo = "bugs@example.com"
+				};
 				pot.Execute();
 
 				return File.ReadAllText(pot.OutputFile);
@@ -69,12 +72,12 @@ namespace SIL.BuildTasks.Tests
 		[Test]
 		public void MatchesInCSharpString_StringWithTilde_HasMatch()
 		{
-			string contents = @"
+			var contents = @"
 somevar.MyLocalizableFunction('~MyLocalizableString');
 ".Replace("'", "\"");
 
 			var pot = new MakePot.MakePot();
-			MatchCollection matches = pot.MatchesInCSharpString(contents);
+			var matches = pot.MatchesInCSharpString(contents);
 			Assert.AreEqual(1, matches.Count);
 			foreach (Match match in matches)
 			{
@@ -86,12 +89,12 @@ somevar.MyLocalizableFunction('~MyLocalizableString');
 		[Test]
 		public void MatchesInCSharpString_StringWithTildeAndNotes_HasMatchAndNotes()
 		{
-			string contents = @"
+			var contents = @"
 somevar.MyLocalizableFunction('~MyLocalizableString', 'MyTranslationNotes');
 ".Replace("'", "\"");
 
 			var pot = new MakePot.MakePot();
-			MatchCollection matches = pot.MatchesInCSharpString(contents);
+			var matches = pot.MatchesInCSharpString(contents);
 			Assert.AreEqual(1, matches.Count);
 			foreach (Match match in matches)
 			{
@@ -105,12 +108,12 @@ somevar.MyLocalizableFunction('~MyLocalizableString', 'MyTranslationNotes');
 		[Test]
 		public void MatchesInCSharpString_StringWithTwoMatches_DoesntContainTildeInResult()
 		{
-			string contents = @"
+			var contents = @"
 somevar.MyLocalizableFunction(StringCatalog.Get('~MyLocalizableString', 'MyTranslationNotes'));
 ".Replace("'", "\"");
 
 			var pot = new MakePot.MakePot();
-			MatchCollection matches = pot.MatchesInCSharpString(contents);
+			var matches = pot.MatchesInCSharpString(contents);
 			Assert.AreEqual(1, matches.Count);
 			foreach (Match match in matches)
 			{
@@ -124,12 +127,12 @@ somevar.MyLocalizableFunction(StringCatalog.Get('~MyLocalizableString', 'MyTrans
 		[Test]
 		public void MatchesInCSharpString_UsingStringCatalogNoTilde_HasMatchAndNotes()
 		{
-			string contents = @"
+			var contents = @"
 somevar.MyLocalizableFunction(StringCatalog.Get('MyLocalizableString', 'MyTranslationNotes'));
 ".Replace("'", "\"");
 
 			var pot = new MakePot.MakePot();
-			MatchCollection matches = pot.MatchesInCSharpString(contents);
+			var matches = pot.MatchesInCSharpString(contents);
 			Assert.AreEqual(1, matches.Count);
 			foreach (Match match in matches)
 			{
@@ -143,12 +146,12 @@ somevar.MyLocalizableFunction(StringCatalog.Get('MyLocalizableString', 'MyTransl
 		[Test]
 		public void MatchesInCSharpString_UsingStringCatalogGetFormattedNoTilde_HasMatchAndNotes()
 		{
-			string contents = @"
+			var contents = @"
 somevar.MyLocalizableFunction(StringCatalog.GetFormatted('MyLocalizableString {0}', 'MyTranslationNotes', someArg));
 ".Replace("'", "\"");
 
 			var pot = new MakePot.MakePot();
-			MatchCollection matches = pot.MatchesInCSharpString(contents);
+			var matches = pot.MatchesInCSharpString(contents);
 			Assert.AreEqual(1, matches.Count);
 			foreach (Match match in matches)
 			{
@@ -162,12 +165,12 @@ somevar.MyLocalizableFunction(StringCatalog.GetFormatted('MyLocalizableString {0
 		[Test]
 		public void MatchesInCSharpString_UsingTextEqual_HasMatchAndNotes()
 		{
-			string contents = @"
+			var contents = @"
 somevar.Text = 'MyLocalizableString';
 ".Replace("'", "\"");
 
 			var pot = new MakePot.MakePot();
-			MatchCollection matches = pot.MatchesInCSharpString(contents);
+			var matches = pot.MatchesInCSharpString(contents);
 			Assert.AreEqual(1, matches.Count);
 			foreach (Match match in matches)
 			{
@@ -180,14 +183,14 @@ somevar.Text = 'MyLocalizableString';
 		[Test]
 		public void MatchesInCSharpString_StringWithBackslashQuote_MatchesToEndOfString()
 		{
-			string contents = @"
+			var contents = @"
 somevar.Text = 'MyLocalizableString \'InQuote\' end';
 ".Replace("'", "\"");
 
-			string expected = "MyLocalizableString \\\"InQuote\\\" end";
+			const string expected = "MyLocalizableString \\\"InQuote\\\" end";
 
 			var pot = new MakePot.MakePot();
-			MatchCollection matches = pot.MatchesInCSharpString(contents);
+			var matches = pot.MatchesInCSharpString(contents);
 			Assert.AreEqual(1, matches.Count);
 			foreach (Match match in matches)
 			{
@@ -203,14 +206,14 @@ somevar.Text = 'MyLocalizableString \'InQuote\' end';
 			const string contents = @"don\'t want backslash";
 			const string expected = @"don't want backslash";
 
-			string actual = MakePot.MakePot.UnescapeString(contents);
+			var actual = MakePot.MakePot.UnescapeString(contents);
 			Assert.AreEqual(expected, actual);
 		}
 
 		[Test]
 		public void ProcessSrcFile_AllMatches_OutputsGoodPo()
 		{
-			string contents = @"
+			var contents = @"
 somevar.Text = 'FirstLocalizableString';
 
 somevar.MyLocalizableFunction(StringCatalog.Get('SecondLocalizableString', 'SecondNotes'));
@@ -219,7 +222,7 @@ somevar.MyLocalizableFunction('~ThirdLocalizableString', 'ThirdNotes');
 
 ".Replace("'", "\"");
 
-			string expected =
+			var expected =
 @"msgid ''
 msgstr ''
 'Project-Id-Version: Testing\n'
@@ -262,11 +265,11 @@ msgstr ''
 		[Test]
 		public void ProcessSrcFile_BackupStringWithDots_DoesNotHaveDuplicates()
 		{
-			string contents = @"
+			var contents = @"
 somevar.Text = 'Backing Up...';
 ".Replace("'", "\"");
 
-			string expected =
+			var expected =
 @"msgid ''
 msgstr ''
 'Project-Id-Version: Testing\n'
@@ -299,13 +302,13 @@ msgstr ''
 		[Test]
 		public void ProcessSrcFile_BackupStringWithDuplicates_HasOnlyOneInOutput()
 		{
-			string contents = @"
+			var contents = @"
 somevar.Text = 'Backing Up...';
 
 somevar.Text = 'Backing Up...';
 ".Replace("'", "\"");
 
-			string expected =
+			var expected =
 @"msgid ''
 msgstr ''
 'Project-Id-Version: Testing\n'
@@ -339,11 +342,11 @@ msgstr ''
 		[Test]
 		public void ProcessSrcFile_EmptyString_NotPresentInOutput()
 		{
-			string contents = @"
+			var contents = @"
 somevar.Text = '';
 ".Replace("'", "\"");
 
-			string expected =
+			var expected =
 @"msgid ''
 msgstr ''
 'Project-Id-Version: Testing\n'
