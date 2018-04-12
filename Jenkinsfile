@@ -10,5 +10,5 @@ xplatformBuildAndRunTests {
 	linuxNodeSpec = 'linux64 && !packager && ubuntu && mono5'
 	linuxTool = 'mono-msbuild15'
 	configuration = 'Release'
-	uploadNuGet = true
+	uploadNuGet = false
 }
