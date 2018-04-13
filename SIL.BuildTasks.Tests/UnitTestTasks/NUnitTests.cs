@@ -34,8 +34,8 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 		{
 			_nunitDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 			Directory.CreateDirectory(_nunitDir);
-			var sourceDir = Path.Combine(OutputDirectory, "..", "..", "packages",
-				"NUnit.Runners.Net4.2.6.4", "tools");
+			var sourceDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+				".nuget", "packages", "nunit.runners.net4", "2.6.4", "tools");
 			foreach (var file in Directory.EnumerateFiles(sourceDir, "*.*",
 				SearchOption.AllDirectories))
 			{
@@ -64,18 +64,18 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 		private static string GetBuildFilename(string category)
 		{
 			var buildFile = Path.GetTempFileName();
-			File.WriteAllText(buildFile, string.Format(@"
+			File.WriteAllText(buildFile, $@"
 <Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
-	<UsingTask TaskName='NUnit' AssemblyFile='{0}' />
+	<UsingTask TaskName='NUnit' AssemblyFile='{
+					Path.Combine(OutputDirectory, "SIL.BuildTasks.dll")
+				}' />
 	<Target Name='Test'>
-		<NUnit Assemblies='{1}' ToolPath='{2}' TestInNewThread='false' Force32Bit='{4}'
-			IncludeCategory='{3}' Verbose='true' />
+		<NUnit Assemblies='{
+					Path.Combine(OutputDirectory, "SIL.BuildTasks.Tests.Helper.dll")
+				}' ToolPath='{NUnitDir}' TestInNewThread='false' Force32Bit='{!Environment.Is64BitProcess}'
+			IncludeCategory='{category}' Verbose='true' />
 	</Target>
-</Project>",
-				Path.Combine(OutputDirectory, "SIL.BuildTasks.dll"),
-				Path.Combine(OutputDirectory, "SIL.BuildTasks.Tests.Helper.dll"),
-				NUnitDir,
-				category, !Environment.Is64BitProcess));
+</Project>");
 
 			return buildFile;
 		}

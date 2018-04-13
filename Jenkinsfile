@@ -6,8 +6,8 @@
 
 xplatformBuildAndRunTests {
 	winNodeSpec = 'windows && supported && vs2017'
-	winTool = 'msbuild15'
 	linuxNodeSpec = 'linux64 && !packager && ubuntu && mono5'
+	winTool = 'msbuild15'
 	linuxTool = 'mono-msbuild15'
 	configuration = 'Release'
 	uploadNuGet = false
