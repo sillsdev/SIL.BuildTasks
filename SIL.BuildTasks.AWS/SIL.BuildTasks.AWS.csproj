@@ -20,5 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.6.1" />
+    <PackageReference Include="GitVersionTask" Version="[4.0.0-beta0012,)">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

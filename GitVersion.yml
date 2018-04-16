@@ -1,0 +1,11 @@
+assembly-versioning-scheme: MajorMinorPatchTag
+mode: ContinuousDeployment
+branches:
+  master:
+    tag: beta
+    regex: (origin/)?master
+  pull-request:
+    mode: ContinuousDeployment
+    tag: PR
+ignore:
+  sha: []
