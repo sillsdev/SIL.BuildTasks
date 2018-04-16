@@ -19,8 +19,6 @@
 		AssemblyFile="$(agent_home_dir)/plugins/dotnetPlugin/bin/JetBrains.BuildServer.MSBuildLoggers.dll"
 		Condition=" '$(teamcity_version)' != '' And '$(OS)'!='Windows_NT'"/>
 
-	<Import Project="NuGet.targets"/>
-
 	<Target Name="Build">
 		<CallTarget Targets="Clean"/>
 		<CallTarget Targets="Compile"/>
@@ -44,7 +42,7 @@
 			WorkingDirectory="$(RootDir)" />
 	</Target>
 
-	<Target Name="Compile" DependsOnTargets="RestorePackages">
+	<Target Name="Compile" DependsOnTargets="Restore">
 		<MSBuild
 			Projects="$(SolutionPath)"
 			Targets="Build"
@@ -81,6 +79,20 @@
 			Force32Bit="$(useNUnit-x86)"
 			Verbose="true"
 			OutputXmlFile="$(RootDir)/output/$(Configuration)/TestResults.xml"/>
+	</Target>
+
+	<Target Name="Restore">
+		<MSBuild
+			Projects="$(SolutionPath)"
+			Targets="Restore"
+			Properties="Configuration=$(Configuration)" />
+	</Target>
+
+	<Target Name="Pack">
+		<MSBuild
+			Projects="$(SolutionPath)"
+			Targets="Pack"
+			Properties="Configuration=$(Configuration)" />
 	</Target>
 
 </Project>

@@ -13,6 +13,18 @@
     <Copyright>Copyright © 2018 SIL International</Copyright>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+
+		<Authors>SIL International</Authors>
+		<PackageLicenseUrl>https://github.com/sillsdev/SIL.BuildTasks/blob/master/LICENSE</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
     <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
       $(PackageTargetFallback);netframework35
     </PackageTargetFallback >
@@ -28,4 +40,9 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+  <Target Name="StoreVersion" AfterTargets="DispatchToInnerBuilds">
+    <WriteLinesToFile File="$(OutputPath)/version.txt"
+      Lines="$(GitVersion_NuGetVersion)"
+      Overwrite="True" />
+  </Target>
 </Project>
