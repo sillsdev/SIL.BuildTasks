@@ -3,8 +3,7 @@
     <TargetFrameworks>net461</TargetFrameworks>
     <RootNamespace>SIL.BuildTasks</RootNamespace>
     <Configurations>Debug;Release</Configurations>
-    <Description>SIL.BuildTasks defines several msbuild tasks used in building our
-      other projects.</Description>
+    <Description>SIL.BuildTasks defines several msbuild tasks used in building our other projects.</Description>
     <OutputPath>../output/$(Configuration)</OutputPath>
 
     <AssemblyTitle>SIL.BuildTasks</AssemblyTitle>
