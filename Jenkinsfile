@@ -10,5 +10,5 @@ xplatformBuildAndRunTests {
 	winTool = 'msbuild15'
 	linuxTool = 'mono-msbuild15'
 	configuration = 'Release'
-	uploadNuGet = false
+	uploadNuGet = true
 }

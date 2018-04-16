@@ -20,10 +20,11 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
 
-		<Authors>SIL International</Authors>
-		<PackageLicenseUrl>https://github.com/sillsdev/SIL.BuildTasks/blob/master/LICENSE</PackageLicenseUrl>
-		<PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Authors>SIL International</Authors>
+    <PackageLicenseUrl>https://github.com/sillsdev/SIL.BuildTasks/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <IsTool>true</IsTool>
 
     <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
       $(PackageTargetFallback);netframework35
