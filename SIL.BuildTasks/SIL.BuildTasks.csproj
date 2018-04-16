@@ -26,6 +26,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <IsTool>true</IsTool>
 
+    <!-- This is required for MarkdownDeep.NET which doesn't provide a version for a newer framework version -->
     <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
       $(PackageTargetFallback);netframework35
     </PackageTargetFallback >
