@@ -7,6 +7,7 @@
 		<Solution>SIL.BuildTasks.sln</Solution>
 		<SolutionPath>$(RootDir)/$(Solution)</SolutionPath>
 		<BuildingWithXBuild>$(_.EndsWith('xbuild'))</BuildingWithXBuild>
+		<FailTaskIfAnyTestsFail Condition="'$(FailTaskIfAnyTestsFail)' == ''">true</FailTaskIfAnyTestsFail>
 		<NuGetPackageDir Condition="'$(OS)'=='Windows_NT'">$(UserProfile)/.nuget/packages</NuGetPackageDir>
 		<NuGetPackageDir Condition="'$(OS)'!='Windows_NT'">$(Home)/.nuget/packages</NuGetPackageDir>
 	</PropertyGroup>
@@ -78,6 +79,7 @@
 			WorkingDirectory="$(RootDir)/output/$(Configuration)/net461"
 			Force32Bit="$(useNUnit-x86)"
 			Verbose="true"
+			FailTaskIfAnyTestsFail="$(FailTaskIfAnyTestsFail)"
 			OutputXmlFile="$(RootDir)/output/$(Configuration)/TestResults.xml"/>
 	</Target>
 
