@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- [nunit] Don't crash on Linux if no toolpath is specified
+
 ## [1.0.0] - 2018-04-16
 
 ### Added

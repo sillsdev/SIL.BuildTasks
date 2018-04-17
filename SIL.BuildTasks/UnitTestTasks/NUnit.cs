@@ -256,18 +256,24 @@ namespace SIL.BuildTasks.UnitTestTasks
 					return;
 				}
 			}
-			foreach (var dir in Directory.EnumerateDirectories(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)))
-			{
-				if (!dir.StartsWith("NUnit"))
-					continue;
 
-				// ReSharper disable once InvertIf
-				if (File.Exists(Path.Combine(dir, Path.Combine("bin", RealProgramName))))
+			var programFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+			if (!string.IsNullOrEmpty(programFilesPath))
+			{
+				foreach (var dir in Directory.EnumerateDirectories(programFilesPath))
 				{
-					ToolPath = dir;
-					return;
+					if (!dir.StartsWith("NUnit"))
+						continue;
+
+					// ReSharper disable once InvertIf
+					if (File.Exists(Path.Combine(dir, Path.Combine("bin", RealProgramName))))
+					{
+						ToolPath = dir;
+						return;
+					}
 				}
 			}
+
 			var keySoftware = Registry.CurrentUser.OpenSubKey("Software");
 			if (keySoftware != null && Environment.OSVersion.Platform == PlatformID.Win32NT)
 			{

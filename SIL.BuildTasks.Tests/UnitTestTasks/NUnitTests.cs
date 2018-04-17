@@ -61,9 +61,10 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 			}
 		}
 
-		private static string GetBuildFilename(string category)
+		private static string GetBuildFilename(string category, bool addToolPath = true)
 		{
 			var buildFile = Path.GetTempFileName();
+			var toolPath = addToolPath ? NUnitDir : "";
 			File.WriteAllText(buildFile, $@"
 <Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
 	<UsingTask TaskName='NUnit' AssemblyFile='{
@@ -72,7 +73,7 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 	<Target Name='Test'>
 		<NUnit Assemblies='{
 					Path.Combine(OutputDirectory, "SIL.BuildTasks.Tests.Helper.dll")
-				}' ToolPath='{NUnitDir}' TestInNewThread='false' Force32Bit='{!Environment.Is64BitProcess}'
+				}' ToolPath='{toolPath}' TestInNewThread='false' Force32Bit='{!Environment.Is64BitProcess}'
 			IncludeCategory='{category}' Verbose='true' />
 	</Target>
 </Project>");
@@ -94,6 +95,15 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 		public void Success_DoesntFailBuild()
 		{
 			var xmlReader = new XmlTextReader(GetBuildFilename("Success"));
+			var project = new Project(xmlReader);
+			var result = project.Build("Test");
+			Assert.That(result, Is.True, "Passing tests shouldn't fail the build");
+		}
+
+		[Test]
+		public void Success_DoesntCrashIfNoToolPath()
+		{
+			var xmlReader = new XmlTextReader(GetBuildFilename("Success", false));
 			var project = new Project(xmlReader);
 			var result = project.Build("Test");
 			Assert.That(result, Is.True, "Passing tests shouldn't fail the build");
