@@ -96,21 +96,22 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// REVIEW: it actually seems to me that this should be the default behavior, but
 		/// I suppose changing the code in that way now could cause problems for existing callers.
 		/// </summary>
-		public bool? FailTaskIfAnyTestsFail
+		/// <remarks>Don't make this property return <c>bool?</c> because msbuild doesn't support nullable types!</remarks>
+		public bool FailTaskIfAnyTestsFail
 		{
-			get => _failTaskIfAnyTestsFail;
+			get => _failTaskIfAnyTestsFail.HasValue && _failTaskIfAnyTestsFail.Value;
 			set
 			{
 				_failTaskIfAnyTestsFail = value;
 
 				// For NUnit, a positive exit code indicates the number of failed tests
-				_failTaskIfPositiveExitCode = value.HasValue && value.Value;
+				_failTaskIfPositiveExitCode = value;
 			}
 		}
 
 		// make this nullable so we have a third state, not set
 		private bool? _testInNewThread;
-		private bool? _failTaskIfAnyTestsFail;
+		protected bool? _failTaskIfAnyTestsFail;
 
 		/// <summary>
 		/// Allows tests to be run in a new thread, allowing you to take advantage of ApartmentState and ThreadPriority settings in the config file.

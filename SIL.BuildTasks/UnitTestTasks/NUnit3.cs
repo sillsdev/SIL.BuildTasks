@@ -44,7 +44,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 				// the logic there could potentially cause unexpected results for existing
 				// callers whereas the NUnit3 task is new enough, I think we are okay.
 				// (And there is no TeamCity property for NUnit, anyway.)
-				if (!FailTaskIfAnyTestsFail.HasValue)
+				if (!_failTaskIfAnyTestsFail.HasValue)
 					FailTaskIfAnyTestsFail = value;
 			}
 		}
