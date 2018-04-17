@@ -98,7 +98,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// </summary>
 		public bool? FailTaskIfAnyTestsFail
 		{
-			get { return _failTaskIfAnyTestsFail; }
+			get => _failTaskIfAnyTestsFail;
 			set
 			{
 				_failTaskIfAnyTestsFail = value;
@@ -117,8 +117,8 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// </summary>
 		public bool TestInNewThread
 		{
-			get { return !_testInNewThread.HasValue || _testInNewThread.Value; }
-			set { _testInNewThread = value; }
+			get => !_testInNewThread.HasValue || _testInNewThread.Value;
+			set => _testInNewThread = value;
 		}
 
 		/// <summary>
