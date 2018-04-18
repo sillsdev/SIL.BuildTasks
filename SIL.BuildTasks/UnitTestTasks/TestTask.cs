@@ -222,10 +222,8 @@ namespace SIL.BuildTasks.UnitTestTasks
 				};
 			try
 			{
-				var msg = string.Format("Starting program: {1} ({2}) in {0}",
-					process.StartInfo.WorkingDirectory,
-					process.StartInfo.FileName,
-					process.StartInfo.Arguments);
+				var msg = $"Starting program: {process.StartInfo.FileName} " +
+					$"({process.StartInfo.Arguments}) in {process.StartInfo.WorkingDirectory}";
 
 				Log.LogMessage(MessageImportance.Low, msg);
 

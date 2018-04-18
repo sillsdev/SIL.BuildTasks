@@ -101,15 +101,6 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 		}
 
 		[Test]
-		public void Success_DoesntCrashIfNoToolPath()
-		{
-			var xmlReader = new XmlTextReader(GetBuildFilename("Success", false));
-			var project = new Project(xmlReader);
-			var result = project.Build("Test");
-			Assert.That(result, Is.True, "Passing tests shouldn't fail the build");
-		}
-
-		[Test]
 		public void FailingTests_DoesntFailBuild()
 		{
 			var xmlReader = new XmlTextReader(GetBuildFilename("Failing"));
@@ -163,5 +154,24 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 			var result = project.Build("Test");
 			Assert.That(result, Is.True, "Warnings on Stderr shouldn't fail the build");
 		}
+
+		[Test]
+		public void ToolPath_NotSetUsesCurrentWorkdir()
+		{
+			var oldWorkDir = Directory.GetCurrentDirectory();
+			try
+			{
+				Directory.SetCurrentDirectory(NUnitDir);
+				var xmlReader = new XmlTextReader(GetBuildFilename("Success", false));
+				var project = new Project(xmlReader);
+				var result = project.Build("Test");
+				Assert.That(result, Is.True, "Passing tests shouldn't fail the build");
+			}
+			finally
+			{
+				Directory.SetCurrentDirectory(oldWorkDir);
+			}
+		}
+
 	}
 }

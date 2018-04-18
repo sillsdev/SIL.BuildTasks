@@ -171,11 +171,12 @@ namespace SIL.BuildTasks.UnitTestTasks
 		{
 			get
 			{
-				if (IsMono)
-					return "mono";
-
 				EnsureToolPath();
-				return Path.Combine(Path.GetFullPath(ToolPath), RealProgramName);
+				var programNameAndPath = Path.Combine(Path.GetFullPath(ToolPath), RealProgramName);
+				if (!File.Exists(programNameAndPath))
+					return null;
+
+				return IsMono ? "mono" : programNameAndPath;
 			}
 		}
 

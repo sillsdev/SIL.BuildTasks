@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- [nunit] Check existence of nunit executable
+
 ### Fixed
 
 - [nunit] Don't crash on Linux if no toolpath is specified
