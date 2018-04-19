@@ -71,13 +71,6 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// </summary>
 		public string WorkingDirectory { get; set; }
 
-		protected override string GetWorkingDirectory()
-		{
-			// ReSharper disable once AssignNullToNotNullAttribute
-			return Path.GetFullPath(!string.IsNullOrEmpty(WorkingDirectory) ?
-				WorkingDirectory : Path.GetDirectoryName(Assemblies[0].ItemSpec));
-		}
-
 		/// <summary>
 		/// Determines whether assemblies are copied to a shadow folder during testing.
 		/// </summary>
@@ -128,7 +121,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 		public bool Force32Bit { get; set; }
 
 		/// <summary>
-		/// Determines the framework to run aganist.
+		/// Determines the framework to run against.
 		/// </summary>
 		public string Framework { get; set; }
 
@@ -159,6 +152,13 @@ namespace SIL.BuildTasks.UnitTestTasks
 
 				return (bool)_isMono;
 			}
+		}
+
+		protected override string GetWorkingDirectory()
+		{
+			// ReSharper disable once AssignNullToNotNullAttribute
+			return Path.GetFullPath(!string.IsNullOrEmpty(WorkingDirectory) ?
+				WorkingDirectory : Path.GetDirectoryName(Assemblies[0].ItemSpec));
 		}
 
 		/// <inheritdoc />
