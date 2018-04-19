@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<SilReleaseTasksPath Condition="'$(SilReleaseTasksPath)'==''">$(MSBuildThisFileDirectory)/../tools</SilReleaseTasksPath>
+		<SilReleaseTasksFile>$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll</SilReleaseTasksFile>
+	</PropertyGroup>
+
+	<UsingTask TaskName="CreateChangelogEntry" AssemblyFile="$(SilReleaseTasksFile)" />
+	<UsingTask TaskName="CreateReleaseNotesHtml" AssemblyFile="$(SilReleaseTasksFile)" />
+	<UsingTask TaskName="StampChangelogFileWithVersion" AssemblyFile="$(SilReleaseTasksFile)" />
+
+</Project>

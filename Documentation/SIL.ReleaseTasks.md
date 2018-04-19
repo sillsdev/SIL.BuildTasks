@@ -1,0 +1,98 @@
+# SIL.ReleaseTasks package
+
+Tasks in the `SIL.ReleaseTasks` nuget package:
+
+## CreateChangelogEntry task
+
+Given a Changelog file, this task will add an entry to the debian changelog (`debian/changelog`). The
+changelog can be a markdown file and can follow the [Keep a Changelog](https://keepachangelog.com)
+conventions.
+
+### Properties
+
+- `ChangelogFile`: The name (and path) of the markdown-style changelog file (required)
+
+- `VersionNumber`: The version number to put in the debian changelog (required)
+
+- `PackageName`: The name of the product/package (required)
+
+- `DebianChangelog`: The path and name of the debian changelog file (required)
+
+- `Distribution`: The name of the distribution to put in the debian changelog entry. Defaults to `UNRELEASED`
+
+- `Urgency`: The value to put in the urgency field in the debian changelog. Defaults to `low`
+
+- `MaintainerInfo`: Name and e-mail of the maintainer. Defaults to
+  `Anonymous <anonymous@example.com>`
+
+### Example
+
+``` xml
+<UsingTask TaskName="CreateChangelogEntry" AssemblyFile="SIL.ReleaseTasks.dll" />
+
+<Target Name="Test">
+  <CreateChangelogEntry ChangelogFile="$(RootDir)/CHANGELOG.md" VersionNumber="3.0.1"
+    PackageName="myfavoriteapp" DebianChangelog="$(RootDir)/debian/changelog"
+    Distribution="stable" Urgency="high" MaintainerInfo="John Doe &lt;john_doe@example.com&gt;" />
+</Target>
+```
+
+This uses the markdown file `CHANGELOG.md` and VersionNumber to generate a changelog entry
+in the DebianChangeLog file giving the author credit to John Doe.
+
+## CreateReleaseNotesHtml task
+
+Given a markdown-style changelog file, this class will generate a release notes HTML file. The
+changelog can be a markdown file and can follow the [Keep a Changelog](https://keepachangelog.com)
+conventions.
+
+If the HTML file already exists, the task will look for a section with `class="releasenotes"`
+and replace it with the current release notes.
+
+### Properties
+
+- `ChangelogFile`: The name (and path) of the markdown-style changelog file (required)
+
+- `HtmlFile`: The name (and path) of the output HTML file (required)
+
+### Example
+
+``` xml
+<UsingTask TaskName="CreateReleaseNotesHtml" AssemblyFile="SIL.ReleaseTasks.dll" />
+
+<Target Name="Test">
+  <CreateReleaseNotesHtml ChangelogFile="$(RootDir)/CHANGELOG.md"
+    HtmlFile="$(OutputDir)/ReleaseNotes.html" />
+</Target>
+```
+
+This generates a `ReleaseNotes.html` file by creating a new file or by replacing the
+`<div class='releasenotes'>` in an existing .htm with a generated one.
+
+## StampChangelogFileWithVersion task
+
+Replaces the first line in a markdown-style Changelog/Release file with the version and date. The
+changelog can be a markdown file and can follow the [Keep a Changelog](https://keepachangelog.com)
+conventions.
+
+This assumes that a temporary line is currently at the top: e.g. `## DEV_VERSION_NUMBER: DEV_RELEASE_DATE`
+
+### Properties
+
+- `ChangelogFile`: The name (and path) of the markdown-style changelog file (required)
+
+- `VersionNumber`: The version number to put in the changelog file (required)
+
+### Example
+
+``` xml
+<UsingTask TaskName="StampChangelogFileWithVersion" AssemblyFile="SIL.ReleaseTasks.dll" />
+
+<Target Name="Test">
+  <StampChangelogFileWithVersion ChangelogFile="$(RootDir)/CHANGELOG.md"
+    VersionNumber="1.0.3" />
+</Target>
+```
+
+This stamps the `CHANGELOG.md` file with the version numbers (replacing the first line with
+`'## VERSION_NUMBER DATE'`).

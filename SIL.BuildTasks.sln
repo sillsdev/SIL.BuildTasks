@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionF
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		CHANGELOG.md = CHANGELOG.md
+		Readme.md = Readme.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ForceCrash", "ForceCrash", "{D41379D9-7E82-4793-BDC0-2D7C89C1F7BF}"
@@ -24,6 +25,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ForceCrash", "ForceCrash", 
 		SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\ForceCrash.vcxproj = SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\ForceCrash.vcxproj
 		SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\Makefile = SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\Makefile
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIL.ReleaseTasks", "SIL.ReleaseTasks\SIL.ReleaseTasks.csproj", "{F572E587-1520-4604-BBB9-F903CDCEFC69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIL.ReleaseTasks.Tests", "SIL.ReleaseTasks.Tests\SIL.ReleaseTasks.Tests.csproj", "{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +88,30 @@ Global
 		{413BC26E-4F2E-4273-9D2D-83AB79753D8D}.Release|x64.Build.0 = Release|Any CPU
 		{413BC26E-4F2E-4273-9D2D-83AB79753D8D}.Release|x86.ActiveCfg = Release|Any CPU
 		{413BC26E-4F2E-4273-9D2D-83AB79753D8D}.Release|x86.Build.0 = Release|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Debug|x64.Build.0 = Debug|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Debug|x86.Build.0 = Debug|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Release|x64.ActiveCfg = Release|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Release|x64.Build.0 = Release|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Release|x86.ActiveCfg = Release|Any CPU
+		{F572E587-1520-4604-BBB9-F903CDCEFC69}.Release|x86.Build.0 = Release|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Debug|x64.Build.0 = Debug|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Debug|x86.Build.0 = Debug|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Release|x64.ActiveCfg = Release|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Release|x64.Build.0 = Release|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Release|x86.ActiveCfg = Release|Any CPU
+		{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

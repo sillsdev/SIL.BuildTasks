@@ -20,6 +20,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Automatically add tasks by providing a `.props` file
 
+### Added
+
+- `SIL.ReleaseTasks` nuget package with three tasks: `CreateChangelogEntry`, `CreateReleaseNotesHtml`,
+  and `StampChangelogFileWithVersion`
+
+### Removed
+
+- The `GenerateReleaseArtifacts` task got removed from `SIL.BuildTasks` and split into three
+  separate tasks (see above). See [document](Documentation/Migration.md#upgrade-to-version-2) for help
+  migrating existing build scripts.
+
 ## [1.0.2] - 2018-06-08
 
 ### Changed
@@ -30,7 +41,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- added documentation for SIL.BuildTasks
+- added documentation for `SIL.BuildTasks`
 
 ### Changed
 

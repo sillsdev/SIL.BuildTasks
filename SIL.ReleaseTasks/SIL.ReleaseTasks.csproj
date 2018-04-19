@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461</TargetFrameworks>
-    <RootNamespace>SIL.BuildTasks</RootNamespace>
+    <RootNamespace>SIL.ReleaseTasks</RootNamespace>
     <Configurations>Debug;Release</Configurations>
-    <Description>SIL.BuildTasks defines several msbuild tasks used in building our other projects.</Description>
+    <Description>Several release related tasks that can work with a CHANGELOG.md file.</Description>
+    <OutputPath>../output/$(Configuration)</OutputPath>
 
-    <AssemblyTitle>SIL.BuildTasks</AssemblyTitle>
+    <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
     <Company>SIL</Company>
     <Product>Palaso Library</Product>
     <Copyright>Copyright © 2018 SIL International</Copyright>
@@ -22,30 +23,39 @@
     <PackageLicenseUrl>https://github.com/sillsdev/SIL.BuildTasks/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
     <IsTool>true</IsTool>
+
+    <!-- This is required for MarkdownDeep.NET which doesn't provide a version for a newer framework version -->
+    <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
+      $(PackageTargetFallback);netframework35
+    </PackageTargetFallback >
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
+    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.2" >
+      <IncludeAssets>All</IncludeAssets>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.5.180" />
+    <!-- still missing GitVersionTask for netstandard! -->
+  </ItemGroup>
+  <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
+    <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.1" >
+      <IncludeAssets>All</IncludeAssets>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="[4.0.0-beta0012,)">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SIL.BuildTasks.props">
+    <Content Include="SIL.ReleaseTasks.props">
       <Pack>true</Pack>
       <PackagePath>build</PackagePath>
     </Content>
   </ItemGroup>
-  <Target Name="StoreVersion" AfterTargets="DispatchToInnerBuilds">
-    <WriteLinesToFile File="$(OutputPath)/version.txt"
-      Lines="$(GitVersion_NuGetVersion)"
-      Overwrite="True" />
-  </Target>
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
   <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
