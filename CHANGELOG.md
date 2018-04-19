@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - [nunit] Check existence of nunit executable
+- [nunit] Allow to set `FailTaskIfAnyTestsFail` property in msbuild script
 
 ### Fixed
 
