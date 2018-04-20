@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] - 2018-04-20
+
 ### Added
 
 - added documentation for SIL.BuildTasks
