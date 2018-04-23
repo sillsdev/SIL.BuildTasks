@@ -13,7 +13,12 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 	[TestFixture]
 	public class NUnitTests
 	{
-		private static string OutputDirectory => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+		private static string OutputDirectoryOfHelper => Path.Combine(
+			OutputDirectoryOfBuildTasks, "..", "..", "..", "SIL.BuildTasks.Tests",
+			"SIL.BuildTasks.Tests.Helper", "bin", "net461");
+
+		private static string OutputDirectoryOfBuildTasks =>
+			Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
 
 		private static string _nunitDir;
 
@@ -68,11 +73,11 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 			File.WriteAllText(buildFile, $@"
 <Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
 	<UsingTask TaskName='NUnit' AssemblyFile='{
-					Path.Combine(OutputDirectory, "SIL.BuildTasks.dll")
+					Path.Combine(OutputDirectoryOfBuildTasks, "SIL.BuildTasks.dll")
 				}' />
 	<Target Name='Test'>
 		<NUnit Assemblies='{
-					Path.Combine(OutputDirectory, "SIL.BuildTasks.Tests.Helper.dll")
+					Path.Combine(OutputDirectoryOfHelper, "SIL.BuildTasks.Tests.Helper.dll")
 				}' ToolPath='{toolPath}' TestInNewThread='false' Force32Bit='{!Environment.Is64BitProcess}'
 			IncludeCategory='{category}' Verbose='true' />
 	</Target>
@@ -81,7 +86,7 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 			return buildFile;
 		}
 
-		[TestFixtureTearDown]
+		[OneTimeTearDown]
 		public void FixtureTearDown()
 		{
 			if (string.IsNullOrEmpty(_nunitDir))

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2018 SIL International
+// Copyright (c) 2012-2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
@@ -251,6 +251,9 @@ namespace SIL.BuildTasks.UnitTestTasks
 			// ReSharper disable once PossibleNullReferenceException
 			foreach (var dir in Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator))
 			{
+				if (string.IsNullOrEmpty(dir))
+					continue;
+
 				// ReSharper disable once InvertIf
 				if (File.Exists(Path.Combine(dir, RealProgramName)))
 				{

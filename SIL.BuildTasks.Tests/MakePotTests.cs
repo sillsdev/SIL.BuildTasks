@@ -258,7 +258,7 @@ msgstr ''
 
 			using (var e = new EnvironmentForTest())
 			{
-				Assert.That(e.MakePotFile(contents), ConstrainStringByLine.Matches(expected));
+				Assert.That(e.MakePotFile(contents), Is.MultilineString(expected));
 			}
 		}
 
@@ -295,7 +295,7 @@ msgstr ''
 
 			using (var e = new EnvironmentForTest())
 			{
-				Assert.That(e.MakePotFile(contents), ConstrainStringByLine.Matches(expected));
+				Assert.That(e.MakePotFile(contents), Is.MultilineString(expected));
 			}
 		}
 
@@ -335,7 +335,7 @@ msgstr ''
 
 			using (var e = new EnvironmentForTest())
 			{
-				Assert.That(e.MakePotFile(contents), ConstrainStringByLine.Matches(expected));
+				Assert.That(e.MakePotFile(contents), Is.MultilineString(expected));
 			}
 		}
 
@@ -368,7 +368,7 @@ msgstr ''
 
 			using (var e = new EnvironmentForTest())
 			{
-				Assert.That(e.MakePotFile(contents), ConstrainStringByLine.Matches(expected));
+				Assert.That(e.MakePotFile(contents), Is.MultilineString(expected));
 			}
 		}
 

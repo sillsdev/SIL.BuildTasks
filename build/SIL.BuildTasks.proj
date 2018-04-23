@@ -12,7 +12,7 @@
 		<NuGetPackageDir Condition="'$(OS)'!='Windows_NT'">$(Home)/.nuget/packages</NuGetPackageDir>
 	</PropertyGroup>
 
-	<UsingTask TaskName="NUnit" AssemblyFile="$(RootDir)/output/$(Configuration)/net461/SIL.BuildTasks.dll" />
+	<UsingTask TaskName="NUnit3" AssemblyFile="$(RootDir)/output/$(Configuration)/net461/SIL.BuildTasks.dll" />
 	<UsingTask TaskName="NUnitTeamCity"
 		AssemblyFile="$(teamcity_dotnet_nunitlauncher_msbuild_task)"
 		Condition=" '$(teamcity_version)' != '' And '$(OS)'=='Windows_NT'"/>
@@ -64,7 +64,7 @@
 		<NUnitTeamCity
 			Assemblies="@(TestAssemblies)"
 			ExcludeCategory="SkipOnTeamCity;ByHand$(ExtraExcludeCategories)"
-			NUnitVersion="NUnit-2.6.4" />
+			NUnitVersion="NUnit-3" />
 	</Target>
 
 	<Target Name="RunNUnit" Condition="'$(teamcity_version)' == ''">
@@ -72,13 +72,14 @@
 			<TestAssemblies Include="$(RootDir)/output/$(Configuration)/net461/*.Tests.dll"/>
 		</ItemGroup>
 
-		<NUnit Assemblies="@(TestAssemblies)"
-			ToolPath="$(NuGetPackageDir)/nunit.runners.net4/2.6.4/tools"
+		<NUnit3 Assemblies="@(TestAssemblies)"
+			ToolPath="$(NuGetPackageDir)/nunit.consolerunner/3.8.0/tools"
 			TestInNewThread="false"
 			ExcludeCategory="$(excludedCategories)$(ExtraExcludeCategories)"
 			WorkingDirectory="$(RootDir)/output/$(Configuration)/net461"
 			Force32Bit="$(useNUnit-x86)"
 			Verbose="true"
+			UseNUnit3Xml="true"
 			FailTaskIfAnyTestsFail="$(FailTaskIfAnyTestsFail)"
 			OutputXmlFile="$(RootDir)/output/$(Configuration)/TestResults.xml"/>
 	</Target>
