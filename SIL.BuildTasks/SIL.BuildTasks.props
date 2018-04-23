@@ -1,0 +1,21 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<SilBuildTasksPath Condition="'$(SilBuildTasksPath)'==''">$(MSBuildThisFileDirectory)/../tools</SilBuildTasksPath>
+		<SilBuildTasksFile>$(SilBuildTasksPath)/SIL.BuildTasks.dll</SilBuildTasksFile>
+	</PropertyGroup>
+
+	<UsingTask TaskName="Archive" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="CpuArchitecture" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="DownloadFile" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="FileUpdate" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="MakePot" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="MakeWixForDirTree" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="NUnit" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="NUnit3" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="Split" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="StampAssemblies" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="UnixName" AssemblyFile="$(SilBuildTasksFile)" />
+	<UsingTask TaskName="UpdateBuildTypeFile" AssemblyFile="$(SilBuildTasksFile)" />
+
+</Project>

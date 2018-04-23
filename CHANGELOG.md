@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Automatically add tasks by providing a `.props` file
+
 ## [1.0.2] - 2018-06-08
 
 ### Changed

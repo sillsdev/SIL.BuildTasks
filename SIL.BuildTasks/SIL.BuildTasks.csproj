@@ -44,6 +44,12 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="SIL.BuildTasks.props">
+      <Pack>true</Pack>
+      <PackagePath>build</PackagePath>
+    </Content>
+  </ItemGroup>
   <Target Name="StoreVersion" AfterTargets="DispatchToInnerBuilds">
     <WriteLinesToFile File="$(OutputPath)/version.txt"
       Lines="$(GitVersion_NuGetVersion)"
