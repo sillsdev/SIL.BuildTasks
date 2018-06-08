@@ -4,7 +4,6 @@
     <RootNamespace>SIL.BuildTasks</RootNamespace>
     <Configurations>Debug;Release</Configurations>
     <Description>SIL.BuildTasks defines several msbuild tasks used in building our other projects.</Description>
-    <OutputPath>../output/$(Configuration)</OutputPath>
 
     <AssemblyTitle>SIL.BuildTasks</AssemblyTitle>
     <Company>SIL</Company>
@@ -23,6 +22,7 @@
     <PackageLicenseUrl>https://github.com/sillsdev/SIL.BuildTasks/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
     <IsTool>true</IsTool>
 
     <!-- This is required for MarkdownDeep.NET which doesn't provide a version for a newer framework version -->
@@ -36,7 +36,10 @@
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.1" />
+    <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.1">
+      <IncludeAssets>All</IncludeAssets>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="GitVersionTask" Version="[4.0.0-beta0012,)">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
@@ -45,5 +48,17 @@
     <WriteLinesToFile File="$(OutputPath)/version.txt"
       Lines="$(GitVersion_NuGetVersion)"
       Overwrite="True" />
+  </Target>
+  <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
+  <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <None
+        Include="$(OutputPath)/net461/*.dll;$(OutputPath)/net461/*.exe;$(OutputPath)/net461/*.dll.config"
+        Exclude="$(OutputPath)/net461/$(AssemblyTitle).dll">
+        <Pack>true</Pack>
+        <PackageFlatten>true</PackageFlatten>
+        <PackagePath>tools</PackagePath>
+      </None>
+    </ItemGroup>
   </Target>
 </Project>
