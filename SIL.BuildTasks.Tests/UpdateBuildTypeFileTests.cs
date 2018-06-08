@@ -72,34 +72,21 @@ namespace SIL.BuildTasks.Tests
 		private static string GetFileContents(string existingType, params string[] types)
 		{
 			var bldr = new StringBuilder();
-			bldr.Append("namespace SIL.BuildTasks.Tests");
-			bldr.Append(Environment.NewLine);
-			bldr.Append("{");
-			bldr.Append(Environment.NewLine);
-			bldr.Append("\tpublic static class MyBuildType");
-			bldr.Append(Environment.NewLine);
-			bldr.Append("\t{");
-			bldr.Append(Environment.NewLine);
-			bldr.Append("\t\tpublic enum VersionType");
-			bldr.Append(Environment.NewLine);
-			bldr.Append("\t\t{");
-			bldr.Append(Environment.NewLine);
+			bldr.AppendLine("namespace SIL.BuildTasks.Tests");
+			bldr.AppendLine("{");
+			bldr.AppendLine("    public static class MyBuildType");
+			bldr.AppendLine("    {");
+			bldr.AppendLine("        public enum VersionType");
+			bldr.AppendLine("        {");
 			foreach (var type in types)
 			{
-				bldr.Append("\t\t\t");
-				bldr.Append(type);
-				bldr.Append(",");
-				bldr.Append(Environment.NewLine);
+				bldr.AppendLine($"            {type},");
 			}
-			bldr.Append("\t\t}");
-			bldr.Append(Environment.NewLine);
-			bldr.Append(Environment.NewLine);
-			bldr.Append("\t\tpublic static VersionType BuildType { get { return VersionType.");
-			bldr.Append(existingType);
-			bldr.Append("; } }");
-			bldr.Append("\t}");
-			bldr.Append(Environment.NewLine);
-			bldr.Append("}");
+			bldr.AppendLine("        }");
+			bldr.AppendLine();
+			bldr.AppendLine($"        public static VersionType BuildType {{ get {{ return VersionType.{existingType}; }} }}");
+			bldr.AppendLine("    }");
+			bldr.AppendLine("}");
 
 			return bldr.ToString();
 		}
