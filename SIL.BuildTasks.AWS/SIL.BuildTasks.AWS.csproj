@@ -4,8 +4,8 @@
     <RootNamespace>SIL.BuildTasks</RootNamespace>
     <Configurations>Debug;Release</Configurations>
     <Description>SIL.BuildTasks.AWS defines a S3BuildPublisher msbuild task to publish a set of files to a S3 bucket.</Description>
-    <OutputPath>../output/$(Configuration)</OutputPath>
-    <AssemblyTitle>SIL.BuildTasks</AssemblyTitle>
+    <OutputPath>bin/$(Configuration)</OutputPath>
+    <AssemblyTitle>SIL.BuildTasks.AWS</AssemblyTitle>
     <Company>SIL</Company>
     <Product>Palaso Library</Product>
     <Copyright>Copyright © 2018 SIL International</Copyright>
@@ -22,6 +22,7 @@
     <PackageLicenseUrl>https://github.com/sillsdev/SIL.BuildTasks/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
     <IsTool>true</IsTool>
   </PropertyGroup>
   <ItemGroup>
@@ -30,9 +31,24 @@
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.6.1" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.6.1">
+      <IncludeAssets>All</IncludeAssets>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="GitVersionTask" Version="[4.0.0-beta0012,)">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+  <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
+  <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <None
+        Include="$(OutputPath)/net461/*.dll;$(OutputPath)/net461/*.exe;$(OutputPath)/net461/*.dll.config"
+        Exclude="$(OutputPath)/net461/$(AssemblyTitle).dll">
+        <Pack>true</Pack>
+        <PackageFlatten>true</PackageFlatten>
+        <PackagePath>tools</PackagePath>
+      </None>
+    </ItemGroup>
+  </Target>
 </Project>
