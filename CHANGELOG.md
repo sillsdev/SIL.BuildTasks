@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.2] - 2018-06-08
+
 ### Changed
 
 - Include all dependencies. This makes it easier to consume the tasks in msbuild scripts.
