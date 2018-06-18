@@ -4,9 +4,9 @@ Tasks in the `SIL.ReleaseTasks` nuget package:
 
 ## CreateChangelogEntry task
 
-Given a Changelog file, this task will add an entry to the debian changelog (`debian/changelog`). The
-changelog can be a markdown file and can follow the [Keep a Changelog](https://keepachangelog.com)
-conventions.
+Given a Changelog file, this task will add an entry to the debian changelog (`debian/changelog`).
+The changelog can be a markdown file and can follow the
+[Keep a Changelog](https://keepachangelog.com) conventions.
 
 ### Properties
 
@@ -18,7 +18,8 @@ conventions.
 
 - `DebianChangelog`: The path and name of the debian changelog file (required)
 
-- `Distribution`: The name of the distribution to put in the debian changelog entry. Defaults to `UNRELEASED`
+- `Distribution`: The name of the distribution to put in the debian changelog entry. Defaults to
+  `UNRELEASED`
 
 - `Urgency`: The value to put in the urgency field in the debian changelog. Defaults to `low`
 
@@ -27,7 +28,7 @@ conventions.
 
 ### Example
 
-``` xml
+```xml
 <UsingTask TaskName="CreateChangelogEntry" AssemblyFile="SIL.ReleaseTasks.dll" />
 
 <Target Name="Test">
@@ -57,7 +58,7 @@ and replace it with the current release notes.
 
 ### Example
 
-``` xml
+```xml
 <UsingTask TaskName="CreateReleaseNotesHtml" AssemblyFile="SIL.ReleaseTasks.dll" />
 
 <Target Name="Test">
@@ -75,7 +76,8 @@ Replaces the first line in a markdown-style Changelog/Release file with the vers
 changelog can be a markdown file and can follow the [Keep a Changelog](https://keepachangelog.com)
 conventions.
 
-This assumes that a temporary line is currently at the top: e.g. `## DEV_VERSION_NUMBER: DEV_RELEASE_DATE`
+This assumes that a temporary line is currently at the top: e.g.
+`## DEV_VERSION_NUMBER: DEV_RELEASE_DATE`
 
 ### Properties
 
@@ -85,7 +87,7 @@ This assumes that a temporary line is currently at the top: e.g. `## DEV_VERSION
 
 ### Example
 
-``` xml
+```xml
 <UsingTask TaskName="StampChangelogFileWithVersion" AssemblyFile="SIL.ReleaseTasks.dll" />
 
 <Target Name="Test">
@@ -96,3 +98,27 @@ This assumes that a temporary line is currently at the top: e.g. `## DEV_VERSION
 
 This stamps the `CHANGELOG.md` file with the version numbers (replacing the first line with
 `'## VERSION_NUMBER DATE'`).
+
+## SetReleaseNotesProperty task
+
+Sets a property to the changes mentioned in the topmost release in a `CHANGELOG.md` file.
+This is a markdown file that follows the [Keep a Changelog](https://keepachangelog.com)
+conventions.
+
+### Properties
+
+- `ChangelogFile`: The name (and path) of the markdown-style changelog file (required)
+
+- `Value` (output parameter): The name of the property that will be set
+
+### Example
+
+```xml
+<UsingTask TaskName="SetReleaseNotesProperty" AssemblyFile="SIL.ReleaseTasks.dll" />
+
+<Target Name="Test">
+  <SetReleaseNotesProperty ChangelogFile="$(RootDir)/CHANGELOG.md">
+    <Output TaskParameter="Value" PropertyName="ReleaseNotes" />
+  </SetReleaseNotesProperty>
+</Target>
+```
