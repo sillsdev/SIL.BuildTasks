@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `SIL.ReleaseTasks` nuget package with three tasks: `CreateChangelogEntry`, `CreateReleaseNotesHtml`,
   and `StampChangelogFileWithVersion`
 
+- `SetReleaseNotesProperty` task that sets a msbuild property with the release notes from a
+  `CHANGELOG.md` file. This is useful for nuget packages.
+
 ### Removed
 
 - The `GenerateReleaseArtifacts` task got removed from `SIL.BuildTasks` and split into three

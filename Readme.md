@@ -11,6 +11,7 @@ Several useful msbuild tasks.
 [CreateChangelogEntry](Documentation/SIL.ReleaseTasks.md#createchangelogentry-task) | Given a Changelog file, this task will add an entry to the debian changelog.
 [CreateReleaseNotesHtml](Documentation/SIL.ReleaseTasks.md#createreleasenoteshtml-task) | Given a markdown-style changelog file, this class will generate a release notes HTML file.
 [StampChangelogFileWithVersion](Documentation/SIL.ReleaseTasks.md#stampchangelogfilewithversion-task) | Replaces the first line in a markdown-style Changelog/Release file with the version and date.
+[SetReleaseNotesProperty](Documentation/SIL.ReleaseTasks.md#setreleasenotesproperty-task) | Given a markdown-style changelog file, this class will set a property to the changes mentioned in the topmost release.
 
 ### [`SIL.BuildTasks` package](Documentation/SIL.BuildTasks.md)
 

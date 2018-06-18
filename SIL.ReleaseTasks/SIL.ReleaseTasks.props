@@ -8,5 +8,6 @@
 	<UsingTask TaskName="CreateChangelogEntry" AssemblyFile="$(SilReleaseTasksFile)" />
 	<UsingTask TaskName="CreateReleaseNotesHtml" AssemblyFile="$(SilReleaseTasksFile)" />
 	<UsingTask TaskName="StampChangelogFileWithVersion" AssemblyFile="$(SilReleaseTasksFile)" />
+	<UsingTask TaskName="SetReleaseNotesProperty" AssemblyFile="$(SilReleaseTasksFile)" />
 
 </Project>
