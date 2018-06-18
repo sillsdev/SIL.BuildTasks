@@ -96,3 +96,27 @@ This assumes that a temporary line is currently at the top: e.g. `## DEV_VERSION
 
 This stamps the `CHANGELOG.md` file with the version numbers (replacing the first line with
 `'## VERSION_NUMBER DATE'`).
+
+## SetReleaseNotesProperty task
+
+Sets a property to the changes mentioned in the topmost release in a `CHANGELOG.md` file.
+This is a markdown file that follows the [Keep a Changelog](https://keepachangelog.com)
+conventions.
+
+### Properties
+
+- `ChangelogFile`: The name (and path) of the markdown-style changelog file (required)
+
+- `Value` (output parameter): The name of the property that will be set
+
+### Example
+
+```xml
+<UsingTask TaskName="SetReleaseNotesProperty" AssemblyFile="SIL.ReleaseTasks.dll" />
+
+<Target Name="Test">
+  <SetReleaseNotesProperty ChangelogFile="$(RootDir)/CHANGELOG.md">
+    <Output TaskParameter="Value" PropertyName="ReleaseNotes" />
+  </SetReleaseNotesProperty>
+</Target>
+```

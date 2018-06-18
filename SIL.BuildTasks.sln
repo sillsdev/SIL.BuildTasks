@@ -30,6 +30,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIL.ReleaseTasks", "SIL.Rel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIL.ReleaseTasks.Tests", "SIL.ReleaseTasks.Tests\SIL.ReleaseTasks.Tests.csproj", "{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{B6AA690D-7454-4A75-ADFF-03E4A6B51966}"
+ProjectSection(SolutionItems) = preProject
+	Documentation\Migration.md = Documentation\Migration.md
+	Documentation\SIL.BuildTasks.md = Documentation\SIL.BuildTasks.md
+	Documentation\SIL.ReleaseTasks.md = Documentation\SIL.ReleaseTasks.md
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
