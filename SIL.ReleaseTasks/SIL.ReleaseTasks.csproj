@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <RootNamespace>SIL.ReleaseTasks</RootNamespace>
     <Configurations>Debug;Release</Configurations>
     <Description>Several release related tasks that can work with a CHANGELOG.md file.</Description>
-    <OutputPath>../output/$(Configuration)</OutputPath>
-
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
     <Company>SIL</Company>
     <Product>Palaso Library</Product>
@@ -18,20 +16,19 @@
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-
     <Authors>SIL International</Authors>
     <PackageLicenseUrl>https://github.com/sillsdev/SIL.BuildTasks/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <IsTool>true</IsTool>
-
+    <BuildOutputTargetFolder>tools/$(TargetFramework)</BuildOutputTargetFolder>
     <!-- This is required for MarkdownDeep.NET which doesn't provide a version for a newer framework version -->
     <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
       $(PackageTargetFallback);netframework35
-    </PackageTargetFallback >
+    </PackageTargetFallback>
+    <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
-    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.2" >
+    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.2">
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
@@ -39,7 +36,7 @@
     <!-- still missing GitVersionTask for netstandard! -->
   </ItemGroup>
   <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
-    <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.1" >
+    <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.1">
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
@@ -50,22 +47,52 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="SIL.ReleaseTasks.props">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-  </ItemGroup>
+  <Target Name="CopyTargetsAndProps" AfterTargets="Build" Condition="'$(TargetFramework)'!=''">
+    <ItemGroup>
+      <PropTargets Include="$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.targets;$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.props" />
+    </ItemGroup>
+    <ReplaceFileText InputFilename="%(PropTargets.Identity)"
+                     OutputFilename="$(OutputPath)/build/$(TargetFramework)/%(PropTargets.Filename)%(PropTargets.Extension)"
+                     MatchExpression="TARGETFRAMEWORK"
+                     ReplacementText="$(TargetFramework)" />
+  </Target>
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
   <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
-      <None
-        Include="$(OutputPath)/net461/*.dll;$(OutputPath)/net461/*.exe;$(OutputPath)/net461/*.dll.config"
-        Exclude="$(OutputPath)/net461/$(AssemblyTitle).dll">
+      <None Include="$(OutputPath)/**/*.dll;$(OutputPath)/**/*.exe;$(OutputPath)/**/*.dll.config" Exclude="$(OutputPath)/**/$(AssemblyTitle).dll">
         <Pack>true</Pack>
-        <PackageFlatten>true</PackageFlatten>
-        <PackagePath>tools</PackagePath>
+        <PackageFlatten>false</PackageFlatten>
+        <PackagePath>$(BuildOutputTargetFolder)</PackagePath>
+      </None>
+      <None Include="$(OutputPath)/**/build/**/*.*">
+        <Pack>true</Pack>
+        <PackagePath>build/</PackagePath>
+      </None>
+      <None Include="$(OutputPath)/**/build/**/*.*">
+        <Pack>true</Pack>
+        <PackagePath>buildMultiTargeting/</PackagePath>
       </None>
     </ItemGroup>
   </Target>
+  <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <InputFilename ParameterType="System.String" Required="true" />
+      <OutputFilename ParameterType="System.String" Required="true" />
+      <MatchExpression ParameterType="System.String" Required="true" />
+      <ReplacementText ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Core" />
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        Directory.CreateDirectory(Path.GetDirectoryName(OutputFilename));
+        File.WriteAllText(
+          OutputFilename,
+          Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
+          );
+      ]]></Code>
+    </Task>
+  </UsingTask>
 </Project>

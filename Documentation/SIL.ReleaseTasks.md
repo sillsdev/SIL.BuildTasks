@@ -122,3 +122,13 @@ conventions.
   </SetReleaseNotesProperty>
 </Target>
 ```
+
+### Automatically create release notes
+
+By adding the `SIL.ReleaseTasks` nuget package to a project, the `PackageReleaseNotes`
+property will be automatically set when creating a nuget package of the .csproj project.
+This works with the new .csproj format that comes with VS 2017 and that defines the
+nuget package in the .csproj file.
+
+By default the changelog file is expected in `../CHANGELOG.md`. The name and path can be
+changed by setting the `ChangelogFile` property.

@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Automatically set `PackageReleaseNotes` property
+
 ## [2.0.0] - 2018-06-18
 
 ### Changed

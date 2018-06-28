@@ -1,13 +1,11 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
 	<PropertyGroup>
-		<SilReleaseTasksPath Condition="'$(SilReleaseTasksPath)'==''">$(MSBuildThisFileDirectory)/../tools</SilReleaseTasksPath>
-		<SilReleaseTasksFile>$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll</SilReleaseTasksFile>
+		<SilReleaseTasksPath Condition="'$(SilReleaseTasksPath)'==''">$(MSBuildThisFileDirectory)/../../tools/TARGETFRAMEWORK</SilReleaseTasksPath>
 	</PropertyGroup>
 
-	<UsingTask TaskName="CreateChangelogEntry" AssemblyFile="$(SilReleaseTasksFile)" />
-	<UsingTask TaskName="CreateReleaseNotesHtml" AssemblyFile="$(SilReleaseTasksFile)" />
-	<UsingTask TaskName="StampChangelogFileWithVersion" AssemblyFile="$(SilReleaseTasksFile)" />
-	<UsingTask TaskName="SetReleaseNotesProperty" AssemblyFile="$(SilReleaseTasksFile)" />
+	<UsingTask TaskName="CreateChangelogEntry" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
+	<UsingTask TaskName="CreateReleaseNotesHtml" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
+	<UsingTask TaskName="StampChangelogFileWithVersion" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
+	<UsingTask TaskName="SetReleaseNotesProperty" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
 
 </Project>
