@@ -22,6 +22,7 @@
 
 	<Target Name="Build">
 		<CallTarget Targets="Clean"/>
+		<CallTarget Targets="PackDogfood"/>
 		<CallTarget Targets="Compile"/>
 		<Message Text="Build Complete"/>
 	</Target>
@@ -98,4 +99,22 @@
 			Properties="Configuration=$(Configuration)" />
 	</Target>
 
+	<!-- Pre-build steps for creating dogfood nuget package -->
+	<PropertyGroup>
+		<DogfoodProject>$(RootDir)/SIL.ReleaseTasks.Dogfood/SIL.ReleaseTasks.Dogfood.csproj</DogfoodProject>
+	</PropertyGroup>
+
+	<Target Name="RestoreDogfood">
+		<MSBuild
+			Projects="$(DogfoodProject)"
+			Targets="Restore"
+			Properties="IsRestoring=true" />
+	</Target>
+
+	<Target Name="PackDogfood" DependsOnTargets="RestoreDogfood">
+		<MSBuild
+			Projects="$(DogfoodProject)"
+			Targets="Pack"
+			Properties="Configuration=Release" />
+	</Target>
 </Project>

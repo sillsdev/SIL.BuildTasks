@@ -1,22 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
-    <RootNamespace>SIL.ReleaseTasks</RootNamespace>
-    <Configurations>Debug;Release</Configurations>
-    <Description>Several release related tasks that can work with a CHANGELOG.md file.</Description>
+    <TargetFrameworks>net461</TargetFrameworks>
+    <Configurations>Release</Configurations>
+    <Description>Intermediate nuget package that can be used when packaging SIL.ReleaseTasks.</Description>
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
+    <AssemblyName>SIL.ReleaseTasks</AssemblyName>
+    <PackageId>SIL.ReleaseTasks.Dogfood</PackageId>
     <Company>SIL</Company>
     <Product>Palaso Library</Product>
     <Copyright>Copyright © 2018 SIL International</Copyright>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Authors>SIL International</Authors>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <Authors>SIL International</Authors>
     <PackageLicenseUrl>https://github.com/sillsdev/SIL.BuildTasks/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -25,30 +26,23 @@
     <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
       $(PackageTargetFallback);netframework35
     </PackageTargetFallback>
-    <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
   </PropertyGroup>
-  <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
-    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.2">
-      <IncludeAssets>All</IncludeAssets>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.5.180" />
-    <!-- still missing GitVersionTask for netstandard! -->
-  </ItemGroup>
   <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.1">
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Tasks.v4.0" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <PackageReference Include="GitVersionTask" Version="[4.0.0-beta0012,)">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.0.0-*,)">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Tasks.v4.0" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
   </ItemGroup>
-  <Import Project="SIL.ReleaseTasks.Common.inc"/>
+  <ItemGroup>
+    <Compile Include="..\SIL.ReleaseTasks\SetReleaseNotesProperty.cs">
+      <Link>SetReleaseNotesProperty.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="..\SIL.ReleaseTasks\SIL.ReleaseTasks.Common.inc" />
 </Project>
