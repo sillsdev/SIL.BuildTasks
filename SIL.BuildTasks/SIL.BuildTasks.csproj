@@ -22,6 +22,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
     <IsTool>true</IsTool>
+    <NoBuild>true</NoBuild>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
