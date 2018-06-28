@@ -9,3 +9,4 @@ branches:
     tag: PR
 ignore:
   sha: []
+next-version: 2.0.1
