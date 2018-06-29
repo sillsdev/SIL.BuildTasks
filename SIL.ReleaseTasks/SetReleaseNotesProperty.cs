@@ -1,16 +1,18 @@
 ﻿// Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.ReleaseTasks
 {
 	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	public class SetReleaseNotesProperty: Task
+	public class SetReleaseNotesProperty : Task
 	{
 		[Required]
 		public string ChangelogFile { get; set; }
@@ -18,8 +20,11 @@ namespace SIL.ReleaseTasks
 		[Output]
 		public string Value { get; set; }
 
+		public string VersionRegex { get; set; } = @"#+ \[([^]]+)\]";
+
 		private string[] _markdownLines;
-		private int _currentIndex;
+		private int      _currentIndex;
+		private Regex    _versionRegex;
 
 		public override bool Execute()
 		{
@@ -29,9 +34,11 @@ namespace SIL.ReleaseTasks
 				return false;
 			}
 
+			_versionRegex = new Regex(VersionRegex);
+
 			_markdownLines = File.ReadAllLines(ChangelogFile);
 
-			Value = ConvertLatestChangelog(1, 3);
+			Value = ConvertLatestChangelog(1, 2);
 
 			if (!string.IsNullOrEmpty(Value))
 				return true;
@@ -68,12 +75,26 @@ namespace SIL.ReleaseTasks
 						{
 							if (level >= skipUntilLevel)
 							{
-								if (bldr.Length > 0)
-									bldr.AppendLine();
-								var headerText = currentLine.Substring(levelHeader.Length);
-								if (!headerText.EndsWith(":"))
-									headerText += ":";
-								bldr.AppendLine(headerText);
+								if (_versionRegex.IsMatch(currentLine))
+								{
+									var version =
+										ExtractPreviousVersionFromChangelog(levelHeader);
+									if (!string.IsNullOrEmpty(version))
+									{
+										bldr.AppendLine($"Changes since version {version}");
+										bldr.AppendLine();
+									}
+								}
+								else
+								{
+									if (bldr.Length > 0)
+										bldr.AppendLine();
+
+									var headerText = currentLine.Substring(levelHeader.Length);
+									if (!headerText.EndsWith(":"))
+										headerText += ":";
+									bldr.AppendLine(headerText);
+								}
 								skipUntilLevel = -1;
 							}
 
@@ -83,11 +104,11 @@ namespace SIL.ReleaseTasks
 						}
 
 						// other level
-						if (level >= skipUntilLevel)
+						if (level > skipUntilLevel)
 							_currentIndex = _markdownLines.Length;
 						break;
 					default:
-						if (level >= skipUntilLevel)
+						if (level > skipUntilLevel)
 							bldr.AppendLine(currentLine);
 						break;
 				}
@@ -96,5 +117,39 @@ namespace SIL.ReleaseTasks
 			return bldr.ToString();
 		}
 
+		private string ExtractPreviousVersionFromChangelog(string currentLevel)
+		{
+			var nonEmptyLines = 0;
+			for (var i = _currentIndex + 1; i < _markdownLines.Length; i++)
+			{
+				var currentLine = _markdownLines[i];
+
+				if (string.IsNullOrEmpty(currentLine))
+					continue;
+
+				nonEmptyLines++;
+				if (!currentLine.StartsWith(currentLevel))
+					continue;
+
+				if (!_versionRegex.IsMatch(currentLine))
+					continue;
+
+				if (nonEmptyLines <= 1)
+				{
+					// if we have something like
+					// ## [Unreleased]
+					// ## [1.5]
+					// we're currently at version 1.5 but we want to return the previous version.
+					// Skip this heading
+					_currentIndex = i;
+					continue;
+				}
+
+				var match = _versionRegex.Match(currentLine);
+				return match.Groups[1].Value;
+			}
+
+			return string.Empty;
+		}
 	}
 }

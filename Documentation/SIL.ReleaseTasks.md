@@ -109,6 +109,9 @@ conventions.
 
 - `ChangelogFile`: The name (and path) of the markdown-style changelog file (required)
 
+- `VersionRegex`: Regular expression to extract the version number from the subheadings in the
+  changelog file. Default: `#+ \[([^]]+)\]`
+
 - `Value` (output parameter): The name of the property that will be set
 
 ### Example
@@ -132,3 +135,9 @@ nuget package in the .csproj file.
 
 By default the changelog file is expected in `../CHANGELOG.md`. The name and path can be
 changed by setting the `ChangelogFile` property.
+
+[Keep a Changelog](https://keepachangelog.com) doesn't make any recommendations in what form
+versions should be put in the changelog. The default for the `SetReleaseNotesProperty` task
+follows the example given on the [Keep a Changelog](https://keepachangelog.com) website, which
+puts the version number in square brackets, e.g. `## [1.0.0] - 2017-06-20`. However, it's
+possible to set the `VersionRegex` property to allow parsing different formats.
