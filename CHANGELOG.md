@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Automatically set `PackageReleaseNotes` property
 - [SetReleaseNotesProperty task] Remove empty lines
+- [SetReleaseNotesProperty task] Add `VersionRegex` property, extract version number and mention
+  in `PackageReleaseNotes` property
 
 ## [2.0.0] - 2018-06-18
 

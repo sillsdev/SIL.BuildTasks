@@ -173,7 +173,47 @@ and this project adheres to [Semantic Versioning](http: //semver.org/).
 
 			// Verify
 			Assert.That(result, Is.True);
-			Assert.That(sut.Value, Is.EqualTo(@"Changed:
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 1.0
+
+Changed:
+- This is a unit test
+"));
+		}
+
+		[Test]
+		public void UnreleasedWithPreviousReleaseAndCustomUnreleasedVersion()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Foo]
+
+### Changed
+
+- This is a unit test
+
+## [1.0] - 2018-06-18
+
+### Added
+
+- added unit test
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 1.0
+
+Changed:
 - This is a unit test
 "));
 		}
@@ -206,6 +246,84 @@ and this project adheres to [Semantic Versioning](http: //semver.org/).
 			// Verify
 			Assert.That(result, Is.True);
 			Assert.That(sut.Value, Is.EqualTo(@"Changed:
+- This is a unit test
+"));
+		}
+
+		[Test]
+		public void EmptyUnreleasedWithTwoPreviousReleases()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+## [1.0.5] - 2018-06-29
+
+### Changed
+
+- This is a unit test
+
+## [1.0.0] - 2018-06-18
+
+### Added
+
+- added unit test
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 1.0.0
+
+Changed:
+- This is a unit test
+"));
+		}
+
+		[Test]
+		public void ReleaseWithPreviousRelease()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [1.0.5] - 2018-06-29
+
+### Changed
+
+- This is a unit test
+
+## [1.0.0] - 2018-06-18
+
+### Added
+
+- added unit test
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 1.0.0
+
+Changed:
 - This is a unit test
 "));
 		}
