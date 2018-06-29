@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - Automatically set `PackageReleaseNotes` property
+- [SetReleaseNotesProperty task] Remove empty lines
 
 ## [2.0.0] - 2018-06-18
 
