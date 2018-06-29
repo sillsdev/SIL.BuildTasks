@@ -31,7 +31,7 @@ namespace SIL.ReleaseTasks
 
 			_markdownLines = File.ReadAllLines(ChangelogFile);
 
-			Value = ConvertLatestChangelog(1, 3, true);
+			Value = ConvertLatestChangelog(1, 3);
 
 			if (!string.IsNullOrEmpty(Value))
 				return true;
@@ -40,7 +40,7 @@ namespace SIL.ReleaseTasks
 			return false;
 		}
 
-		private string ConvertLatestChangelog(int level, int skipUntilLevel = -1, bool skipUntiLevelReached = false)
+		private string ConvertLatestChangelog(int level, int skipUntilLevel = -1)
 		{
 			var bldr = new StringBuilder();
 			if (_currentIndex >= _markdownLines.Length)
@@ -53,11 +53,7 @@ namespace SIL.ReleaseTasks
 			{
 				var currentLine = _markdownLines[_currentIndex];
 				if (string.IsNullOrEmpty(currentLine))
-				{
-					if (!skipUntiLevelReached)
-						bldr.AppendLine();
 					continue;
-				}
 
 				switch (currentLine[0])
 				{
@@ -72,16 +68,17 @@ namespace SIL.ReleaseTasks
 						{
 							if (level >= skipUntilLevel)
 							{
+								if (bldr.Length > 0)
+									bldr.AppendLine();
 								var headerText = currentLine.Substring(levelHeader.Length);
 								if (!headerText.EndsWith(":"))
 									headerText += ":";
 								bldr.AppendLine(headerText);
 								skipUntilLevel = -1;
-								skipUntiLevelReached = false;
 							}
 
 							_currentIndex++;
-							bldr.Append(ConvertLatestChangelog(level + 1, skipUntilLevel, skipUntiLevelReached));
+							bldr.Append(ConvertLatestChangelog(level + 1, skipUntilLevel));
 							break;
 						}
 

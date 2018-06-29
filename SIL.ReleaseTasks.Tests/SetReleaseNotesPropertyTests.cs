@@ -109,7 +109,6 @@ and this project adheres to [Semantic Versioning](http: //semver.org/).
 			// Verify
 			Assert.That(result, Is.True);
 			Assert.That(sut.Value, Is.EqualTo(@"Changed:
-
 - This is a unit test
 "));
 		}
@@ -139,7 +138,6 @@ and this project adheres to [Semantic Versioning](http: //semver.org/).
 			// Verify
 			Assert.That(result, Is.True);
 			Assert.That(sut.Value, Is.EqualTo(@"Changed:
-
 - This is a unit test
 "));
 		}
@@ -176,9 +174,7 @@ and this project adheres to [Semantic Versioning](http: //semver.org/).
 			// Verify
 			Assert.That(result, Is.True);
 			Assert.That(sut.Value, Is.EqualTo(@"Changed:
-
 - This is a unit test
-
 "));
 		}
 
@@ -210,7 +206,6 @@ and this project adheres to [Semantic Versioning](http: //semver.org/).
 			// Verify
 			Assert.That(result, Is.True);
 			Assert.That(sut.Value, Is.EqualTo(@"Changed:
-
 - This is a unit test
 "));
 		}
@@ -246,13 +241,10 @@ and this project adheres to [Semantic Versioning](http: //semver.org/).
 			// Verify
 			Assert.That(result, Is.True);
 			Assert.That(sut.Value, Is.EqualTo(@"Changed:
-
 - This is a unit test
 
 Added:
-
 - added unit test
-
 "));
 		}
 
