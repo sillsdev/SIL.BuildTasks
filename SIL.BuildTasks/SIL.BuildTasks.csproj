@@ -43,8 +43,9 @@
       <PackagePath>build</PackagePath>
     </Content>
   </ItemGroup>
-  <Target Name="StoreVersion" AfterTargets="DispatchToInnerBuilds">
-    <WriteLinesToFile File="$(OutputPath)/version.txt" Lines="$(GitVersion_NuGetVersion)" Overwrite="True" />
+  <Target Name="StoreVersion" AfterTargets="Build">
+    <MakeDir Directories="$(PackageOutputPath)"/>
+    <WriteLinesToFile File="$(PackageOutputPath)/version.txt" Lines="$(GitVersion_NuGetVersion)" Overwrite="True" />
   </Target>
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
   <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
