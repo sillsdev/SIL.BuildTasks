@@ -11,4 +11,5 @@ xplatformBuildAndRunTests {
 	linuxTool = 'mono-msbuild15'
 	configuration = 'Release'
 	uploadNuGet = true
+	clean = true
 }
