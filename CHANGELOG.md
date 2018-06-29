@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [SetReleaseNotesProperty task] Remove empty lines
 - [SetReleaseNotesProperty task] Add `VersionRegex` property, extract version number and mention
   in `PackageReleaseNotes` property
+- Allow to skip setting `PackageReleaseNotes` property automatically by setting the
+  `IgnoreSetReleaseNotesProp` property.
 
 ## [2.0.0] - 2018-06-18
 

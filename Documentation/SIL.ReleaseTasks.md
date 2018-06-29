@@ -133,6 +133,9 @@ property will be automatically set when creating a nuget package of the .csproj 
 This works with the new .csproj format that comes with VS 2017 and that defines the
 nuget package in the .csproj file.
 
+If you don't want to automatically set the `PackageReleaseNotes` property, you can set the
+`IgnoreSetReleaseNotesProp` property to `true`.
+
 By default the changelog file is expected in `../CHANGELOG.md`. The name and path can be
 changed by setting the `ChangelogFile` property.
 
