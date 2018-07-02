@@ -3,7 +3,6 @@
 		Condition="'$(IgnoreSetReleaseNotesProp)' != 'true'">
 		<PropertyGroup>
 			<ChangelogFile Condition="'$(ChangelogFile)'==''">../CHANGELOG.md</ChangelogFile>
-			<VersionRegex Condition="'$(VersionRegex)'==''">#+ \[([^]]+)\]</VersionRegex>
 		</PropertyGroup>
 		<SetReleaseNotesProperty ChangelogFile="$(ChangelogFile)" VersionRegex="$(VersionRegex)">
 			<Output TaskParameter="Value" PropertyName="PackageReleaseNotes"/>

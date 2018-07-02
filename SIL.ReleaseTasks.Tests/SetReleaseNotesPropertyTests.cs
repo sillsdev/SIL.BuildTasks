@@ -366,5 +366,42 @@ Added:
 "));
 		}
 
+		[Test]
+		public void CustomVersionRegex()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			sut.VersionRegex = @"#+ @d+-@d+-@d+ @@[a-z]+ @(([^)]+)@)|## Unreleased";
+			_tempFile = Path.GetTempFileName();
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## Unreleased
+
+### Changed:
+
+- This is a unit test
+
+## 2018-07-02 @foo (5.0)
+
+### Added
+
+- added unit test");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 5.0
+
+Changed:
+- This is a unit test
+"));
+		}
 	}
 }

@@ -144,3 +144,6 @@ versions should be put in the changelog. The default for the `SetReleaseNotesPro
 follows the example given on the [Keep a Changelog](https://keepachangelog.com) website, which
 puts the version number in square brackets, e.g. `## [1.0.0] - 2017-06-20`. However, it's
 possible to set the `VersionRegex` property to allow parsing different formats.
+
+__NOTE:__ Due to [msbuild bug #3468](https://github.com/Microsoft/msbuild/issues/3468) the escape
+character is @ instead of \\ (backslash)! To insert @ in the regular expression, double it: @@.

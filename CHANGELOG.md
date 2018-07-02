@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Implement workaround for [msbuild bug #3468](https://github.com/Microsoft/msbuild/issues/3468):
+  use @ as escape character instead of \\ (backslash) for `VersionRegex` property
+
 ## [2.0.1] - 2018-06-29
 
 ### Changed

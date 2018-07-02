@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
@@ -20,7 +21,7 @@ namespace SIL.ReleaseTasks
 		[Output]
 		public string Value { get; set; }
 
-		public string VersionRegex { get; set; } = @"#+ \[([^]]+)\]";
+		public string VersionRegex { get; set; }
 
 		private string[] _markdownLines;
 		private int      _currentIndex;
@@ -34,7 +35,20 @@ namespace SIL.ReleaseTasks
 				return false;
 			}
 
-			_versionRegex = new Regex(VersionRegex);
+			string versionRegexString;
+			if (string.IsNullOrEmpty(VersionRegex))
+			{
+				versionRegexString = @"#+ \[([^]]+)\]";
+			}
+			else
+			{
+				// we can't use backslash as escape character in the property
+				// (https://github.com/Microsoft/msbuild/issues/3468), so we use @ instead and
+				// convert the @ to \ here.
+				versionRegexString = Regex.Replace(VersionRegex, "(^|[^@])(@)([^@])",
+					match => $@"{match.Groups[1].Value}\{match.Groups[3].Value}").Replace("@@", "@");
+			}
+			_versionRegex = new Regex(versionRegexString);
 
 			_markdownLines = File.ReadAllLines(ChangelogFile);
 
