@@ -124,6 +124,7 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 		}
 
 		[Test]
+		[Ignore("No longer happens with Mono 5.12")]
 		[Platform(Exclude = "Win", Reason = "Doesn't crash on Windows. Instead we get an AccessViolationException that .NET handles")]
 		public void TestCrash_FailsBuild()
 		{

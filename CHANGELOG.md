@@ -16,6 +16,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.3] - 2018-07-28
+
+### Changed
+
+- Change default date output format for `StampChangelogFileWithVersion` to
+  `yyyy-MM-dd` (instead of `dd/MMM/yyyy`).
+- Add new property `DateTimeFormat` to `StampChangelogFileWithVersion` task
+  to allow specification of output format.
+
+## [2.0.2] - 2018-07-02
+
 ### Fixed
 
 - Implement workaround for [msbuild bug #3468](https://github.com/Microsoft/msbuild/issues/3468):

@@ -29,10 +29,14 @@ namespace SIL.ReleaseTasks
 		[Required]
 		public string VersionNumber { get; set; }
 
+		public string DateTimeFormat { get; set; }
+
 		public override bool Execute()
 		{
+			if (string.IsNullOrEmpty(DateTimeFormat))
+				DateTimeFormat = "yyyy-MM-dd";
 			var markdownLines = File.ReadAllLines(ChangelogFile);
-			markdownLines[0] = $"## {VersionNumber} {DateTime.Today:dd/MMM/yyyy}";
+			markdownLines[0] = $"## {VersionNumber} {DateTime.Today.ToString(DateTimeFormat)}";
 			File.WriteAllLines(ChangelogFile, markdownLines);
 			return true;
 		}

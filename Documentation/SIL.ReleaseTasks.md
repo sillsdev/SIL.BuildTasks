@@ -85,6 +85,8 @@ This assumes that a temporary line is currently at the top: e.g.
 
 - `VersionNumber`: The version number to put in the changelog file (required)
 
+- `DateTimeFormat`: The format string used to output the date. Default: `yyyy-MM-dd`
+
 ### Example
 
 ```xml
@@ -92,7 +94,7 @@ This assumes that a temporary line is currently at the top: e.g.
 
 <Target Name="Test">
   <StampChangelogFileWithVersion ChangelogFile="$(RootDir)/CHANGELOG.md"
-    VersionNumber="1.0.3" />
+    VersionNumber="1.0.3" DateTimeFormat="dd/MMM/yyyy" />
 </Target>
 ```
 
