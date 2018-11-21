@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionF
 		.gitignore = .gitignore
 		CHANGELOG.md = CHANGELOG.md
 		Readme.md = Readme.md
+		GitVersion.yml = GitVersion.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ForceCrash", "ForceCrash", "{D41379D9-7E82-4793-BDC0-2D7C89C1F7BF}"

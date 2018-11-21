@@ -35,8 +35,14 @@
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="GitVersionTask" Version="[4.0.0-beta0012,)">
+    <PackageReference Include="GitVersionTask" Version="4.0.0">
       <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="UtilPack.NuGet.MSBuild" Version="2.9.0" Condition="!$(TargetFramework.StartsWith('net4'))">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="UtilPack.NuGet.MSBuild" Version="2.8.0" Condition="$(TargetFramework.StartsWith('net4'))">
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.0.0-*,)">
       <PrivateAssets>All</PrivateAssets>
