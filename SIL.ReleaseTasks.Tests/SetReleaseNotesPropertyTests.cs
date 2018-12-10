@@ -403,5 +403,38 @@ Changed:
 - This is a unit test
 "));
 		}
+
+		[Test]
+		public void AppendToReleaseNotesProperty()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			sut.AppendToReleaseNotesProperty = @"
+See full changelog at github.";
+			_tempFile = Path.GetTempFileName();
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+### Changed:
+
+- This is a unit test");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changed:
+- This is a unit test
+
+See full changelog at github.
+"));
+		}
 	}
 }

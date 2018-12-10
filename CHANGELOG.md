@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2018-12-11
+
+### Changed
+
+- Add new property `AppendToReleaseNotesProperty` to `ReleaseNotesProperty` task
+  that allows to add text to the end of the release notes.
+
 ## [2.1.0] - 2018-07-28
 
 ### Changed

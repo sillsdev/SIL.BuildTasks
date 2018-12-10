@@ -23,6 +23,8 @@ namespace SIL.ReleaseTasks
 
 		public string VersionRegex { get; set; }
 
+		public string AppendToReleaseNotesProperty { get; set; }
+
 		private string[] _markdownLines;
 		private int      _currentIndex;
 		private Regex    _versionRegex;
@@ -52,7 +54,13 @@ namespace SIL.ReleaseTasks
 
 			_markdownLines = File.ReadAllLines(ChangelogFile);
 
-			Value = ConvertLatestChangelog(1, 2);
+			var bldr = new StringBuilder();
+			bldr.Append(ConvertLatestChangelog(1, 2));
+
+			if (!string.IsNullOrEmpty(AppendToReleaseNotesProperty))
+				bldr.AppendLine(AppendToReleaseNotesProperty);
+
+			Value = bldr.ToString();
 
 			if (!string.IsNullOrEmpty(Value))
 				return true;

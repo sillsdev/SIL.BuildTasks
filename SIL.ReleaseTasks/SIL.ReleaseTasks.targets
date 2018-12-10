@@ -4,7 +4,8 @@
 		<PropertyGroup>
 			<ChangelogFile Condition="'$(ChangelogFile)'==''">../CHANGELOG.md</ChangelogFile>
 		</PropertyGroup>
-		<SetReleaseNotesProperty ChangelogFile="$(ChangelogFile)" VersionRegex="$(VersionRegex)">
+		<SetReleaseNotesProperty ChangelogFile="$(ChangelogFile)" VersionRegex="$(VersionRegex)"
+			AppendToReleaseNotesProperty="$(AppendToReleaseNotesProperty)">
 			<Output TaskParameter="Value" PropertyName="PackageReleaseNotes"/>
 		</SetReleaseNotesProperty>
 	</Target>

@@ -114,6 +114,8 @@ conventions.
 - `VersionRegex`: Regular expression to extract the version number from the subheadings in the
   changelog file. Default: `#+ \[([^]]+)\]`
 
+- `AppendToReleaseNotesProperty`: Text that gets added to the end of the property
+
 - `Value` (output parameter): The name of the property that will be set
 
 ### Example
@@ -122,7 +124,13 @@ conventions.
 <UsingTask TaskName="SetReleaseNotesProperty" AssemblyFile="SIL.ReleaseTasks.dll" />
 
 <Target Name="Test">
-  <SetReleaseNotesProperty ChangelogFile="$(RootDir)/CHANGELOG.md">
+  <PropertyGroup>
+    <TextToAdd><![CDATA[
+See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHANGELOG.md]]>
+    </TextToAdd>
+  </PropertyGroup>
+  <SetReleaseNotesProperty ChangelogFile="$(RootDir)/CHANGELOG.md"
+    AppendToReleaseNotesProperty="$(TextToAdd)">
     <Output TaskParameter="Value" PropertyName="ReleaseNotes" />
   </SetReleaseNotesProperty>
 </Target>
