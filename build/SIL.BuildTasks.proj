@@ -85,7 +85,7 @@
 			OutputXmlFile="$(RootDir)/output/$(Configuration)/TestResults.xml"/>
 	</Target>
 
-	<Target Name="Restore">
+	<Target Name="Restore" DependsOnTargets="PackDogfood">
 		<MSBuild
 			Projects="$(SolutionPath)"
 			Targets="Restore"
