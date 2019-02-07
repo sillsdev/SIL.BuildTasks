@@ -8,7 +8,7 @@
     <AssemblyTitle>SIL.BuildTasks.AWS</AssemblyTitle>
     <Company>SIL</Company>
     <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018 SIL International</Copyright>
+    <Copyright>Copyright © 2018-2019 SIL International</Copyright>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -35,13 +35,7 @@
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="GitVersionTask" Version="4.0.0">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="UtilPack.NuGet.MSBuild" Version="2.9.0" Condition="!$(TargetFramework.StartsWith('net4'))">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="UtilPack.NuGet.MSBuild" Version="2.8.0" Condition="$(TargetFramework.StartsWith('net4'))">
+    <PackageReference Include="GitVersionTask.alt" Version="4.0.2-alpha-0004">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.0.0-*,)">
