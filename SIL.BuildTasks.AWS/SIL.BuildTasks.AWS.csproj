@@ -24,6 +24,11 @@
     <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
     <IsTool>true</IsTool>
     <NoBuild>true</NoBuild>
+    <AppendToReleaseNotesProperty><![CDATA[
+See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHANGELOG.md]]>
+    </AppendToReleaseNotesProperty>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
