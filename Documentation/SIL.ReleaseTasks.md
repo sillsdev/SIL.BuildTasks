@@ -109,7 +109,8 @@ conventions.
 
 ### Properties
 
-- `ChangelogFile`: The name (and path) of the markdown-style changelog file (required)
+- `ChangelogFile`: The name (and path) of the markdown-style changelog file. Defaults to
+  `../CHANGELOG.md`.
 
 - `VersionRegex`: Regular expression to extract the version number from the subheadings in the
   changelog file. Default: `#+ \[([^]]+)\]`
