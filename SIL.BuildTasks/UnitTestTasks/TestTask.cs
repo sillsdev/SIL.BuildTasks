@@ -225,6 +225,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 				var msg = $"Starting program: {process.StartInfo.FileName} " +
 					$"({process.StartInfo.Arguments}) in {process.StartInfo.WorkingDirectory}";
 
+				Console.WriteLine(msg);
 				Log.LogMessage(MessageImportance.Low, msg);
 
 				process.Start();

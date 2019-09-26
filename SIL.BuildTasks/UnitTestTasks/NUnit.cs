@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
+using LibGit2Sharp.Handlers;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Microsoft.Win32;
@@ -237,7 +239,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 				bldr.Append(" --nothread");
 			if (!string.IsNullOrEmpty(OutputXmlFile))
 				bldr.AppendFormat(" \"--xml={0}\"", OutputXmlFile);
-			bldr.Append(" --labels");
+			bldr.Append(" --labels"); 
 			return bldr.ToString();
 		}
 
@@ -246,34 +248,40 @@ namespace SIL.BuildTasks.UnitTestTasks
 			if (!string.IsNullOrEmpty(ToolPath) &&
 				File.Exists(Path.Combine(ToolPath, RealProgramName)))
 			{
+				Console.WriteLine($"{nameof(EnsureToolPath)}: existing {nameof(ToolPath)} valid: {ToolPath}");
 				return;
 			}
-			// ReSharper disable once PossibleNullReferenceException
-			foreach (var dir in Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator))
-			{
-				if (string.IsNullOrEmpty(dir))
-					continue;
 
-				// ReSharper disable once InvertIf
-				if (File.Exists(Path.Combine(dir, RealProgramName)))
+			var pathEnvVar = Environment.GetEnvironmentVariable("PATH");
+			if (pathEnvVar != null)
+			{
+				Console.WriteLine($"{nameof(EnsureToolPath)} looking for {RealProgramName} in path: {pathEnvVar}");
+				ToolPath = pathEnvVar.Split(Path.PathSeparator)
+					.FirstOrDefault(dir => !string.IsNullOrEmpty(dir) && File.Exists(Path.Combine(dir, RealProgramName)));
+				if (ToolPath != null)
 				{
-					ToolPath = dir;
+					Console.WriteLine($"{nameof(EnsureToolPath)} result: {ToolPath}");
 					return;
 				}
 			}
 
 			var programFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+			Console.WriteLine($"{nameof(EnsureToolPath)} looking for {RealProgramName} in {programFilesPath}");
 			if (!string.IsNullOrEmpty(programFilesPath))
 			{
-				foreach (var dir in Directory.EnumerateDirectories(programFilesPath))
+				foreach (var dir in Directory.EnumerateDirectories(programFilesPath)
+					.Where(d => d != null && Path.GetFileName(d).StartsWith("NUnit")))
 				{
-					if (!dir.StartsWith("NUnit"))
-						continue;
+					Console.WriteLine($"3a) EnsureToolPath examining {dir}");
 
+					ToolPath = new[] {"bin", "nunit-console"}
+						.Select(s => Path.Combine(dir, s))
+						.FirstOrDefault(p => File.Exists(Path.Combine(p, RealProgramName)));
+					
 					// ReSharper disable once InvertIf
-					if (File.Exists(Path.Combine(dir, Path.Combine("bin", RealProgramName))))
+					if (ToolPath != null)
 					{
-						ToolPath = dir;
+						Console.WriteLine($"{nameof(EnsureToolPath)} result: {ToolPath}");
 						return;
 					}
 				}
@@ -282,26 +290,34 @@ namespace SIL.BuildTasks.UnitTestTasks
 			var keySoftware = Registry.CurrentUser.OpenSubKey("Software");
 			if (keySoftware != null && Environment.OSVersion.Platform == PlatformID.Win32NT)
 			{
+				Console.WriteLine($"{nameof(EnsureToolPath)} looking for {RealProgramName} under registry subkey {keySoftware.Name}");
+
 				var keyNUnitOrg = keySoftware.OpenSubKey("nunit.org");
 				var keyNUnit = keyNUnitOrg?.OpenSubKey("Nunit");
 				if (keyNUnit != null)
 				{
+					Console.WriteLine($"{nameof(EnsureToolPath)} looking for {RealProgramName} under registry subkey {keyNUnit.Name}");
+
 					foreach (var verName in keyNUnit.GetSubKeyNames())
 					{
 						var keyVer = keyNUnit.OpenSubKey(verName);
 						if (keyVer == null)
 							continue;
 
+						Console.WriteLine($"{nameof(EnsureToolPath)} looking for {RealProgramName} under registry subkey {keyVer.Name}");
+
 						var path = keyVer.GetValue("InstallDir").ToString();
 						if (string.IsNullOrEmpty(path) || !File.Exists(Path.Combine(path, RealProgramName)))
 							continue;
 
 						ToolPath = path;
+						Console.WriteLine($"{nameof(EnsureToolPath)} result: {ToolPath}");
 						return;
 					}
 				}
 			}
 			ToolPath = ".";
+			Console.WriteLine($"{nameof(EnsureToolPath)} fallback result: {ToolPath}");
 		}
 
 		protected override string TestProgramName => $"{GetType().Name} ({FixturePath})";
