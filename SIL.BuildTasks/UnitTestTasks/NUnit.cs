@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -246,34 +247,40 @@ namespace SIL.BuildTasks.UnitTestTasks
 			if (!string.IsNullOrEmpty(ToolPath) &&
 				File.Exists(Path.Combine(ToolPath, RealProgramName)))
 			{
+				Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)}: existing {nameof(ToolPath)} valid: {ToolPath}");
 				return;
 			}
-			// ReSharper disable once PossibleNullReferenceException
-			foreach (var dir in Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator))
-			{
-				if (string.IsNullOrEmpty(dir))
-					continue;
 
-				// ReSharper disable once InvertIf
-				if (File.Exists(Path.Combine(dir, RealProgramName)))
+			var pathEnvVar = Environment.GetEnvironmentVariable("PATH");
+			if (pathEnvVar != null)
+			{
+				Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} looking for {RealProgramName} in path: {pathEnvVar}");
+				ToolPath = pathEnvVar.Split(Path.PathSeparator)
+					.FirstOrDefault(dir => !string.IsNullOrEmpty(dir) && File.Exists(Path.Combine(dir, RealProgramName)));
+				if (ToolPath != null)
 				{
-					ToolPath = dir;
+					Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} result: {ToolPath}");
 					return;
 				}
 			}
 
 			var programFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+			Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} looking for {RealProgramName} in {programFilesPath}");
 			if (!string.IsNullOrEmpty(programFilesPath))
 			{
-				foreach (var dir in Directory.EnumerateDirectories(programFilesPath))
+				foreach (var dir in Directory.EnumerateDirectories(programFilesPath)
+					.Where(d => d != null && Path.GetFileName(d).StartsWith("NUnit")))
 				{
-					if (!dir.StartsWith("NUnit"))
-						continue;
+					Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} examining {dir}");
 
+					ToolPath = new[] {"bin", "nunit-console"}
+						.Select(s => Path.Combine(dir, s))
+						.FirstOrDefault(p => File.Exists(Path.Combine(p, RealProgramName)));
+					
 					// ReSharper disable once InvertIf
-					if (File.Exists(Path.Combine(dir, Path.Combine("bin", RealProgramName))))
+					if (ToolPath != null)
 					{
-						ToolPath = dir;
+						Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} result: {ToolPath}");
 						return;
 					}
 				}
@@ -282,26 +289,34 @@ namespace SIL.BuildTasks.UnitTestTasks
 			var keySoftware = Registry.CurrentUser.OpenSubKey("Software");
 			if (keySoftware != null && Environment.OSVersion.Platform == PlatformID.Win32NT)
 			{
+				Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} looking for {RealProgramName} under registry subkey {keySoftware.Name}");
+
 				var keyNUnitOrg = keySoftware.OpenSubKey("nunit.org");
 				var keyNUnit = keyNUnitOrg?.OpenSubKey("Nunit");
 				if (keyNUnit != null)
 				{
+					Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} looking for {RealProgramName} under registry subkey {keyNUnit.Name}");
+
 					foreach (var verName in keyNUnit.GetSubKeyNames())
 					{
 						var keyVer = keyNUnit.OpenSubKey(verName);
 						if (keyVer == null)
 							continue;
 
+						Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} looking for {RealProgramName} under registry subkey {keyVer.Name}");
+
 						var path = keyVer.GetValue("InstallDir").ToString();
 						if (string.IsNullOrEmpty(path) || !File.Exists(Path.Combine(path, RealProgramName)))
 							continue;
 
 						ToolPath = path;
+						Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} result: {ToolPath}");
 						return;
 					}
 				}
 			}
 			ToolPath = ".";
+			Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)} fallback result: {ToolPath}");
 		}
 
 		protected override string TestProgramName => $"{GetType().Name} ({FixturePath})";
