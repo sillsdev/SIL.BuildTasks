@@ -36,12 +36,11 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
-    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.2">
+    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4">
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.5.180" />
-    <!-- still missing GitVersionTask for netstandard! -->
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.4.0" />
   </ItemGroup>
   <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.1">
@@ -51,15 +50,11 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.0.0-*,)">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.0.0-*,)" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="GitVersionTask.alt" Version="4.0.2-alpha-0004">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="GitVersionTask" Version="5.1.3" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="SIL.ReleaseTasks.Common.inc" />
 </Project>

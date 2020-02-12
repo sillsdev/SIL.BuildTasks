@@ -74,7 +74,7 @@
 		</ItemGroup>
 
 		<NUnit3 Assemblies="@(TestAssemblies)"
-			ToolPath="$(NuGetPackageDir)/nunit.consolerunner/3.8.0/tools"
+			ToolPath="$(NuGetPackageDir)/nunit.consolerunner/3.10.0/tools"
 			TestInNewThread="false"
 			ExcludeCategory="$(excludedCategories)$(ExtraExcludeCategories)"
 			WorkingDirectory="$(RootDir)/output/$(Configuration)/net461"
@@ -105,6 +105,7 @@
 	</PropertyGroup>
 
 	<Target Name="RestoreDogfood">
+		<MakeDir Directories="$(RootDir)/SIL.ReleaseTasks.Dogfood/bin/$(Configuration)"/>
 		<MSBuild
 			Projects="$(DogfoodProject)"
 			Targets="Restore"
