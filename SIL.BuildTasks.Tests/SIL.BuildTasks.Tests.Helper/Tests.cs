@@ -8,7 +8,8 @@ using NUnit.Framework;
 namespace SIL.BuildTasks.Tests.Helper
 {
 	/// <summary>
-	/// This class defines some tests used for testing the NUnitTask class
+	/// This class defines some tests used for testing the NUnitTask class. The tests are not
+	/// intended to be run directly, only by the NUnitTests.
 	/// </summary>
 	[TestFixture]
 	public class Tests
