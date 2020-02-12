@@ -32,6 +32,8 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     </AppendToReleaseNotesProperty>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.2">
@@ -54,6 +56,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="GitVersionTask.alt" Version="4.0.2-alpha-0004">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
