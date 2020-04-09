@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.0] - 2020-04-15
+
+### Added
+
+- Add `NormalizeLocales` Task to help work with Crowdin Localized files
+
 ### Added
 
 - Create symbol nuget package
