@@ -75,6 +75,12 @@ may be sent in clear.
 
 ### Example
 
+## NormalizeLocales task
+
+### Properties
+
+- `L10nsDirectory`: The directory whose subdirectories are locale names and contain localization files
+
 ## NUnit task
 
 Runs NUnit (v2) on a test assembly.
