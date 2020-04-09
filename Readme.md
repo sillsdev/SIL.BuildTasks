@@ -23,6 +23,7 @@ Several useful msbuild tasks.
 [FileUpdate](Documentation/SIL.BuildTasks.md#fileupdate-task) |
 [MakePot](Documentation/SIL.BuildTasks.md#makepot-task) |
 [MakeWixForDirTree](Documentation/SIL.BuildTasks.md#makewixfordirtree-task) |
+[NormalizeLocales](Documentation/SIL.BuildTasks.md#normalizelocales-task) | Drops country code from directories and filenames to help work with Crowdin
 [NUnit](Documentation/SIL.BuildTasks.md#nunit-task) | Run NUnit (v2) on a test assembly.
 [NUnit3](Documentation/SIL.BuildTasks.md#nunit3-task) | Run NUnit3 on a test assembly.
 [Split](Documentation/SIL.BuildTasks.md#split-task) |
