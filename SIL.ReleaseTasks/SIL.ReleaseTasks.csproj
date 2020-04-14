@@ -33,10 +33,10 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.4.0" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.5.0" />
   </ItemGroup>
   <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
-    <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.1">
+    <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.2">
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
@@ -47,7 +47,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="GitVersionTask" Version="5.1.3" PrivateAssets="All" />
+    <PackageReference Include="GitVersionTask" Version="5.2.4" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="SIL.ReleaseTasks.Common.inc" />
 </Project>

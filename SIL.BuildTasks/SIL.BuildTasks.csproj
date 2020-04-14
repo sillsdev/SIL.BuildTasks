@@ -32,7 +32,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.0.0-*,)" PrivateAssets="All" />
-    <PackageReference Include="GitVersionTask" Version="5.1.3" PrivateAssets="All" />
+    <PackageReference Include="GitVersionTask" Version="5.2.4" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="SIL.BuildTasks.props">
