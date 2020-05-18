@@ -89,10 +89,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				string ret;
 				return _guids.TryGetValue(id, out ret) ? ret : null;
 			}
-			set
-			{
-				_guids[id] = value;
-			}
+			set => _guids[id] = value;
 		}
 
 

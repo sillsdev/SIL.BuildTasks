@@ -34,8 +34,8 @@ namespace SIL.BuildTasks
 		/// </summary>
 		public string DateFormat
 		{
-			get { return _dateFormat ?? "dd/MMM/yyyy"; }
-			set { _dateFormat = value; }
+			get => _dateFormat ?? "dd/MMM/yyyy";
+			set => _dateFormat = value;
 		}
 
 		public override bool Execute()

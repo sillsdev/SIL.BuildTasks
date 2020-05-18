@@ -1,4 +1,4 @@
-<Project  ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTarget="Test">
+<Project  ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Test">
 	<PropertyGroup>
 		<RootDir Condition="'$(RootDir)'==''">$(MSBuildProjectDirectory)/..</RootDir>
 		<Configuration Condition="'$(Configuration)'==''">Release</Configuration>
@@ -8,8 +8,13 @@
 		<SolutionPath>$(RootDir)/$(Solution)</SolutionPath>
 		<BuildingWithXBuild>$(_.EndsWith('xbuild'))</BuildingWithXBuild>
 		<FailTaskIfAnyTestsFail Condition="'$(FailTaskIfAnyTestsFail)' == ''">true</FailTaskIfAnyTestsFail>
-		<NuGetPackageDir Condition="'$(OS)'=='Windows_NT'">$(UserProfile)/.nuget/packages</NuGetPackageDir>
-		<NuGetPackageDir Condition="'$(OS)'!='Windows_NT'">$(Home)/.nuget/packages</NuGetPackageDir>
+		<ExtraExcludeCategories Condition="'$(OS)'!='Windows_NT'">KnownMonoIssue,</ExtraExcludeCategories>
+		<ExtraExcludeCategories Condition="'$(teamcity_version)' != '' Or '$(JENKINS_URL)' != ''">SkipOnTeamCity,$(ExtraExcludeCategories)</ExtraExcludeCategories>
+		<RestartBuild Condition="!Exists('$(RootDir)/packages/NUnit.ConsoleRunner/tools/nunit3-console.exe')">true</RestartBuild>
+		<RestartBuild Condition="Exists('$(RootDir)/packages/NUnit.ConsoleRunner/tools/nunit3-console.exe')">false</RestartBuild>
+		<TeamCity Condition="'$(teamcity_version)' != ''">true</TeamCity>
+		<TeamCity Condition="'$(teamcity_version)' == ''">false</TeamCity>
+		<TestOutputXmlFile Condition="'$(teamcity_version)' == ''">$(RootDir)/output/$(Configuration)/TestResults.xml</TestOutputXmlFile>
 	</PropertyGroup>
 
 	<UsingTask TaskName="NUnit3" AssemblyFile="$(RootDir)/output/$(Configuration)/net461/SIL.BuildTasks.dll" />
@@ -20,7 +25,15 @@
 		AssemblyFile="$(agent_home_dir)/plugins/dotnetPlugin/bin/JetBrains.BuildServer.MSBuildLoggers.dll"
 		Condition=" '$(teamcity_version)' != '' And '$(OS)'!='Windows_NT'"/>
 
-	<Target Name="Build">
+	<Import Project="NuGet.targets"/>
+
+	<Target Name="RestoreBuildTasks" DependsOnTargets="CheckPrerequisites">
+		<Message Text="RestartBuild=$(RestartBuild)" />
+		<!-- Install NUnit.Console which has the required extensions (and NUnit.ConsoleRunner itself) as dependencies -->
+		<Exec Command='$(NuGetCommand) install NUnit.Console -excludeVersion -version 3.11.1 -solutionDirectory "$(RootDir)"' />
+	</Target>
+
+	<Target Name="Build" DependsOnTargets="RestoreBuildTasks">
 		<CallTarget Targets="Clean"/>
 		<CallTarget Targets="PackDogfood"/>
 		<CallTarget Targets="Compile"/>
@@ -55,34 +68,22 @@
 		<CallTarget Targets="TestOnly"/>
 	</Target>
 
-	<Target Name="TestOnly" DependsOnTargets="RunNUnitTC;RunNUnit"/>
-
-	<Target Name="RunNUnitTC" Condition="'$(teamcity_version)' != ''">
-		<ItemGroup>
-			<TestAssemblies Include="$(RootDir)/output/$(Configuration)/net461/*.Tests.dll"/>
-		</ItemGroup>
-
-		<NUnitTeamCity
-			Assemblies="@(TestAssemblies)"
-			ExcludeCategory="SkipOnTeamCity;ByHand$(ExtraExcludeCategories)"
-			NUnitVersion="NUnit-3" />
-	</Target>
-
-	<Target Name="RunNUnit" Condition="'$(teamcity_version)' == ''">
+	<Target Name="TestOnly">
 		<ItemGroup>
 			<TestAssemblies Include="$(RootDir)/output/$(Configuration)/net461/*.Tests.dll"/>
 		</ItemGroup>
 
 		<NUnit3 Assemblies="@(TestAssemblies)"
-			ToolPath="$(NuGetPackageDir)/nunit.consolerunner/3.10.0/tools"
+			ToolPath="$(RootDir)/packages/NUnit.ConsoleRunner/tools"
 			TestInNewThread="false"
-			ExcludeCategory="$(excludedCategories)$(ExtraExcludeCategories)"
+			ExcludeCategory="ByHand;$(excludedCategories)$(ExtraExcludeCategories)"
 			WorkingDirectory="$(RootDir)/output/$(Configuration)/net461"
 			Force32Bit="$(useNUnit-x86)"
 			Verbose="true"
-			UseNUnit3Xml="true"
+			UseNUnit3Xml="false"
 			FailTaskIfAnyTestsFail="$(FailTaskIfAnyTestsFail)"
-			OutputXmlFile="$(RootDir)/output/$(Configuration)/TestResults.xml"/>
+			OutputXmlFile="$(TestOutputXmlFile)"
+			TeamCity="$(TeamCity)"/>
 	</Target>
 
 	<Target Name="Restore" DependsOnTargets="PackDogfood">

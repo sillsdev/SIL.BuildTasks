@@ -16,14 +16,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.1] - 2020-05-19
+
+### Changed
+
+- `NUnit3` task: Deal with differing options in `NUnit.ConsoleRunner` versions
+
+### Fixed
+
+- `NUnit3` task: Fix output format on Linux
+
 ## [2.3.0] - 2020-04-15
 
 ### Added
 
 - Add `NormalizeLocales` Task to help work with Crowdin Localized files
-
-### Added
-
 - Create symbol nuget package
 
 ## [2.2.0] - 2018-12-11

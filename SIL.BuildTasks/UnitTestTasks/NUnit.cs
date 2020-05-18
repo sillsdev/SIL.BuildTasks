@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2018 SIL International
+// Copyright (c) 2012-2020 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
@@ -173,13 +173,15 @@ namespace SIL.BuildTasks.UnitTestTasks
 			get
 			{
 				EnsureToolPath();
-				var programNameAndPath = Path.Combine(Path.GetFullPath(ToolPath), RealProgramName);
+				var programNameAndPath = RealProgramNameAndPath;
 				if (!File.Exists(programNameAndPath))
 					return null;
 
 				return IsMono ? "mono" : programNameAndPath;
 			}
 		}
+
+		protected string RealProgramNameAndPath => Path.Combine(Path.GetFullPath(ToolPath), RealProgramName);
 
 		protected override string ProgramArguments
 		{
@@ -190,7 +192,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 				{
 					EnsureToolPath();
 					bldr.Append("--debug "); // cause Mono to show filenames in stack trace
-					bldr.Append(Path.Combine(Path.GetFullPath(ToolPath), RealProgramName));
+					bldr.Append(RealProgramNameAndPath);
 				}
 				foreach (var item in Assemblies)
 				{
@@ -244,8 +246,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 
 		private void EnsureToolPath()
 		{
-			if (!string.IsNullOrEmpty(ToolPath) &&
-				File.Exists(Path.Combine(ToolPath, RealProgramName)))
+			if (!string.IsNullOrEmpty(ToolPath) && File.Exists(RealProgramNameAndPath))
 			{
 				Log.LogMessage(MessageImportance.Low, $"{nameof(EnsureToolPath)}: existing {nameof(ToolPath)} valid: {ToolPath}");
 				return;
@@ -276,7 +277,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 					ToolPath = new[] {"bin", "nunit-console"}
 						.Select(s => Path.Combine(dir, s))
 						.FirstOrDefault(p => File.Exists(Path.Combine(p, RealProgramName)));
-					
+
 					// ReSharper disable once InvertIf
 					if (ToolPath != null)
 					{

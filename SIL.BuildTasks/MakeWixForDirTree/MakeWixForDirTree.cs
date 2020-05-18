@@ -70,8 +70,8 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		 */
 		public string MatchRegExPattern
 		{
-			get { return _fileMatchPattern.ToString(); }
-			set { _fileMatchPattern = new Regex(value, RegexOptions.IgnoreCase); }
+			get => _fileMatchPattern.ToString();
+			set => _fileMatchPattern = new Regex(value, RegexOptions.IgnoreCase);
 		}
 
 		/// <summary>
@@ -79,8 +79,8 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		/// </summary>
 		public string IgnoreRegExPattern
 		{
-			get { return _ignoreFilePattern.ToString(); }
-			set { _ignoreFilePattern = new Regex(value, RegexOptions.IgnoreCase); }
+			get => _ignoreFilePattern.ToString();
+			set => _ignoreFilePattern = new Regex(value, RegexOptions.IgnoreCase);
 		}
 
 		/// <summary>

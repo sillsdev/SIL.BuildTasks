@@ -23,5 +23,7 @@ build/nuget.exe
 *.nupkg
 packages/
 .idea/
+Release/
+Debug/
 
 .vs/

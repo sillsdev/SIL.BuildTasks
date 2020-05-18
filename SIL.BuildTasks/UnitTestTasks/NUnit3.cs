@@ -1,8 +1,10 @@
-﻿// Copyright (c) 2016-2018 SIL International
+// Copyright (c) 2016-2020 SIL International
 // This software is licensed under the MIT license (http://opensource.org/licenses/MIT)
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text;
 
 namespace SIL.BuildTasks.UnitTestTasks
@@ -21,8 +23,8 @@ namespace SIL.BuildTasks.UnitTestTasks
 
 		public bool UseNUnit3Xml
 		{
-			get { return _useNUnit3Xml.HasValue && _useNUnit3Xml.Value; }
-			set { _useNUnit3Xml = value; }
+			get => _useNUnit3Xml.HasValue && _useNUnit3Xml.Value;
+			set => _useNUnit3Xml = value;
 		}
 
 		public bool NoColor { get; set; }
@@ -33,7 +35,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// </summary>
 		public bool TeamCity
 		{
-			get { return _teamCity; }
+			get => _teamCity;
 			set
 			{
 				_teamCity = value;
@@ -63,10 +65,12 @@ namespace SIL.BuildTasks.UnitTestTasks
 			// We don't support TestInNewThread for now
 			if (!string.IsNullOrEmpty(OutputXmlFile))
 			{
-				bldr.AppendFormat(" \"--result:{0};format={1}\"", OutputXmlFile,
+				bldr.AppendFormat(" \"--result:{0};format={1}\"",
+					new Uri(OutputXmlFile).LocalPath,
 					UseNUnit3Xml ? "nunit3" : "nunit2");
 			}
-			bldr.Append(" --labels=All");
+
+			bldr.Append(GetLabelsOption());
 			if (NoColor)
 				bldr.Append(" --nocolor");
 			if (Force32Bit)
@@ -74,6 +78,20 @@ namespace SIL.BuildTasks.UnitTestTasks
 			if (TeamCity)
 				bldr.Append(" --teamcity");
 			return bldr.ToString();
+		}
+
+		private string GetLabelsOption()
+		{
+			var version = ConsoleRunnerVersion;
+			if (version.ProductMajorPart > 3 ||
+				version.ProductMajorPart == 3 && version.ProductMinorPart >= 8)
+			{
+				// Starting with NUnit.ConsoleRunner 3.8 there's a --labels=Before option that
+				// does the same as --labels=All. However, the latter is deprecated in later
+				// versions so we use the new syntax.
+				return " --labels=Before";
+			}
+			return " --labels=All";
 		}
 
 		internal override string AddIncludeAndExcludeArguments()
@@ -112,5 +130,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 			bldr.Insert(0, "(").Append(")");
 			return bldr.ToString();
 		}
+
+		private FileVersionInfo ConsoleRunnerVersion => FileVersionInfo.GetVersionInfo(RealProgramNameAndPath);
 	}
 }
