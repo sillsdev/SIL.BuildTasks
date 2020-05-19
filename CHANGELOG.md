@@ -22,10 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - `NUnit3` task: Deal with differing options in `NUnit.ConsoleRunner` versions
 
-### Fixed
-
-- `NUnit3` task: Fix output format on Linux
-
 ## [2.3.0] - 2020-04-15
 
 ### Added
