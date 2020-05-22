@@ -1,4 +1,4 @@
-<Project  ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Test">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Test">
 	<PropertyGroup>
 		<RootDir Condition="'$(RootDir)'==''">$(MSBuildProjectDirectory)/..</RootDir>
 		<Configuration Condition="'$(Configuration)'==''">Release</Configuration>
@@ -6,7 +6,6 @@
 		<useNUnit-x86 Condition="'$(OS)'!='Windows_NT'">false</useNUnit-x86>
 		<Solution>SIL.BuildTasks.sln</Solution>
 		<SolutionPath>$(RootDir)/$(Solution)</SolutionPath>
-		<BuildingWithXBuild>$(_.EndsWith('xbuild'))</BuildingWithXBuild>
 		<FailTaskIfAnyTestsFail Condition="'$(FailTaskIfAnyTestsFail)' == ''">true</FailTaskIfAnyTestsFail>
 		<ExtraExcludeCategories Condition="'$(OS)'!='Windows_NT'">KnownMonoIssue,</ExtraExcludeCategories>
 		<ExtraExcludeCategories Condition="'$(teamcity_version)' != '' Or '$(JENKINS_URL)' != ''">SkipOnTeamCity,$(ExtraExcludeCategories)</ExtraExcludeCategories>
@@ -18,12 +17,6 @@
 	</PropertyGroup>
 
 	<UsingTask TaskName="NUnit3" AssemblyFile="$(RootDir)/output/$(Configuration)/net461/SIL.BuildTasks.dll" />
-	<UsingTask TaskName="NUnitTeamCity"
-		AssemblyFile="$(teamcity_dotnet_nunitlauncher_msbuild_task)"
-		Condition=" '$(teamcity_version)' != '' And '$(OS)'=='Windows_NT'"/>
-	<UsingTask TaskName="NUnitTeamCity"
-		AssemblyFile="$(agent_home_dir)/plugins/dotnetPlugin/bin/JetBrains.BuildServer.MSBuildLoggers.dll"
-		Condition=" '$(teamcity_version)' != '' And '$(OS)'!='Windows_NT'"/>
 
 	<Import Project="NuGet.targets"/>
 
@@ -49,10 +42,9 @@
 
 	<Target Name="Clean">
 		<Delete Files="@(ExistingObjectFiles)" />
-		<!-- HACK: xbuild has a bug with ** filespecs - it deletes the parent directory as well. -->
-		<Delete Condition="!$(BuildingWithXBuild)"
+		<Delete Condition="'$(OS)'=='Windows_NT' OR $(MSBuildToolsVersion) &gt;= 15"
 			 Files="$(RootDir)/**/obj/**/*" />
-		<Exec Condition="$(BuildingWithXBuild)"
+		<Exec Condition="'$(OS)'!='Windows_NT' AND $(MSBuildToolsVersion) &lt; 15"
 			Command="find . %5c( -name obj -o -name bin -o -name test-results %5c) -type d -print0 | xargs -0 rm -rf"
 			WorkingDirectory="$(RootDir)" />
 	</Target>
