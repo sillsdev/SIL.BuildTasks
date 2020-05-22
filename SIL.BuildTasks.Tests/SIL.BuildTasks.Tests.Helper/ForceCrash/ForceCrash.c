@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #ifdef WIN32
-__declspec(dllexport) void ForceCrash(int *p);
+__declspec(dllexport) void ForceCrash();
 __declspec(dllexport) void OutputOnStderr();
 #endif
 

@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.2] - 2020-05-22
+
+### Fixed
+
+- `MakeWixForDirTree` task: fix `Exclude` property
+
 ## [2.3.1] - 2020-05-19
 
 ### Changed

@@ -222,9 +222,9 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 			foreach (var s in Exclude)
 			{
-				var key = Path.IsPathRooted(s)
+				var key = new Uri(Path.IsPathRooted(s)
 					? s.ToLower()
-					: Path.GetFullPath(Path.Combine(RootDirectory, s)).ToLower();
+					: Path.GetFullPath(Path.Combine(RootDirectory, s)).ToLower()).LocalPath;
 				_exclude.Add(key, s);
 			}
 		}
