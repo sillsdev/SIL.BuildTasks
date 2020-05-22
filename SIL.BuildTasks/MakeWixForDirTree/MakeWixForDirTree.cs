@@ -268,7 +268,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 			SetupDirectoryPermissions(parent, outerDirectoryId, doc, guidDatabase);
 
-			// Build a list of the files in this directory removing any that have been exluded
+			// Build a list of the files in this directory removing any that have been excluded
 			// ReSharper disable once LoopCanBeConvertedToQuery
 			foreach (var f in Directory.GetFiles(dirPath))
 			{
