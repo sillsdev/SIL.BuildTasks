@@ -16,24 +16,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- [SIL.ReleaseTasks] Fix failure when running with `dotnet pack`
+
 ## [2.3.2] - 2020-05-22
 
 ### Fixed
 
-- `MakeWixForDirTree` task: fix `Exclude` property
+- [SIL.BuildTasks] `MakeWixForDirTree` task: fix `Exclude` property
 
 ## [2.3.1] - 2020-05-19
 
 ### Changed
 
-- `NUnit3` task: Deal with differing options in `NUnit.ConsoleRunner` versions
+- [SIL.BuildTasks] `NUnit3` task: Deal with differing options in `NUnit.ConsoleRunner` versions
 
 ## [2.3.0] - 2020-04-15
 
 ### Added
 
-- Add `NormalizeLocales` Task to help work with Crowdin Localized files
-- Create symbol nuget package
+- [SIL.BuildTasks] Add `NormalizeLocales` Task to help work with Crowdin Localized files
+- Create symbol nuget packages
 
 ## [2.2.0] - 2018-12-11
 
