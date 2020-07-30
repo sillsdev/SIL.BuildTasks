@@ -5,8 +5,14 @@
       <PropTargets Include="$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.targets;$(MSBuildThisFileDirectory)/../$(PackageId)/$(PackageId).props" />
     </ItemGroup>
     <ReplaceFileText InputFilename="%(PropTargets.Identity)" OutputFilename="$(OutputPath)/build/$(TargetFramework)/$(PackageId)%(PropTargets.Extension)" MatchExpression="ASSEMBLYDIR" ReplacementText="../../tools/$(TargetFramework)" />
-    <ReplaceFileText InputFilename="%(PropTargets.Identity)" OutputFilename="$(OutputPath)/buildMultiTargeting/$(PackageId)%(PropTargets.Extension)" MatchExpression="ASSEMBLYDIR" ReplacementText="../tools/$(TargetFramework)" />
+    <ReplaceFileText InputFilename="%(PropTargets.Identity)" OutputFilename="$(OutputPath)/buildMultiTargeting/$(TargetFramework)/$(PackageId)%(PropTargets.Extension)" MatchExpression="ASSEMBLYDIR" ReplacementText="../tools/$(TargetFramework)" />
+    <MakeDir Directories="$(OutputPath)/lib/net461" />
+    <MakeDir Directories="$(OutputPath)/lib/netstandard2.0" />
+    <!-- Create empty files -->
+    <WriteLinesToFile File="$(OutputPath)/lib/net461/_._" />
+    <WriteLinesToFile File="$(OutputPath)/lib/netstandard2.0/_._" />
   </Target>
+
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
   <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
@@ -18,9 +24,13 @@
         <Pack>true</Pack>
         <PackagePath>build/</PackagePath>
       </None>
-      <None Include="$(OutputPath)/net461/buildMultiTargeting/*.*">
+      <None Include="$(OutputPath)/net461/buildMultiTargeting/**/*.*;$(OutputPath)/netstandard2.0/buildMultiTargeting/**/*.*">
         <Pack>true</Pack>
         <PackagePath>buildMultiTargeting/</PackagePath>
+      </None>
+      <None Include="$(OutputPath)/lib/**/_._">
+        <Pack>true</Pack>
+        <PackagePath>lib/</PackagePath>
       </None>
     </ItemGroup>
   </Target>

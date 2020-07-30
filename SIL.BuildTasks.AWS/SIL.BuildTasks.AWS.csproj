@@ -45,11 +45,18 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
   </ItemGroup>
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
   <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
+    <MakeDir Directories="$(OutputPath)/lib/net461" />
+    <!-- Create empty file -->
+    <WriteLinesToFile File="$(OutputPath)/lib/net461/_._" />
     <ItemGroup>
       <None Include="$(OutputPath)/net461/*.dll;$(OutputPath)/net461/*.exe;$(OutputPath)/net461/*.dll.config" Exclude="$(OutputPath)/net461/$(AssemblyTitle).dll">
         <Pack>true</Pack>
         <PackageFlatten>true</PackageFlatten>
         <PackagePath>tools</PackagePath>
+      </None>
+      <None Include="$(OutputPath)/lib/**/_._">
+        <Pack>true</Pack>
+        <PackagePath>lib/</PackagePath>
       </None>
     </ItemGroup>
   </Target>
