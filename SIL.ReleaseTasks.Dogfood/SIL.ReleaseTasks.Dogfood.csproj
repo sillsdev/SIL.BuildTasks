@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <Configurations>Release</Configurations>
     <Description>Intermediate nuget package that can be used when packaging SIL.ReleaseTasks.</Description>
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
@@ -21,6 +21,13 @@
       $(PackageTargetFallback);netframework35
     </PackageTargetFallback>
   </PropertyGroup>
+  <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
+    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4">
+      <IncludeAssets>All</IncludeAssets>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.5.0" />
+  </ItemGroup>
   <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.2">
       <IncludeAssets>All</IncludeAssets>

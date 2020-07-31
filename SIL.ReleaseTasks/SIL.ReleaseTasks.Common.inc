@@ -34,7 +34,7 @@
       </None>
     </ItemGroup>
   </Target>
-  <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+  <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
       <InputFilename ParameterType="System.String" Required="true" />
       <OutputFilename ParameterType="System.String" Required="true" />
@@ -52,6 +52,7 @@
           OutputFilename,
           Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
           );
+        Log.LogMessage("Writing file {0}, replacing {1} with {2}", OutputFilename, MatchExpression, ReplacementText);
       ]]></Code>
     </Task>
   </UsingTask>
