@@ -5,7 +5,7 @@
 @Library('lsdev-pipeline-library') _
 
 xplatformBuildAndRunTests {
-	winNodeSpec = 'windows && supported && vs2019 && netcore3.1'
+	winNodeSpec = 'windows && vs2019 && netcore3.1'
 	linuxNodeSpec = 'linux64 && !packager && ubuntu && mono6'
 	winTool = 'msbuild16'
 	linuxTool = 'mono-msbuild15'
