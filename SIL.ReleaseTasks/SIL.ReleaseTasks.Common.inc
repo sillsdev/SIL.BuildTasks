@@ -5,7 +5,7 @@
       <PropTargets Include="$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.targets;$(MSBuildThisFileDirectory)/../$(PackageId)/$(PackageId).props" />
     </ItemGroup>
     <ReplaceFileText InputFilename="%(PropTargets.Identity)" OutputFilename="$(OutputPath)/build/$(TargetFramework)/$(PackageId)%(PropTargets.Extension)" MatchExpression="ASSEMBLYDIR" ReplacementText="../../tools/$(TargetFramework)" />
-    <ReplaceFileText InputFilename="%(PropTargets.Identity)" OutputFilename="$(OutputPath)/buildMultiTargeting/$(TargetFramework)/$(PackageId)%(PropTargets.Extension)" MatchExpression="ASSEMBLYDIR" ReplacementText="../tools/$(TargetFramework)" />
+    <ReplaceFileText InputFilename="%(PropTargets.Identity)" OutputFilename="$(OutputPath)/buildMultiTargeting/$(TargetFramework)/$(PackageId)%(PropTargets.Extension)" MatchExpression="ASSEMBLYDIR" ReplacementText="../../tools/$(TargetFramework)" />
     <MakeDir Directories="$(OutputPath)/lib/net461" />
     <MakeDir Directories="$(OutputPath)/lib/netstandard2.0" />
     <!-- Create empty files -->
