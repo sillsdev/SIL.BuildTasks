@@ -1,11 +1,10 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- This file is shared between SIL.ReleaseTasks.csproj and SIL.ReleaseTasks.Dogfood.csproj -->
   <Target Name="CopyTargetsAndProps" AfterTargets="Build">
-    <ItemGroup>
-      <PropTargets Include="$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.targets;$(MSBuildThisFileDirectory)/../$(PackageId)/$(PackageId).props" />
-    </ItemGroup>
-    <ReplaceFileText InputFilename="%(PropTargets.Identity)" OutputFilename="$(OutputPath)/build/$(TargetFramework)/$(PackageId)%(PropTargets.Extension)" MatchExpression="ASSEMBLYDIR" ReplacementText="../../tools/$(TargetFramework)" />
-    <ReplaceFileText InputFilename="%(PropTargets.Identity)" OutputFilename="$(OutputPath)/buildMultiTargeting/$(TargetFramework)/$(PackageId)%(PropTargets.Extension)" MatchExpression="ASSEMBLYDIR" ReplacementText="../../tools/$(TargetFramework)" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)/../$(PackageId)/$(PackageId).props" DestinationFiles="$(OutputPath)/build/$(PackageId).props" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.targets" DestinationFiles="$(OutputPath)/build/$(PackageId).targets" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)/../$(PackageId)/$(PackageId).props" DestinationFiles="$(OutputPath)/buildMultiTargeting/$(PackageId).props" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.targets" DestinationFiles="$(OutputPath)/buildMultiTargeting/$(PackageId).targets" />
     <MakeDir Directories="$(OutputPath)/lib/net461" />
     <MakeDir Directories="$(OutputPath)/lib/netstandard2.0" />
     <!-- Create empty files -->
@@ -20,11 +19,12 @@
         <Pack>true</Pack>
         <PackagePath>$(BuildOutputTargetFolder)</PackagePath>
       </None>
-      <None Include="$(OutputPath)/net461/build/**/*.*;$(OutputPath)/netstandard2.0/build/**/*.*">
+      <!-- we use *.props and *.targets files from net461 - they are identical to the ones in standard2.0 -->
+      <None Include="$(OutputPath)/net461/build/*.*">
         <Pack>true</Pack>
         <PackagePath>build/</PackagePath>
       </None>
-      <None Include="$(OutputPath)/net461/buildMultiTargeting/**/*.*;$(OutputPath)/netstandard2.0/buildMultiTargeting/**/*.*">
+      <None Include="$(OutputPath)/net461/buildMultiTargeting/*.*">
         <Pack>true</Pack>
         <PackagePath>buildMultiTargeting/</PackagePath>
       </None>
@@ -34,26 +34,4 @@
       </None>
     </ItemGroup>
   </Target>
-  <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
-    <ParameterGroup>
-      <InputFilename ParameterType="System.String" Required="true" />
-      <OutputFilename ParameterType="System.String" Required="true" />
-      <MatchExpression ParameterType="System.String" Required="true" />
-      <ReplacementText ParameterType="System.String" Required="true" />
-    </ParameterGroup>
-    <Task>
-      <Reference Include="System.Core" />
-      <Using Namespace="System" />
-      <Using Namespace="System.IO" />
-      <Using Namespace="System.Text.RegularExpressions" />
-      <Code Type="Fragment" Language="cs"><![CDATA[
-        Directory.CreateDirectory(Path.GetDirectoryName(OutputFilename));
-        File.WriteAllText(
-          OutputFilename,
-          Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
-          );
-        Log.LogMessage("Writing file {0}, replacing {1} with {2}", OutputFilename, MatchExpression, ReplacementText);
-      ]]></Code>
-    </Task>
-  </UsingTask>
 </Project>

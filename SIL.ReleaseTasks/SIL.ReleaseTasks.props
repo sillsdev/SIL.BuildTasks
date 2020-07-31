@@ -1,11 +1,12 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<SilReleaseTasksPath Condition="'$(SilReleaseTasksPath)'==''">$(MSBuildThisFileDirectory)/ASSEMBLYDIR</SilReleaseTasksPath>
-	</PropertyGroup>
+  <PropertyGroup>
+    <SilReleaseTasksPath Condition="$(GitVersionAssemblyFile) == '' And '$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\tools\net461</SilReleaseTasksPath>
+    <SilReleaseTasksPath Condition="$(GitVersionAssemblyFile) == '' And '$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\tools\netstandard2.0</SilReleaseTasksPath>
+  </PropertyGroup>
 
-	<UsingTask TaskName="CreateChangelogEntry" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
-	<UsingTask TaskName="CreateReleaseNotesHtml" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
-	<UsingTask TaskName="StampChangelogFileWithVersion" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
-	<UsingTask TaskName="SetReleaseNotesProperty" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
+  <UsingTask TaskName="CreateChangelogEntry" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
+  <UsingTask TaskName="CreateReleaseNotesHtml" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
+  <UsingTask TaskName="StampChangelogFileWithVersion" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
+  <UsingTask TaskName="SetReleaseNotesProperty" AssemblyFile="$(SilReleaseTasksPath)/SIL.ReleaseTasks.dll" />
 
 </Project>

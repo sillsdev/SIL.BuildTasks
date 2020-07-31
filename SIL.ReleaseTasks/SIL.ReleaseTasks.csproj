@@ -43,7 +43,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.0.0-*,)" PrivateAssets="All" />
+    <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
