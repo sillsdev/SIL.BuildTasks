@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- [SIL.ReleaseTasks] Fix setting of `SilReleaseTasksPath` property
+
 ## [2.3.3] - 2020-07-31
 
 ### Fixed
