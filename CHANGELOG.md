@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Support for Keep a Changelog style CHANGELOG.md files in SIL.ReleaseTasks.
+
 ## [2.4.0] - 2021-01-22
 
 ### Added
