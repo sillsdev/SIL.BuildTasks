@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 
@@ -31,17 +33,96 @@ namespace SIL.ReleaseTasks.Tests
 				sut.MaintainerInfo = "Steve McConnel <stephen_mcconnel@example.com>";
 				sut.DebianChangelog = changeLogFile;
 				sut.Distribution = "unstable";
+				string expectedDebianChangelog =
+@"myfavoriteapp (2.3.11) unstable; urgency=low
+
+  * with some random content
+  * does some things
+
+ -- Steve McConnel <stephen_mcconnel@example.com>  DATE_NOW
+
+myfavoriteapp (2.1.0~alpha1) unstable; urgency=low
+
+  * Initial Release for Linux.
+
+ -- Stephen McConnel <stephen_mcconnel@example.com>  Fri, 12 Jul 2013 14:57:59 -0500
+";
+				expectedDebianChangelog = expectedDebianChangelog.Replace("DATE_NOW", CreateChangelogEntry.DebianDateNow());
 
 				// Execute
 				Assert.That(sut.Execute(), Is.True);
 
 				// Verify
 				var newContents = File.ReadAllLines(changeLogFile);
-				Assert.AreEqual(newContents.Length, 13, "New changelog entry was not the expected length");
-				Assert.That(newContents[0], Does.StartWith("myfavoriteapp (2.3.11) unstable; urgency=low"));
-				//Make sure that the author line matches debian standards for time offset and spacing around author name
+				string newContentsText = string.Join("\n", newContents);
+				Assert.That(newContentsText, Is.EqualTo(expectedDebianChangelog));
+				// Make sure that the author line matches debian standards for time offset and spacing around author name
 				Assert.That(newContents[5], Does.Match(" -- " + sut.MaintainerInfo + "  .*[+-]\\d\\d\\d\\d"));
 			}
+		}
+
+		[Test]
+		public void GenerateNewDebianChangelogEntry_InterpretsKAC()
+		{
+			// Setup
+			var sut = new CreateChangelogEntry();
+
+			string changelogContent =
+@"All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+<!-- Available types of changes:
+### Added
+### Changed
+### Fixed
+### Deprecated
+### Removed
+### Security
+-->
+
+## [Unreleased]
+
+## [2.3.11] - 2020-12-05
+
+### Changed
+- This to that.
+
+### Fixed
+- Unplanned bugs.
+
+## [1.2.3] - 2020-12-01
+
+### Added
+- New features.
+
+### Fixed
+- All bugs.";
+
+			string expectedNewChangelogEntry = @"myfavoriteapp (2.3.11) unstable; urgency=low
+
+  * Changed
+    * This to that.
+
+  * Fixed
+    * Unplanned bugs.
+
+ -- Steve McConnel <stephen_mcconnel@example.com>  DATE_NOW
+";
+			expectedNewChangelogEntry = expectedNewChangelogEntry.Replace("DATE_NOW", CreateChangelogEntry.DebianDateNow());
+
+			sut.VersionNumber = "2.3.11";
+			sut.PackageName = "myfavoriteapp";
+			sut.MaintainerInfo = "Steve McConnel <stephen_mcconnel@example.com>";
+			sut.Distribution = "unstable";
+
+			// Execute
+			List<string> output = sut.GenerateNewDebianChangelogEntry(changelogContent.Split('\n'));
+			string actualEntry = string.Join("\n", output);
+
+			// Verify
+			Assert.That(actualEntry, Is.EqualTo(expectedNewChangelogEntry));
 		}
 
 		[Test]

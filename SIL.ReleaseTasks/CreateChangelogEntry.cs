@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -29,9 +30,9 @@ namespace SIL.ReleaseTasks
 		[Required]
 		public string DebianChangelog { get; set; }
 
-		public string Distribution { get; set; }
+		public string Distribution { get; set; } = "UNRELEASED";
 
-		public string Urgency { get; set; }
+		public string Urgency { get; set; } = "low";
 
 		/// <summary>
 		/// Name and e-mail string
@@ -41,10 +42,6 @@ namespace SIL.ReleaseTasks
 		[SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
 		public override bool Execute()
 		{
-			if (string.IsNullOrEmpty(Distribution))
-				Distribution = "UNRELEASED";
-			if (string.IsNullOrEmpty(Urgency))
-				Urgency = "low";
 			var oldChangeLog = Path.ChangeExtension(DebianChangelog, ".old");
 			File.Delete(oldChangeLog);
 			File.Move(DebianChangelog, oldChangeLog);
@@ -59,31 +56,69 @@ namespace SIL.ReleaseTasks
 			{
 				MaintainerInfo = "Anonymous <anonymous@example.com>";
 			}
-			var markdownLines = File.ReadAllLines(ChangelogFile);
-			var newEntryLines = new List<string> {
-				// Write out the first markdown line as the changelog version line
+			string[] markdownLines = File.ReadAllLines(ChangelogFile);
+			List<string> newChangelogEntry = GenerateNewDebianChangelogEntry(markdownLines);
+			File.AppendAllLines(DebianChangelog, newChangelogEntry);
+		}
+
+		public List<string> GenerateNewDebianChangelogEntry(string[] markdownLines)
+		{
+			string mdText = string.Join("\n", markdownLines);
+			bool isKAC = CreateReleaseNotesHtml.RemoveKACHeadIfPresent(ref mdText);
+			markdownLines = mdText.Split('\n');
+
+			if (isKAC)
+			{
+				markdownLines = ConvertKACSectionsToBullets(markdownLines);
+			}
+
+			var newEntryLines = new List<string>
+			{
+				// Write out the first line as the changelog version line
 				$"{PackageName} ({VersionNumber}) {Distribution}; urgency={Urgency}",
 				string.Empty
 			};
-			for(var i = 1; i < markdownLines.Length; ++i)
+			// Skip a beginning blank line after the version header, if present.
+			int contentStartingLineAfterVersionHeader = 1;
+			if (string.IsNullOrWhiteSpace(markdownLines[1]))
 			{
-				if(markdownLines[i].StartsWith("##"))
+				contentStartingLineAfterVersionHeader = 2;
+			}
+			for (var i = contentStartingLineAfterVersionHeader; i < markdownLines.Length; ++i)
+			{
+				if (markdownLines[i].StartsWith("##"))
+				{
 					break;
+				}
 				ConvertMarkdownLineToChangelogLine(markdownLines[i], newEntryLines);
 			}
-			newEntryLines.Add(string.Empty);
+			if (newEntryLines[newEntryLines.Count - 1] != string.Empty)
+			{
+				// End body with a blank line, if not already.
+				newEntryLines.Add(string.Empty);
+			}
 			// The debian changelog needs RFC 2822 format (Thu, 15 Oct 2015 08:25:16 -0500), which is not quite what .NET can provide
-			var debianDate = $"{DateTime.Now:ddd, dd MMM yyyy HH'|'mm'|'ss zzz}".Replace(":", "").Replace('|', ':');
+			var debianDate = CreateChangelogEntry.DebianDateNow();
 			newEntryLines.Add($" -- {MaintainerInfo}  {debianDate}");
 			newEntryLines.Add(string.Empty);
-			File.AppendAllLines(DebianChangelog, newEntryLines);
+			return newEntryLines;
+		}
+
+		/// <summary>
+		/// Date/Time now, in format suitable for debian/changelog files.
+		/// </summary>
+		public static string DebianDateNow()
+		{
+			return $"{DateTime.Now:ddd, dd MMM yyyy HH'|'mm'|'ss zzz}".Replace(":", "").Replace('|', ':');
 		}
 
 		private static void ConvertMarkdownLineToChangelogLine(string markdownLine, List<string> newEntryLines)
 		{
-			if (string.IsNullOrEmpty(markdownLine))
+			if (string.IsNullOrWhiteSpace(markdownLine))
+			{
+				newEntryLines.Add(string.Empty);
 				return;
-
+			}
 			// ReSharper disable once SwitchStatementMissingSomeCases
 			switch(markdownLine[0])
 			{
@@ -99,14 +134,36 @@ namespace SIL.ReleaseTasks
 				case '7':
 				case '8':
 				case '9':
-				case '0': // treat all unordered and ordered list items the same in the changelog
+				case '0':
+					// Treat all unordered and ordered list items the same in the changelog
 					newEntryLines.Add($"  *{markdownLine.Substring(1)}");
 					break;
-				case ' ': // Handle lists within lists, only second level items are handled, any further indentation is currently ignored
-					newEntryLines.Add($"    *{markdownLine.Trim().Substring(1).Trim('.')}");
+				case ' ':
+					// Handle lists within lists, only second level items are handled, any further indentation is
+					// currently ignored.
+					// TrimStart('.') is used to remove the period from "1.".
+					newEntryLines.Add($"    *{markdownLine.Trim().Substring(1).TrimStart('.')}");
 					break;
 			}
 		}
 
+		/// <summary>
+		/// Keep a Changelog style changelogs have sections like "Fixed" and "Added". Change these to bullets.
+		/// </summary>
+		private string[] ConvertKACSectionsToBullets(string[] mdLines)
+		{
+			return (new List<string>(mdLines))
+				// Indent everything, except headers and empty lines, so the section bullets are at the least level of indentation.
+				.Select((string line) => {
+					if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+					{
+						return line;
+					}
+					return line.Insert(0, "  ");
+				})
+				// Change ### section headers to first-level bullets.
+				.Select((string line) => line.Replace("### ", "- "))
+				.ToArray();
+		}
 	}
 }
