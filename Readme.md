@@ -30,3 +30,17 @@ Several useful msbuild tasks.
 [StampAssemblies](Documentation/SIL.BuildTasks.md#stampassemblies-task) |
 [UnixName](Documentation/SIL.BuildTasks.md#unixname-task) | Determine the Unix Name of the operating system executing the build.
 [UpdateBuildTypeFile](Documentation/SIL.BuildTasks.md#updatebuildtypefile-task) |
+
+## Build
+
+### Linux
+
+Install Mono 6 from https://www.mono-project.com/download/stable/ .
+
+Install .NET 5.0 SDK (or .NET Core 3.1 SDK) from https://dot.net/core-sdk-vscode .
+
+Run tests:
+
+```bash
+msbuild build/SIL.BuildTasks.proj
+```
