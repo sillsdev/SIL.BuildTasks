@@ -51,6 +51,28 @@ namespace SIL.BuildTasks.UnitTestTasks
 			}
 		}
 
+		public string Test { get; set; }
+
+		public string Trace { get; set; }
+
+		public int Agents { get; set; }
+
+		public int Workers { get; set; }
+
+		public bool DisposeRunners { get; set; }
+
+		/// <summary>
+		/// When set to true it will offer the opportunity to attach a debugger before starting the unit tests
+		/// </summary>
+		public bool Debug { get; set; }
+
+		/// <summary>
+		/// PROCESS isolation for test assemblies. Values: Single, Separate, Multiple.
+		/// If not specified, defaults to Separate for a single assembly or Multiple for more than one.
+		/// By default, processes are run in parallel
+		/// </summary>
+		public string Process { get; set; }
+
 		/// <inheritdoc />
 		/// <summary>
 		/// Gets the name (without path) of the NUnit executable. When running on Mono this is
@@ -77,6 +99,20 @@ namespace SIL.BuildTasks.UnitTestTasks
 				bldr.Append(" --x86");
 			if (TeamCity)
 				bldr.Append(" --teamcity");
+			if (!string.IsNullOrEmpty(Trace))
+				bldr.AppendFormat(" --trace={0}", Trace);
+			if (!string.IsNullOrEmpty(Test))
+				bldr.AppendFormat(" --test={0}", Test);
+			if (DisposeRunners)
+				bldr.Append(" --dispose-runners");
+			if (Debug)
+				bldr.Append(" --debug");
+			if (!string.IsNullOrEmpty(Process))
+				bldr.AppendFormat(" --process={0}", Process);
+			if (Workers > 0)
+				bldr.AppendFormat(" --workers={0}", Workers);
+			if (Agents > 0)
+				bldr.AppendFormat(" --agents={0}", Agents);
 			return bldr.ToString();
 		}
 

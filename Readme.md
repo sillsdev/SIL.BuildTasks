@@ -44,3 +44,9 @@ Run tests:
 ```bash
 msbuild build/SIL.BuildTasks.proj
 ```
+
+### Building a local package of SIL.BuildTasks for testing (Windows)
+
+1. Run the Pack build command from inside Visual Studio on the SIL.ReleaseTasks.Dogfood project
+2. Run the Pack build command from inside Visual Studio on the SIL.BuildTasks project
+3. Install the package from the output folder into your local Nuget source e.g.`nuget.exe add output/Debug/SIL.BuildTasks.2.3.5-beta.1.nupkg -Source /c/Repositories/DevelopmentPackages/`

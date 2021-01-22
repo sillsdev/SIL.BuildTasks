@@ -161,12 +161,26 @@ Runs NUnit3 on a test assembly.
 
 See properties for NUnit task. The following additional properties are defined:
 
-- `UseNUnit3Xml`: Whether to use the NUnit3 or NUnit2 XML format
-
 - `NoColor`: Determines the use of colors in the output
+
+- `UseNUnit3Xml`: Whether to use the NUnit3 or NUnit2 XML format
 
 - `TeamCity`: Should be set to true if the tests are running on a TeamCity server.
   Adds `--teamcity` when calling nunit which _"Turns on use of TeamCity service messages."_
+
+- `Agent`: The number of NUnit agents to use when running the tests
+
+- `Workers`: Specify the NUMBER of worker threads to be used in running tests
+
+- `Process`: PROCESS isolation for test assemblies. Values: Single, Separate, Multiple
+
+- `DisposeRunners`: When true Dispose each test runner after it has finished running its tests
+
+- `Debug`: Causes NUnit to break into the debugger immediately before it executes your tests
+
+- `Test`: Comma-separated list of FULLNAMES of tests to run or explore. This option may be repeated
+
+- `Trace`: Set internal trace LEVEL. Values: Off, Error, Warning, Info, Verbose (Debug)
 
 ### Example
 
