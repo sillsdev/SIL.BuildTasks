@@ -172,7 +172,7 @@ See properties for NUnit task. The following additional properties are defined:
 
 - `Workers`: Specify the NUMBER of worker threads to be used in running tests
 
-- `Process`: PROCESS isolation for test assemblies. Values: Single, Separate, Multipl
+- `Process`: PROCESS isolation for test assemblies. Values: Single, Separate, Multiple
 
 - `DisposeRunners`: When true Dispose each test runner after it has finished running its tests
 
