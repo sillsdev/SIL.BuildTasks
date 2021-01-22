@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.3.5] - 2021-01-22
 
-### Changed
+### Added
 
 - [SIL.BuildTasks] `Nunit3` task: Add `Process`, `Workers`, `Trace`, `Test`, `Agents`, and `Debug` properties for passing
   on to the NUnit console runner for tuning and debugging
