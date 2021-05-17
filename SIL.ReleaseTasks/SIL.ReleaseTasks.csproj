@@ -7,7 +7,7 @@
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
     <Company>SIL</Company>
     <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018-2020 SIL International</Copyright>
+    <Copyright>Copyright © 2018-2021 SIL International</Copyright>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Authors>SIL International</Authors>
@@ -27,6 +27,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4">
@@ -47,7 +48,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="GitVersionTask" Version="5.2.4" PrivateAssets="All" />
+    <PackageReference Include="GitVersion.MsBuild" Version="5.6.9" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="SIL.ReleaseTasks.Common.inc" />
 </Project>

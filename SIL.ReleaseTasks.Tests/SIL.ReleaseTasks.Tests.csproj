@@ -7,7 +7,7 @@
     <AssemblyTitle>SIL.ReleaseTasks.Tests</AssemblyTitle>
     <Company>SIL</Company>
     <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018 SIL International</Copyright>
+    <Copyright>Copyright © 2018-2021 SIL International</Copyright>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
