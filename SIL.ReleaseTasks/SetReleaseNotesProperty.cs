@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 SIL International
+// Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
@@ -28,6 +28,7 @@ namespace SIL.ReleaseTasks
 		private string[] _markdownLines;
 		private int      _currentIndex;
 		private Regex    _versionRegex;
+		private Regex _urlRegex;
 
 		public override bool Execute()
 		{
@@ -41,6 +42,7 @@ namespace SIL.ReleaseTasks
 			if (string.IsNullOrEmpty(VersionRegex))
 			{
 				versionRegexString = @"#+ \[([^]]+)\]";
+				
 			}
 			else
 			{
@@ -71,6 +73,10 @@ namespace SIL.ReleaseTasks
 
 		private string ConvertLatestChangelog(int level, int skipUntilLevel = -1)
 		{
+			string urlRegex = @"(\[([^]]+)\]: (http|https|ftp|)://[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(/?)" +
+					@"([-a-zA-Z0-9.?,'/\+&%$#_]*)?([-a-zA-Z0-9?,'/+&%$#_]+))+";
+			_urlRegex = new Regex(urlRegex);
+
 			var bldr = new StringBuilder();
 			if (_currentIndex >= _markdownLines.Length)
 				return bldr.ToString();
@@ -130,7 +136,7 @@ namespace SIL.ReleaseTasks
 							_currentIndex = _markdownLines.Length;
 						break;
 					default:
-						if (level > skipUntilLevel)
+						if ((level > skipUntilLevel) && !_urlRegex.IsMatch(currentLine))
 							bldr.AppendLine(currentLine);
 						break;
 				}
