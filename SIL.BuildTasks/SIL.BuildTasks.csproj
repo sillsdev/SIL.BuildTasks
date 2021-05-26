@@ -23,6 +23,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
@@ -32,7 +33,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
-    <PackageReference Include="GitVersionTask" Version="5.2.4" PrivateAssets="All" />
+    <PackageReference Include="GitVersion.MsBuild" Version="5.6.9" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="SIL.BuildTasks.props">
