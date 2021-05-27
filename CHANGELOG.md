@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- [SIL.ReleaseTasks] Exclude links from CHANGELOG.md file when extracting release notes (#46)
+
 ## [2.5.0] - 2021-02-24
 
 ### Added
