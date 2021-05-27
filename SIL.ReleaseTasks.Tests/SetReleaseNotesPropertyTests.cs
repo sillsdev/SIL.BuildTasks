@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 SIL International
+// Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System.IO;
@@ -434,6 +434,39 @@ See full changelog at github.";
 - This is a unit test
 
 See full changelog at github.
+"));
+		}
+
+
+		[Test]
+		public void UrlInChangeLog()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+### Changed
+
+- This is a unit test
+
+[Unreleased]: https://example.com
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changed:
+- This is a unit test
 "));
 		}
 	}
