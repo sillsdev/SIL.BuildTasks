@@ -32,6 +32,9 @@ namespace SIL.ReleaseTasks
 
 		public override bool Execute()
 		{
+			string urlRegex = @"\[[^]]+\]: (http|https|ftp|)://.+";
+			_urlRegex = new Regex(urlRegex);
+
 			if (!File.Exists(ChangelogFile))
 			{
 				Log.LogError($"The given changelog file ({ChangelogFile}) does not exist.");
@@ -73,9 +76,6 @@ namespace SIL.ReleaseTasks
 
 		private string ConvertLatestChangelog(int level, int skipUntilLevel = -1)
 		{
-			string urlRegex = @"(\[([^]]+)\]: (http|https|ftp|)://[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(/?)" +
-					@"([-a-zA-Z0-9.?,'/\+&%$#_]*)?([-a-zA-Z0-9?,'/+&%$#_]+))+";
-			_urlRegex = new Regex(urlRegex);
 
 			var bldr = new StringBuilder();
 			if (_currentIndex >= _markdownLines.Length)
@@ -136,6 +136,9 @@ namespace SIL.ReleaseTasks
 							_currentIndex = _markdownLines.Length;
 						break;
 					default:
+						if (_urlRegex.IsMatch(currentLine))
+							_currentIndex = _markdownLines.Length;
+
 						if ((level > skipUntilLevel) && !_urlRegex.IsMatch(currentLine))
 							bldr.AppendLine(currentLine);
 						break;
