@@ -138,8 +138,7 @@ namespace SIL.ReleaseTasks
 					default:
 						if (_urlRegex.IsMatch(currentLine))
 							_currentIndex = _markdownLines.Length;
-
-						if ((level > skipUntilLevel) && !_urlRegex.IsMatch(currentLine))
+						else if (level > skipUntilLevel)
 							bldr.AppendLine(currentLine);
 						break;
 				}
