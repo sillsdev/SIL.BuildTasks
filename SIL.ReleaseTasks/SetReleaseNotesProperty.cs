@@ -25,15 +25,25 @@ namespace SIL.ReleaseTasks
 
 		public string AppendToReleaseNotesProperty { get; set; }
 
+		public Boolean FilterEntries { get; set; }
+
+		public string PackageId { get; set; }
+
 		private string[] _markdownLines;
 		private int      _currentIndex;
 		private Regex    _versionRegex;
 		private Regex _urlRegex;
+		private Regex _filterRegex;
 
 		public override bool Execute()
 		{
 			string urlRegex = @"\[[^]]+\]: (http|https|ftp|)://.+";
 			_urlRegex = new Regex(urlRegex);
+
+			string filterRegex = @"\- \[([^]]+)\]";
+			//string filterRegex = @"\- ";
+			_filterRegex = new Regex(filterRegex);
+			
 
 			if (!File.Exists(ChangelogFile))
 			{
@@ -84,6 +94,9 @@ namespace SIL.ReleaseTasks
 			var levelHeader = new string('#', level) + " ";
 			var parentLevelHeader = new string('#', level - 1) + " ";
 
+			string filterRegex = @"\- \[([^]]+)\]";
+			_filterRegex = new Regex(filterRegex);
+
 			for (; _currentIndex < _markdownLines.Length; _currentIndex++)
 			{
 				var currentLine = _markdownLines[_currentIndex];
@@ -115,13 +128,54 @@ namespace SIL.ReleaseTasks
 								}
 								else
 								{
-									if (bldr.Length > 0)
-										bldr.AppendLine();
+									
+
+									bool endOfFile = false; 
+									bool currentPackage = false; 
+									bool printLine = false; 
 
 									var headerText = currentLine.Substring(levelHeader.Length);
 									if (!headerText.EndsWith(":"))
 										headerText += ":";
-									bldr.AppendLine(headerText);
+
+									//exclude unnecessary headers from changelog file
+									for (int i = _currentIndex + 1; i < _markdownLines.Length - 1; i++)
+									{
+										var line = _markdownLines[i];
+										if (line.StartsWith("-") && FilterEntries)
+										{
+											if (_filterRegex.IsMatch(line) && line.StartsWith($"- [{PackageId}]"))
+											{
+												currentPackage = true;
+												break;
+											}
+											else
+											{
+												if (!_filterRegex.IsMatch(line) && !string.IsNullOrEmpty(line))
+												{
+													printLine = true;
+													break;
+												}
+											}
+										}
+										else if (!_versionRegex.IsMatch(line) && !string.IsNullOrEmpty(line))
+											break;
+
+										if (i == _markdownLines.Length - 1)
+										{
+											endOfFile = true;
+											break;
+										}
+
+									}
+									
+									if (((currentPackage || printLine) && !endOfFile && FilterEntries) || !FilterEntries)
+									{
+										if (bldr.Length > 0)
+											bldr.AppendLine();
+										bldr.AppendLine(headerText);
+									}	
+
 								}
 								skipUntilLevel = -1;
 							}
@@ -135,8 +189,16 @@ namespace SIL.ReleaseTasks
 						if (level > skipUntilLevel)
 							_currentIndex = _markdownLines.Length;
 						break;
-					default:
-						if (_urlRegex.IsMatch(currentLine))
+					default: 
+						if (currentLine.StartsWith("-") && _filterRegex.IsMatch(currentLine) && FilterEntries)
+						{
+							if (currentLine.StartsWith($"- [{PackageId}]"))
+							{
+								string newLine = currentLine.Replace($" [{PackageId}]", "");
+								bldr.AppendLine(newLine);
+							}
+						}
+						else if (_urlRegex.IsMatch(currentLine))
 							_currentIndex = _markdownLines.Length;
 						else if (level > skipUntilLevel)
 							bldr.AppendLine(currentLine);
