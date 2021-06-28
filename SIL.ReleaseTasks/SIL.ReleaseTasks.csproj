@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <RootNamespace>SIL.ReleaseTasks</RootNamespace>
@@ -28,6 +28,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
+    <FilterEntries>true</FilterEntries>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4">

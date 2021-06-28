@@ -469,5 +469,294 @@ See full changelog at github.
 - This is a unit test
 "));
 		}
+
+
+		[Test]
+		public void FilterEntriesTrueSomeOtherProject()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = true;
+			sut.PackageId = "Some.OtherProject";
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+## [2.4.0] - 2021-01-22
+
+### Added
+
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+### Fixed
+
+- [Some.OtherProject] Fix crash in 'Foobar'
+
+## [2.3.0]
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.3.0
+
+Added:
+- 'ReadMe.md' Lorem ipsum
+
+Fixed:
+- Fix crash in 'Foobar'
+"));
+
+		}
+
+
+		[Test]
+		public void FilterEntriesFalseSomeOtherProject()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = false;
+			sut.PackageId = "Some.OtherProject";
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+## [2.4.0] - 2021-01-22
+
+### Added
+
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+### Fixed
+
+- [Some.OtherProject] Fix crash in 'Foobar'
+
+## [2.3.0]
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.3.0
+
+Added:
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+Fixed:
+- [Some.OtherProject] Fix crash in 'Foobar'
+"));
+
+		}
+
+		[Test]
+		public void FilterEntriesTrueMyProject1()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = true;
+			sut.PackageId = "MyProject1";
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+## [2.4.0] - 2021-01-22
+
+### Added
+
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+### Fixed
+
+- [Some.OtherProject] Fix crash in 'Foobar'
+
+## [2.3.0]
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.3.0
+
+Added:
+- Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+"));
+
+		}
+
+
+		[Test]
+		public void FilterEntriesFalseMyProject1()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = false;
+			sut.PackageId = "MyProject1";
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+## [2.4.0] - 2021-01-22
+
+### Added
+
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+### Fixed
+
+- [Some.OtherProject] Fix crash in 'Foobar'
+
+## [2.3.0]
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.3.0
+
+Added:
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+Fixed:
+- [Some.OtherProject] Fix crash in 'Foobar'
+"));
+		}
+
+
+
+		[Test]
+		public void FilterEntriesUnnecessaryHeaders()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = true;
+			sut.PackageId = "MyProject1";
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+## [2.4.0] - 2021-01-22
+
+### Added
+
+- [Some.OtherProject] Add 'DoSomething()' method to 'Foo'
+
+### Fixed
+
+- [MyProject1] Fix crash in 'Foobar'
+- 'ReadMe.md' Lorem ipsum
+
+## [2.3.0]
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.3.0
+
+Fixed:
+- Fix crash in 'Foobar'
+- 'ReadMe.md' Lorem ipsum
+"));
+
+		}
+
+
+		[Test]
+		public void FilterEntriesOtherUnnecessaryHeaders()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = true;
+			sut.PackageId = "AnotherProject";
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+## [Unreleased]
+
+## [2.4.0] - 2021-01-22
+
+### Added
+
+- [Some.OtherProject] Add 'DoSomething()' method to 'Foo'
+
+### Fixed
+
+- [MyProject1] Fix crash in 'Foobar'
+- 'ReadMe.md' Lorem ipsum
+
+## [2.3.0]
+");
+
+			sut.ChangelogFile = _tempFile;
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.3.0
+
+Fixed:
+- 'ReadMe.md' Lorem ipsum
+"));
+
+		}
+
+
+
+
+
 	}
+
+	
 }
