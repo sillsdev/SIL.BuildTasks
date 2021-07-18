@@ -2,6 +2,12 @@
 
 Tasks in the `SIL.ReleaseTasks` nuget package:
 
+## SetReleaseNotesProperty task
+
+This new feature adds a filter option to the SetReleaseNotesProperty task which allows to filter out any
+entries that do not belong to a specific nuget package. To achieve this we add a new property
+FilterEntries that controls whether or not the new feature is enabled for a project.
+
 ## CreateChangelogEntry task
 
 Given a Changelog file, this task will add an entry to the debian changelog (`debian/changelog`).

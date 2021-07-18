@@ -25,7 +25,7 @@ namespace SIL.ReleaseTasks
 
 		public string AppendToReleaseNotesProperty { get; set; }
 
-		public Boolean FilterEntries { get; set; }
+		public bool FilterEntries { get; set; }
 
 		public string PackageId { get; set; }
 
@@ -41,7 +41,6 @@ namespace SIL.ReleaseTasks
 			_urlRegex = new Regex(urlRegex);
 
 			string filterRegex = @"\- \[([^]]+)\]";
-			//string filterRegex = @"\- ";
 			_filterRegex = new Regex(filterRegex);
 			
 
@@ -94,9 +93,6 @@ namespace SIL.ReleaseTasks
 			var levelHeader = new string('#', level) + " ";
 			var parentLevelHeader = new string('#', level - 1) + " ";
 
-			string filterRegex = @"\- \[([^]]+)\]";
-			_filterRegex = new Regex(filterRegex);
-
 			for (; _currentIndex < _markdownLines.Length; _currentIndex++)
 			{
 				var currentLine = _markdownLines[_currentIndex];
@@ -128,53 +124,16 @@ namespace SIL.ReleaseTasks
 								}
 								else
 								{
-									
-
-									bool endOfFile = false; 
-									bool currentPackage = false; 
-									bool printLine = false; 
-
 									var headerText = currentLine.Substring(levelHeader.Length);
 									if (!headerText.EndsWith(":"))
 										headerText += ":";
-
-									//exclude unnecessary headers from changelog file
-									for (int i = _currentIndex + 1; i < _markdownLines.Length - 1; i++)
-									{
-										var line = _markdownLines[i];
-										if (line.StartsWith("-") && FilterEntries)
-										{
-											if (_filterRegex.IsMatch(line) && line.StartsWith($"- [{PackageId}]"))
-											{
-												currentPackage = true;
-												break;
-											}
-											else
-											{
-												if (!_filterRegex.IsMatch(line) && !string.IsNullOrEmpty(line))
-												{
-													printLine = true;
-													break;
-												}
-											}
-										}
-										else if (!_versionRegex.IsMatch(line) && !string.IsNullOrEmpty(line))
-											break;
-
-										if (i == _markdownLines.Length - 1)
-										{
-											endOfFile = true;
-											break;
-										}
-
-									}
-									
-									if (((currentPackage || printLine) && !endOfFile && FilterEntries) || !FilterEntries)
+									bool printHeader = SkipHeader(_currentIndex);
+									if (printHeader)
 									{
 										if (bldr.Length > 0)
 											bldr.AppendLine();
 										bldr.AppendLine(headerText);
-									}	
+									}
 
 								}
 								skipUntilLevel = -1;
@@ -190,12 +149,39 @@ namespace SIL.ReleaseTasks
 							_currentIndex = _markdownLines.Length;
 						break;
 					default: 
-						if (currentLine.StartsWith("-") && _filterRegex.IsMatch(currentLine) && FilterEntries)
+						if (FilterEntries)
 						{
-							if (currentLine.StartsWith($"- [{PackageId}]"))
+							int m = _currentIndex;
+							if (_filterRegex.IsMatch(currentLine) && !String.IsNullOrEmpty(currentLine))
 							{
-								string newLine = currentLine.Replace($" [{PackageId}]", "");
-								bldr.AppendLine(newLine);
+								if (currentLine.StartsWith($"- [{PackageId}]"))
+								{
+									string newLine = currentLine.Replace($" [{PackageId}]", "");
+									bldr.AppendLine(newLine);
+									m++;
+									while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !String.IsNullOrEmpty(_markdownLines[m]))
+									{
+										bldr.AppendLine(_markdownLines[m]);
+										_currentIndex = m;
+										m++;
+									}
+									
+								}else
+								{
+									while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && String.IsNullOrEmpty(_markdownLines[m]))
+									{
+										_currentIndex = m;
+										m++;
+									}
+								}
+							}else if (currentLine.StartsWith("-") && !String.IsNullOrEmpty(currentLine))
+							{
+								while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !String.IsNullOrEmpty(_markdownLines[m]))
+								{
+									bldr.AppendLine(_markdownLines[m]);
+									_currentIndex = m;
+									m++;
+								}
 							}
 						}
 						else if (_urlRegex.IsMatch(currentLine))
@@ -242,6 +228,53 @@ namespace SIL.ReleaseTasks
 			}
 
 			return string.Empty;
+		}
+
+		private bool SkipHeader(int index)
+		{
+			//var currentLine = _markdownLines[index];
+			bool print = false;
+			bool endOfFile = false;
+			bool currentPackage = false;
+			bool printLine = false;
+
+			//exclude unnecessary headers from changelog file
+			for (int i = index + 1; i < _markdownLines.Length; i++)
+			{
+				var line = _markdownLines[i];
+				if (string.IsNullOrEmpty(line) || line.StartsWith("  "))
+					continue;
+				if (line.StartsWith("-") && FilterEntries)
+				{
+					if (_filterRegex.IsMatch(line))
+					{
+						if (line.StartsWith($"- [{PackageId}]"))
+						{
+							currentPackage = true;
+							break;
+						}
+					}
+					else
+					{
+						printLine = true;
+						break;
+					}
+				}
+				else if (!_versionRegex.IsMatch(line))
+					break;
+
+				if (i == _markdownLines.Length - 1)
+				{
+					endOfFile = true;
+					break;
+				}
+			}
+
+			if (((currentPackage || printLine) && !endOfFile && FilterEntries) || !FilterEntries)
+			{
+				print = true;
+			}
+			return print;
 		}
 	}
 }
