@@ -152,31 +152,33 @@ namespace SIL.ReleaseTasks
 						if (FilterEntries)
 						{
 							int m = _currentIndex;
-							if (_filterRegex.IsMatch(currentLine) && !String.IsNullOrEmpty(currentLine))
+								if (_filterRegex.IsMatch(currentLine))
 							{
 								if (currentLine.StartsWith($"- [{PackageId}]"))
 								{
 									string newLine = currentLine.Replace($" [{PackageId}]", "");
 									bldr.AppendLine(newLine);
 									m++;
-									while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !String.IsNullOrEmpty(_markdownLines[m]))
+									while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !string.IsNullOrEmpty(_markdownLines[m]))
 									{
 										bldr.AppendLine(_markdownLines[m]);
 										_currentIndex = m;
 										m++;
 									}
 									
-								}else
+								}
+								else
 								{
-									while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && String.IsNullOrEmpty(_markdownLines[m]))
+									while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && string.IsNullOrEmpty(_markdownLines[m]))
 									{
 										_currentIndex = m;
 										m++;
 									}
 								}
-							}else if (currentLine.StartsWith("-") && !String.IsNullOrEmpty(currentLine))
+							}
+							else if (currentLine.StartsWith("-"))
 							{
-								while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !String.IsNullOrEmpty(_markdownLines[m]))
+								while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !string.IsNullOrEmpty(_markdownLines[m]))
 								{
 									bldr.AppendLine(_markdownLines[m]);
 									_currentIndex = m;
@@ -232,12 +234,6 @@ namespace SIL.ReleaseTasks
 
 		private bool SkipHeader(int index)
 		{
-			//var currentLine = _markdownLines[index];
-			bool print = false;
-			bool endOfFile = false;
-			bool currentPackage = false;
-			bool printLine = false;
-
 			//exclude unnecessary headers from changelog file
 			for (int i = index + 1; i < _markdownLines.Length; i++)
 			{
@@ -250,31 +246,18 @@ namespace SIL.ReleaseTasks
 					{
 						if (line.StartsWith($"- [{PackageId}]"))
 						{
-							currentPackage = true;
-							break;
+							return true;
 						}
 					}
 					else
 					{
-						printLine = true;
-						break;
+						return true;
 					}
 				}
 				else if (!_versionRegex.IsMatch(line))
 					break;
-
-				if (i == _markdownLines.Length - 1)
-				{
-					endOfFile = true;
-					break;
-				}
 			}
-
-			if (((currentPackage || printLine) && !endOfFile && FilterEntries) || !FilterEntries)
-			{
-				print = true;
-			}
-			return print;
+			return !FilterEntries;
 		}
 	}
 }
