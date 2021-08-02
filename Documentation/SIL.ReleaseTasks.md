@@ -119,7 +119,7 @@ conventions.
 
 - `Value` (output parameter): The name of the property that will be set
 
-- 'FilterEntries': Filters out entries that do not belong to a specific nuget package, when enabled.
+- `FilterEntries`: Filters out entries that do not belong to a specific nuget package, when enabled.
 
 ### Example
 
