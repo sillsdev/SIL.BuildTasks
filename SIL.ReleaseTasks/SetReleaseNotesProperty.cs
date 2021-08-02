@@ -25,15 +25,24 @@ namespace SIL.ReleaseTasks
 
 		public string AppendToReleaseNotesProperty { get; set; }
 
+		public bool FilterEntries { get; set; }
+
+		public string PackageId { get; set; }
+
 		private string[] _markdownLines;
 		private int      _currentIndex;
 		private Regex    _versionRegex;
 		private Regex _urlRegex;
+		private Regex _filterRegex;
 
 		public override bool Execute()
 		{
 			string urlRegex = @"\[[^]]+\]: (http|https|ftp|)://.+";
 			_urlRegex = new Regex(urlRegex);
+
+			string filterRegex = @"\- \[([^]]+)\]";
+			_filterRegex = new Regex(filterRegex);
+			
 
 			if (!File.Exists(ChangelogFile))
 			{
@@ -115,13 +124,17 @@ namespace SIL.ReleaseTasks
 								}
 								else
 								{
-									if (bldr.Length > 0)
-										bldr.AppendLine();
-
 									var headerText = currentLine.Substring(levelHeader.Length);
 									if (!headerText.EndsWith(":"))
 										headerText += ":";
-									bldr.AppendLine(headerText);
+									bool printHeader = SkipHeader(_currentIndex);
+									if (printHeader)
+									{
+										if (bldr.Length > 0)
+											bldr.AppendLine();
+										bldr.AppendLine(headerText);
+									}
+
 								}
 								skipUntilLevel = -1;
 							}
@@ -135,8 +148,45 @@ namespace SIL.ReleaseTasks
 						if (level > skipUntilLevel)
 							_currentIndex = _markdownLines.Length;
 						break;
-					default:
-						if (_urlRegex.IsMatch(currentLine))
+					default: 
+						if (FilterEntries)
+						{
+							int m = _currentIndex;
+								if (_filterRegex.IsMatch(currentLine))
+							{
+								if (currentLine.StartsWith($"- [{PackageId}]"))
+								{
+									string newLine = currentLine.Replace($" [{PackageId}]", "");
+									bldr.AppendLine(newLine);
+									m++;
+									while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !string.IsNullOrEmpty(_markdownLines[m]))
+									{
+										bldr.AppendLine(_markdownLines[m]);
+										_currentIndex = m;
+										m++;
+									}
+									
+								}
+								else
+								{
+									while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && string.IsNullOrEmpty(_markdownLines[m]))
+									{
+										_currentIndex = m;
+										m++;
+									}
+								}
+							}
+							else if (currentLine.StartsWith("-"))
+							{
+								while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !string.IsNullOrEmpty(_markdownLines[m]))
+								{
+									bldr.AppendLine(_markdownLines[m]);
+									_currentIndex = m;
+									m++;
+								}
+							}
+						}
+						else if (_urlRegex.IsMatch(currentLine))
 							_currentIndex = _markdownLines.Length;
 						else if (level > skipUntilLevel)
 							bldr.AppendLine(currentLine);
@@ -180,6 +230,34 @@ namespace SIL.ReleaseTasks
 			}
 
 			return string.Empty;
+		}
+
+		private bool SkipHeader(int index)
+		{
+			//exclude unnecessary headers from changelog file
+			for (int i = index + 1; i < _markdownLines.Length; i++)
+			{
+				var line = _markdownLines[i];
+				if (string.IsNullOrEmpty(line) || line.StartsWith("  "))
+					continue;
+				if (line.StartsWith("-") && FilterEntries)
+				{
+					if (_filterRegex.IsMatch(line))
+					{
+						if (line.StartsWith($"- [{PackageId}]"))
+						{
+							return true;
+						}
+					}
+					else
+					{
+						return true;
+					}
+				}
+				else if (!_versionRegex.IsMatch(line))
+					break;
+			}
+			return !FilterEntries;
 		}
 	}
 }

@@ -119,6 +119,8 @@ conventions.
 
 - `Value` (output parameter): The name of the property that will be set
 
+- `FilterEntries`: Filters out entries that do not belong to a specific nuget package, when enabled.
+
 ### Example
 
 ```xml
@@ -129,6 +131,7 @@ conventions.
     <TextToAdd><![CDATA[
 See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHANGELOG.md]]>
     </TextToAdd>
+    <FilterEntries>true</FilterEntries>
   </PropertyGroup>
   <SetReleaseNotesProperty ChangelogFile="$(RootDir)/CHANGELOG.md"
     AppendToReleaseNotesProperty="$(TextToAdd)">

@@ -3,9 +3,11 @@
 		Condition="'$(IgnoreSetReleaseNotesProp)' != 'true'">
 		<PropertyGroup>
 			<ChangelogFile Condition="'$(ChangelogFile)'==''">../CHANGELOG.md</ChangelogFile>
+			<PackageId Condition="'$(PackageId)'==''">$(AssembyName)</PackageId>
 		</PropertyGroup>
 		<SetReleaseNotesProperty ChangelogFile="$(ChangelogFile)" VersionRegex="$(VersionRegex)"
-			AppendToReleaseNotesProperty="$(AppendToReleaseNotesProperty)">
+			AppendToReleaseNotesProperty="$(AppendToReleaseNotesProperty)" FilterEntries="$(FilterEntries)"
+			PackageId="$(PackageId)">
 			<Output TaskParameter="Value" PropertyName="PackageReleaseNotes"/>
 		</SetReleaseNotesProperty>
 	</Target>
