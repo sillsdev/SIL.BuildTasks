@@ -873,6 +873,130 @@ Fixed:
 "));
 
 		}
+
+		[Test]
+		[Ignore("issue #52")]
+		public void FilterEntries_UnreleasedWithComment()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = true;
+			sut.PackageId = "MyProject1";
+			sut.ChangelogFile = _tempFile;
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+<!-- comment
+-->
+
+## [Unreleased]
+
+### Added
+
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+## [2.4.0] - 2021-01-22
+");
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.4.0
+
+Added:
+- Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+"));
+		}
+
+		[Test]
+		[Ignore("issue #52")]
+		public void FilterEntries_ReleasedWithComment()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = true;
+			sut.PackageId = "MyProject1";
+			sut.ChangelogFile = _tempFile;
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+<!-- comment
+-->
+
+## [Unreleased]
+
+## [2.4.0] - 2021-01-22
+
+### Added
+
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+## [2.3.0] - 2021-01-21
+");
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.3.0
+
+Added:
+- Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+"));
+		}
+
+		[Test]
+		public void FilterEntries_UnreleasedUnfilteredWithComment()
+		{
+			// Setup
+			var sut = new SetReleaseNotesProperty();
+			sut.BuildEngine = new MockEngine();
+			_tempFile = Path.GetTempFileName();
+			sut.FilterEntries = false;
+			sut.PackageId = "MyProject1";
+			sut.ChangelogFile = _tempFile;
+
+			File.WriteAllText(_tempFile, @"
+# Change Log
+
+<!-- comment
+-->
+
+## [Unreleased]
+
+### Added
+
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+
+## [2.4.0] - 2021-01-22
+");
+
+			// Exercise
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True);
+			Assert.That(sut.Value, Is.EqualTo(@"Changes since version 2.4.0
+
+Added:
+- [MyProject1] Add 'DoSomething()' method to 'Foo'
+- 'ReadMe.md' Lorem ipsum
+"));
+		}
+
 	}
-	
 }

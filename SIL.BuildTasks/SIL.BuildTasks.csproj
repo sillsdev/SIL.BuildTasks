@@ -24,6 +24,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
+    <FilterEntries>true</FilterEntries>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
