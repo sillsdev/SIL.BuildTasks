@@ -180,7 +180,8 @@ namespace SIL.ReleaseTasks
 							{
 								while (m < _markdownLines.Length && !_markdownLines[m].StartsWith("- [") && !string.IsNullOrEmpty(_markdownLines[m]))
 								{
-									bldr.AppendLine(_markdownLines[m]);
+									if (!currentLine.StartsWith("-->"))
+										bldr.AppendLine(_markdownLines[m]);
 									_currentIndex = m;
 									m++;
 								}

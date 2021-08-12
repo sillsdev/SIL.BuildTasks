@@ -875,7 +875,6 @@ Fixed:
 		}
 
 		[Test]
-		[Ignore("issue #52")]
 		public void FilterEntries_UnreleasedWithComment()
 		{
 			// Setup
@@ -916,7 +915,6 @@ Added:
 		}
 
 		[Test]
-		[Ignore("issue #52")]
 		public void FilterEntries_ReleasedWithComment()
 		{
 			// Setup
