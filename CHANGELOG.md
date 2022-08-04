@@ -19,10 +19,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - [SIL.ReleaseTasks] Added filter option for project-specific entries (#48)
+- [SIL.BuildTasks] Additionally build for .NetStandard 2.0
 
 ### Fixed
 
 - [SIL.ReleaseTasks] Exclude links from CHANGELOG.md file when extracting release notes (#46)
+- [SIL.BuildTasks] Fixed logging in `MakeWixForDirTree` task (#55)
 
 ## [2.5.0] - 2021-02-24
 
@@ -150,3 +152,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - First release as NuGet package
+
+[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.5.0...master
+
+[2.5.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.4.0...v2.5.0
+[2.4.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.3.0...v2.4.0
+[2.3.4]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.3.3...v2.3.4
+[2.3.3]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.3.2...v2.3.3
+[2.3.2]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.3.1...v2.3.2
+[2.3.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.3.0...v2.3.1
+[2.3.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.2.0...v2.3.0
+[2.2.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.0.1...v2.1.0
+[2.0.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v1.0.2...v2.0.0
+[1.0.2]: https://github.com/sillsdev/SIL.BuildTasks/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/...v1.0.0
