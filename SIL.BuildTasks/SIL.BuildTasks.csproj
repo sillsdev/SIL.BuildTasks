@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <RootNamespace>SIL.BuildTasks</RootNamespace>
     <Configurations>Debug;Release</Configurations>
     <Description>SIL.BuildTasks defines several msbuild tasks used in building our other projects.</Description>
     <AssemblyTitle>SIL.BuildTasks</AssemblyTitle>
     <Company>SIL</Company>
     <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018-2021 SIL International</Copyright>
+    <Copyright>Copyright © 2018-2022 SIL International</Copyright>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Authors>SIL International</Authors>

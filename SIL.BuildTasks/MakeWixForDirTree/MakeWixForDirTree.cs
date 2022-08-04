@@ -433,7 +433,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		{
 			try
 			{
-				Log.LogMessage(importance.ToString(), message);
+				Log.LogMessage(importance, message);
 			}
 			catch (InvalidOperationException)
 			{
@@ -445,7 +445,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		{
 			try
 			{
-				Log.LogMessage(importance.ToString(), message, args);
+				Log.LogMessage(importance, message, args);
 			}
 			catch (InvalidOperationException)
 			{
