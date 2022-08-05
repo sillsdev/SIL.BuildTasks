@@ -1,26 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <Configurations>Release</Configurations>
     <Description>Intermediate nuget package that can be used when packaging SIL.ReleaseTasks.</Description>
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
     <AssemblyName>SIL.ReleaseTasks</AssemblyName>
     <PackageId>SIL.ReleaseTasks.Dogfood</PackageId>
-    <Company>SIL</Company>
-    <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018-2021 SIL International</Copyright>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Authors>SIL International</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageOutputPath>bin/$(Configuration)</PackageOutputPath>
     <BuildOutputTargetFolder>tools/$(TargetFramework)</BuildOutputTargetFolder>
     <!-- This is required for MarkdownDeep.NET which doesn't provide a version for a newer framework version -->
     <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
       $(PackageTargetFallback);netframework35
     </PackageTargetFallback>
-    <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4">
@@ -42,9 +32,6 @@
     <Compile Include="..\SIL.ReleaseTasks\SetReleaseNotesProperty.cs">
       <Link>SetReleaseNotesProperty.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.6.9" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="..\SIL.ReleaseTasks\SIL.ReleaseTasks.Common.inc" />
 </Project>
