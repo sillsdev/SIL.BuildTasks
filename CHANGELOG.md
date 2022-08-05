@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [SIL.ReleaseTasks] Added filter option for project-specific entries (#48)
 - [SIL.BuildTasks] Additionally build for .NetStandard 2.0
 
+### Changed
+
+- Target .NET 4.7.2 instead of 4.6.1
+
 ### Fixed
 
 - [SIL.ReleaseTasks] Exclude links from CHANGELOG.md file when extracting release notes (#46)

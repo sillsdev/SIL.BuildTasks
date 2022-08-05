@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
     <RootNamespace>SIL.BuildTasks.Tests.Helper</RootNamespace>
     <AssemblyTitle>SIL.BuildTasks.Tests.Helper</AssemblyTitle>
     <OutputPath>bin</OutputPath>
@@ -28,8 +28,8 @@
       <SourceFiles Include="$(MSBuildProjectDirectory)/ForceCrash/$(Configuration)/ForceCrash.dll" Condition="'$(OS)'=='Windows_NT'" />
     </ItemGroup>
     <PropertyGroup>
-      <Destination Condition="$(OutputPath.Contains('net461'))">$(OutputPath)</Destination>
-      <Destination Condition="!$(OutputPath.Contains('net461'))">$(OutputPath)/net461</Destination>
+      <Destination Condition="$(OutputPath.Contains('net472'))">$(OutputPath)</Destination>
+      <Destination Condition="!$(OutputPath.Contains('net472'))">$(OutputPath)/net472</Destination>
     </PropertyGroup>
     <Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(Destination)" />
   </Target>

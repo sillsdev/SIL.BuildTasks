@@ -16,7 +16,7 @@
 		<TestOutputXmlFile Condition="'$(teamcity_version)' == ''">$(RootDir)/output/$(Configuration)/TestResults.xml</TestOutputXmlFile>
 	</PropertyGroup>
 
-	<UsingTask TaskName="NUnit3" AssemblyFile="$(RootDir)/output/$(Configuration)/net461/SIL.BuildTasks.dll" />
+	<UsingTask TaskName="NUnit3" AssemblyFile="$(RootDir)/output/$(Configuration)/net472/SIL.BuildTasks.dll" />
 
 	<Import Project="NuGet.targets"/>
 
@@ -62,14 +62,14 @@
 
 	<Target Name="TestOnly">
 		<ItemGroup>
-			<TestAssemblies Include="$(RootDir)/output/$(Configuration)/net461/*.Tests.dll"/>
+			<TestAssemblies Include="$(RootDir)/output/$(Configuration)/net472/*.Tests.dll"/>
 		</ItemGroup>
 
 		<NUnit3 Assemblies="@(TestAssemblies)"
 			ToolPath="$(RootDir)/packages/NUnit.ConsoleRunner/tools"
 			TestInNewThread="false"
 			ExcludeCategory="ByHand;$(excludedCategories)$(ExtraExcludeCategories)"
-			WorkingDirectory="$(RootDir)/output/$(Configuration)/net461"
+			WorkingDirectory="$(RootDir)/output/$(Configuration)/net472"
 			Force32Bit="$(useNUnit-x86)"
 			Verbose="true"
 			UseNUnit3Xml="false"
