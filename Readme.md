@@ -2,6 +2,8 @@
 
 Several useful msbuild tasks.
 
+[![Build, Test and Pack](https://github.com/sillsdev/SIL.BuildTasks/actions/workflows/CI-CD.yml/badge.svg)](https://github.com/sillsdev/SIL.BuildTasks/actions/workflows/CI-CD.yml)
+
 ## Current Tasks
 
 ### [`SIL.ReleaseTasks` package](Documentation/SIL.ReleaseTasks.md)
@@ -33,16 +35,15 @@ Several useful msbuild tasks.
 
 ## Build
 
-### Linux
+### Windows or Linux
 
-Install Mono 6 from https://www.mono-project.com/download/stable/ .
+Install .NET 6.0 SDK from https://dot.net/core-sdk-vscode .
 
-Install .NET 5.0 SDK (or .NET Core 3.1 SDK) from https://dot.net/core-sdk-vscode .
-
-Run tests:
+Build and run tests:
 
 ```bash
-msbuild build/SIL.BuildTasks.proj
+dotnet pack --configuration Release SIL.ReleaseTasks.Dogfood/SIL.ReleaseTasks.Dogfood.csproj
+dotnet test
 ```
 
 ### Building a local package of SIL.BuildTasks for testing (Windows)
