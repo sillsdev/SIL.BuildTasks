@@ -6,11 +6,6 @@
     <IsTool>true</IsTool>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Tasks.v4.0" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
