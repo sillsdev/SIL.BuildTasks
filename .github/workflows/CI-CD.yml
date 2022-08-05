@@ -34,9 +34,12 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
+    - name: Set up Visual Studio shell
+      uses: egor-tensin/vs-shell@9a932a62d05192eae18ca370155cf877eecc2202 # v2
+      if: matrix.os == 'windows-latest'
+
     - name: Build and pack Dogfood
       run: |
-        # directory needs to exist because we use it as nuget package source...
         mkdir SIL.ReleaseTasks.Dogfood/bin
         mkdir SIL.ReleaseTasks.Dogfood/bin/Release
         dotnet pack --configuration Release SIL.ReleaseTasks.Dogfood/SIL.ReleaseTasks.Dogfood.csproj
