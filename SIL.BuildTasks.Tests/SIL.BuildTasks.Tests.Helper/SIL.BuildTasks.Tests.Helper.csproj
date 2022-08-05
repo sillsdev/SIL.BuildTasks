@@ -22,7 +22,7 @@
   <Target Name="BuildUnmanaged" AfterTargets="DispatchToInnerBuilds">
     <RemoveDir Directories="$(MSBuildProjectDirectory)/ForceCrash/$(Configuration)" Condition="Exists('$(MSBuildProjectDirectory)/ForceCrash/$(Configuration)')" />
     <Exec Command="make" WorkingDirectory="$(MSBuildProjectDirectory)/ForceCrash" Condition="'$(OS)'!='Windows_NT'" />
-    <Exec Command="cl /DFORCECRASH_EXPORTS /D_USRDLL /D_WINDOWS ForceCrash.c /link /dll /out:$(MSBuildProjectDirectory)/ForceCrash/ForceCrash.dll" WorkingDirectory="$(MSBuildProjectDirectory)/ForceCrash/" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="cl /DFORCECRASH_EXPORTS /D_USRDLL /D_WINDOWS /DWIN32 ForceCrash.c /link /dll /out:$(MSBuildProjectDirectory)/ForceCrash/ForceCrash.dll" WorkingDirectory="$(MSBuildProjectDirectory)/ForceCrash/" Condition="'$(OS)'=='Windows_NT'" />
     <ItemGroup>
       <SourceFiles Include="$(MSBuildProjectDirectory)/ForceCrash/libForceCrash.so" Condition="'$(OS)'!='Windows_NT'" />
       <SourceFiles Include="$(MSBuildProjectDirectory)/ForceCrash/ForceCrash.dll" Condition="'$(OS)'=='Windows_NT'" />

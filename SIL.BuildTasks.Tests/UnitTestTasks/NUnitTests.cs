@@ -1,28 +1,32 @@
-// Copyright (c) 2016-2018 SIL International
+// Copyright (c) 2016-2022 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Xml;
-using Microsoft.Build.Evaluation;
+using Microsoft.Build.Framework;
+using Moq;
 using NUnit.Framework;
 
 namespace SIL.BuildTasks.Tests.UnitTestTasks
 {
+	// see https://docs.microsoft.com/en-us/visualstudio/msbuild/tutorial-test-custom-task
 	[TestFixture]
 	public class NUnitTests
 	{
-		private static string OutputDirectoryOfHelper => Path.Combine(
+		internal static string OutputDirectoryOfHelper => Path.Combine(
 			OutputDirectoryOfBuildTasks, "..", "..", "..", "SIL.BuildTasks.Tests",
 			"SIL.BuildTasks.Tests.Helper", "bin", "net472");
 
-		private static string OutputDirectoryOfBuildTasks =>
+		internal static string OutputDirectoryOfBuildTasks =>
 			Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
 
-		private static string _nunitDir;
+		private         Mock<IBuildEngine>        _buildEngine;
+		private         List<BuildErrorEventArgs> _errors;
+		private static string                     _nunitDir;
 
-		private static string NUnitDir
+		internal static string NUnitDir
 		{
 			get
 			{
@@ -33,9 +37,10 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 
 				return _nunitDir;
 			}
+			set => _nunitDir = value;
 		}
 
-		private static void CopyNUnit()
+		internal static void CopyNUnit()
 		{
 			_nunitDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 			Directory.CreateDirectory(_nunitDir);
@@ -66,24 +71,21 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 			}
 		}
 
-		private static string GetBuildFilename(string category, bool addToolPath = true)
+		private BuildTasks.UnitTestTasks.NUnit GetNUnitTask(string testCategory)
 		{
-			var buildFile = Path.GetTempFileName();
-			var toolPath = addToolPath ? NUnitDir : "";
-			File.WriteAllText(buildFile, $@"
-<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
-	<UsingTask TaskName='NUnit' AssemblyFile='{
-					Path.Combine(OutputDirectoryOfBuildTasks, "SIL.BuildTasks.dll")
-				}' />
-	<Target Name='Test'>
-		<NUnit Assemblies='{
-					Path.Combine(OutputDirectoryOfHelper, "SIL.BuildTasks.Tests.Helper.dll")
-				}' ToolPath='{toolPath}' TestInNewThread='false' Force32Bit='{!Environment.Is64BitProcess}'
-			IncludeCategory='{category}' Verbose='true' />
-	</Target>
-</Project>");
-
-			return buildFile;
+			var testAssembly = new Mock<ITaskItem>();
+			testAssembly.Setup(x => x.ItemSpec).Returns(
+				Path.Combine(OutputDirectoryOfHelper, "SIL.BuildTasks.Tests.Helper.dll"));
+			var sut = new SIL.BuildTasks.UnitTestTasks.NUnit {
+				Assemblies = new[] { testAssembly.Object },
+				ToolPath = NUnitDir,
+				TestInNewThread = false,
+				Force32Bit = !Environment.Is64BitProcess,
+				IncludeCategory = testCategory,
+				Verbose = true,
+				BuildEngine = _buildEngine.Object
+			};
+			return sut;
 		}
 
 		[OneTimeTearDown]
@@ -96,88 +98,97 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 			_nunitDir = null;
 		}
 
+		[SetUp]
+		public void Setup()
+		{
+			_buildEngine = new Mock<IBuildEngine>();
+			_errors = new List<BuildErrorEventArgs>();
+			_buildEngine.Setup(x => x.LogErrorEvent(It.IsAny<BuildErrorEventArgs>()))
+				.Callback<BuildErrorEventArgs>(e => _errors.Add(e));
+		}
+
 		[Test]
 		public void Success_DoesntFailBuild()
 		{
-			var xmlReader = new XmlTextReader(GetBuildFilename("Success"));
-			var project = new Project(xmlReader);
-			var result = project.Build("Test");
+			// Setup
+			var sut = GetNUnitTask("Success");
+
+			// Execute
+			var result = sut.Execute();
+
+			// Verify
 			Assert.That(result, Is.True, "Passing tests shouldn't fail the build");
+			Assert.That(_errors.Count, Is.EqualTo(0));
 		}
 
 		[Test]
 		public void FailingTests_DoesntFailBuild()
 		{
-			var xmlReader = new XmlTextReader(GetBuildFilename("Failing"));
-			var project = new Project(xmlReader);
-			var result = project.Build("Test");
+			// Setup
+			var sut = GetNUnitTask("Failing");
+
+			// Execute
+			var result = sut.Execute();
+
+			// Verify
 			Assert.That(result, Is.True, "Failing tests shouldn't fail the build");
+			Assert.That(_errors.Count, Is.EqualTo(0));
 		}
 
 		[Test]
 		public void Exception_FailsTestButNotBuild()
 		{
-			var xmlReader = new XmlTextReader(GetBuildFilename("Exception"));
-			var project = new Project(xmlReader);
-			var result = project.Build("Test");
-			Assert.That(result, Is.True, "Exception in test shouldn't fail the build");
-		}
+			// Setup
+			var sut = GetNUnitTask("Exception");
 
-		[Test]
-		[Ignore("No longer happens with Mono 5.12")]
-		[Platform(Exclude = "Win", Reason = "Doesn't crash on Windows. Instead we get an AccessViolationException that .NET handles")]
-		public void TestCrash_FailsBuild()
-		{
-			var xmlReader = new XmlTextReader(GetBuildFilename("Crash"));
-			var project = new Project(xmlReader);
-			var result = project.Build("Test");
-			Assert.That(result, Is.False, "Crash should fail the build");
+			// Execute
+			var result = sut.Execute();
+
+			// Verify
+			Assert.That(result, Is.True, "Exception in test shouldn't fail the build");
+			Assert.That(_errors.Count, Is.EqualTo(0));
 		}
 
 		[Test]
 		public void OutputOnStderr_DoesntFailBuild()
 		{
-			var xmlReader = new XmlTextReader(GetBuildFilename("Stderr"));
-			var project = new Project(xmlReader);
-			var result = project.Build("Test");
+			// Setup
+			var sut = GetNUnitTask("Stderr");
+
+			// Execute
+			var result = sut.Execute();
+
+			// Verify
 			Assert.That(result, Is.True, "Output on Stderr shouldn't fail the build");
+			Assert.That(_errors.Count, Is.EqualTo(0));
 		}
 
 		[Test]
 		public void ErrorOnStderr_FailsBuild()
 		{
-			var xmlReader = new XmlTextReader(GetBuildFilename("ErrorOnStdErr"));
-			var project = new Project(xmlReader);
-			var result = project.Build("Test");
+			// Setup
+			var sut = GetNUnitTask("ErrorOnStdErr");
+
+			// Execute
+			var result = sut.Execute();
+
+			// Verify
 			Assert.That(result, Is.False, "Errors on Stderr should fail the build");
+			Assert.That(_errors.Count, Is.EqualTo(1));
 		}
 
 		[Test]
 		public void WarningOnStderr_DoesntFailBuild()
 		{
-			var xmlReader = new XmlTextReader(GetBuildFilename("WarningOnStdErr"));
-			var project = new Project(xmlReader);
-			var result = project.Build("Test");
+			// Setup
+			var sut = GetNUnitTask("WarningOnStdErr");
+
+			// Execute
+			var result = sut.Execute();
+
+			// Verify
 			Assert.That(result, Is.True, "Warnings on Stderr shouldn't fail the build");
+			Assert.That(_errors.Count, Is.EqualTo(0));
 		}
-
-		[Test]
-		public void ToolPath_NotSetUsesCurrentWorkdir()
-		{
-			var oldWorkDir = Directory.GetCurrentDirectory();
-			try
-			{
-				Directory.SetCurrentDirectory(NUnitDir);
-				var xmlReader = new XmlTextReader(GetBuildFilename("Success", false));
-				var project = new Project(xmlReader);
-				var result = project.Build("Test");
-				Assert.That(result, Is.True, "Passing tests shouldn't fail the build");
-			}
-			finally
-			{
-				Directory.SetCurrentDirectory(oldWorkDir);
-			}
-		}
-
 	}
 }
