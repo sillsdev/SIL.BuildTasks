@@ -7,15 +7,7 @@
     <IsTool>true</IsTool>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Tasks.v4.0" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.110.50">
-      <IncludeAssets>All</IncludeAssets>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="AWSSDK.S3" Version="3.3.110.50" IncludeAssets="All" PrivateAssets="All" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->

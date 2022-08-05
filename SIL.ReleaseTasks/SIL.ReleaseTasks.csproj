@@ -5,17 +5,9 @@
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
     <BuildOutputTargetFolder>tools/$(TargetFramework)</BuildOutputTargetFolder>
   </PropertyGroup>
-  <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.2.0" />
-  </ItemGroup>
-  <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Tasks.v4.0" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Markdig.Signed" Version="0.30.2" />
+    <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="SIL.ReleaseTasks.Common.inc" />
 </Project>
