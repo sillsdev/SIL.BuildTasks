@@ -5,10 +5,10 @@
     <Copy SourceFiles="$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.targets" DestinationFiles="$(OutputPath)/build/$(PackageId).targets" />
     <Copy SourceFiles="$(MSBuildThisFileDirectory)/../$(PackageId)/$(PackageId).props" DestinationFiles="$(OutputPath)/buildMultiTargeting/$(PackageId).props" />
     <Copy SourceFiles="$(MSBuildThisFileDirectory)/SIL.ReleaseTasks.targets" DestinationFiles="$(OutputPath)/buildMultiTargeting/$(PackageId).targets" />
-    <MakeDir Directories="$(OutputPath)/lib/net461" />
+    <MakeDir Directories="$(OutputPath)/lib/net472" />
     <MakeDir Directories="$(OutputPath)/lib/netstandard2.0" />
     <!-- Create empty files -->
-    <WriteLinesToFile File="$(OutputPath)/lib/net461/_._" />
+    <WriteLinesToFile File="$(OutputPath)/lib/net472/_._" />
     <WriteLinesToFile File="$(OutputPath)/lib/netstandard2.0/_._" />
   </Target>
 
@@ -19,12 +19,12 @@
         <Pack>true</Pack>
         <PackagePath>$(BuildOutputTargetFolder)</PackagePath>
       </None>
-      <!-- we use *.props and *.targets files from net461 - they are identical to the ones in standard2.0 -->
-      <None Include="$(OutputPath)/net461/build/*.*">
+      <!-- we use *.props and *.targets files from net472 - they are identical to the ones in standard2.0 -->
+      <None Include="$(OutputPath)/net472/build/*.*">
         <Pack>true</Pack>
         <PackagePath>build/</PackagePath>
       </None>
-      <None Include="$(OutputPath)/net461/buildMultiTargeting/*.*">
+      <None Include="$(OutputPath)/net472/buildMultiTargeting/*.*">
         <Pack>true</Pack>
         <PackagePath>buildMultiTargeting/</PackagePath>
       </None>

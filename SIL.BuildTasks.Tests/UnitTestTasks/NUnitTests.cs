@@ -15,7 +15,7 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 	{
 		private static string OutputDirectoryOfHelper => Path.Combine(
 			OutputDirectoryOfBuildTasks, "..", "..", "..", "SIL.BuildTasks.Tests",
-			"SIL.BuildTasks.Tests.Helper", "bin", "net461");
+			"SIL.BuildTasks.Tests.Helper", "bin", "net472");
 
 		private static string OutputDirectoryOfBuildTasks =>
 			Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);

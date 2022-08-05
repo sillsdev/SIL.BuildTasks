@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
     <RootNamespace>SIL.ReleaseTasks.Tests</RootNamespace>
     <OutputPath>../output/$(Configuration)</OutputPath>
     <AssemblyTitle>SIL.ReleaseTasks.Tests</AssemblyTitle>

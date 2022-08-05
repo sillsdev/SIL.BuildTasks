@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <SilReleaseTasksPath Condition="$(SilReleaseTasksPath) == '' And '$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\tools\net461</SilReleaseTasksPath>
+    <SilReleaseTasksPath Condition="$(SilReleaseTasksPath) == '' And '$(MSBuildRuntimeType)' != 'Core'">$(MSBuildThisFileDirectory)..\tools\net472</SilReleaseTasksPath>
     <SilReleaseTasksPath Condition="$(SilReleaseTasksPath) == '' And '$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)..\tools\netstandard2.0</SilReleaseTasksPath>
   </PropertyGroup>
 
