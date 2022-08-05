@@ -22,10 +22,10 @@
   <Target Name="BuildUnmanaged" AfterTargets="DispatchToInnerBuilds">
     <RemoveDir Directories="$(MSBuildProjectDirectory)/ForceCrash/$(Configuration)" Condition="Exists('$(MSBuildProjectDirectory)/ForceCrash/$(Configuration)')" />
     <Exec Command="make" WorkingDirectory="$(MSBuildProjectDirectory)/ForceCrash" Condition="'$(OS)'!='Windows_NT'" />
-    <Exec Command="&quot;$(MSBuildBinPath)\msbuild&quot; /t:Rebuild /p:Configuration=$(Configuration) ForceCrash.vcxproj" WorkingDirectory="$(MSBuildProjectDirectory)/ForceCrash/" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="cl /DFORCECRASH_EXPORTS /D_USRDLL /D_WINDOWS ForceCrash.c /link /dll /out:$(MSBuildProjectDirectory)/ForceCrash/ForceCrash.dll" WorkingDirectory="$(MSBuildProjectDirectory)/ForceCrash/" Condition="'$(OS)'=='Windows_NT'" />
     <ItemGroup>
       <SourceFiles Include="$(MSBuildProjectDirectory)/ForceCrash/libForceCrash.so" Condition="'$(OS)'!='Windows_NT'" />
-      <SourceFiles Include="$(MSBuildProjectDirectory)/ForceCrash/$(Configuration)/ForceCrash.dll" Condition="'$(OS)'=='Windows_NT'" />
+      <SourceFiles Include="$(MSBuildProjectDirectory)/ForceCrash/ForceCrash.dll" Condition="'$(OS)'=='Windows_NT'" />
     </ItemGroup>
     <PropertyGroup>
       <Destination Condition="$(OutputPath.Contains('net472'))">$(OutputPath)</Destination>
