@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using MarkdownDeep;
+using Markdig;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -36,14 +36,13 @@ namespace SIL.ReleaseTasks
 				return false;
 			}
 
-			var markDownTransformer = new Markdown();
 			try
 			{
 				string inputMarkdown = File.ReadAllText(ChangelogFile);
 				CreateReleaseNotesHtml.RemoveKeepAChangelogHeadIfPresent(ref inputMarkdown);
 				// MarkdownDeep appears to use \n for newlines. Rather than mix those with platform line-endings, just
 				// convert them to platform line-endings if needed.
-				var markdownHtml = markDownTransformer.Transform(inputMarkdown).Replace("\n", Environment.NewLine);
+				var markdownHtml = Markdown.ToHtml(inputMarkdown).Replace("\n", Environment.NewLine);
 				if(File.Exists(HtmlFile))
 				{
 					var htmlDoc = XDocument.Load(HtmlFile);
