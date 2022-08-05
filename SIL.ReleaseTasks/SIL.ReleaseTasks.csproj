@@ -14,7 +14,7 @@
       <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.5.0" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.2.0" />
   </ItemGroup>
   <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.2">
