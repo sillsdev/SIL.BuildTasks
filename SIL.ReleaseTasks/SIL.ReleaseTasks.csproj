@@ -4,27 +4,18 @@
     <Description>Several release related tasks that can work with a CHANGELOG.md file.</Description>
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
     <BuildOutputTargetFolder>tools/$(TargetFramework)</BuildOutputTargetFolder>
-    <!-- This is required for MarkdownDeep.NET which doesn't provide a version for a newer framework version -->
-    <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
-      $(PackageTargetFallback);netframework35
-    </PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
-    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4">
-      <IncludeAssets>All</IncludeAssets>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.2.0" />
   </ItemGroup>
   <ItemGroup Condition="!$(TargetFramework.Contains('netstandard'))">
-    <PackageReference Include="MarkdownDeep.NET.Patched" Version="1.5.0.2">
-      <IncludeAssets>All</IncludeAssets>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Markdig.Signed" Version="0.30.2" />
   </ItemGroup>
   <Import Project="SIL.ReleaseTasks.Common.inc" />
 </Project>
