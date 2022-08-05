@@ -1,34 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <RootNamespace>SIL.ReleaseTasks</RootNamespace>
-    <Configurations>Debug;Release</Configurations>
     <Description>Several release related tasks that can work with a CHANGELOG.md file.</Description>
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
-    <Company>SIL</Company>
-    <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018-2022 SIL International</Copyright>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Authors>SIL International</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <BuildOutputTargetFolder>tools/$(TargetFramework)</BuildOutputTargetFolder>
     <!-- This is required for MarkdownDeep.NET which doesn't provide a version for a newer framework version -->
     <PackageTargetFallback Condition="'$(TargetFramework)'=='net461'">
       $(PackageTargetFallback);netframework35
     </PackageTargetFallback>
-    <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
-    <AppendToReleaseNotesProperty><![CDATA[
-See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHANGELOG.md]]>
-    </AppendToReleaseNotesProperty>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
-    <FilterEntries>true</FilterEntries>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4">
@@ -46,10 +25,6 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="GitVersion.MsBuild" Version="5.6.9" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="SIL.ReleaseTasks.Common.inc" />
 </Project>

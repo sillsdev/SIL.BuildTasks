@@ -2,14 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>net461</TargetFrameworks>
     <RootNamespace>SIL.BuildTasks.Tests.Helper</RootNamespace>
-    <Configurations>Debug;Release</Configurations>
-    <OutputPath>bin</OutputPath>
     <AssemblyTitle>SIL.BuildTasks.Tests.Helper</AssemblyTitle>
-    <Company>SIL</Company>
-    <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018-2021 SIL International</Copyright>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <OutputPath>bin</OutputPath>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>

@@ -1,30 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <RootNamespace>SIL.BuildTasks</RootNamespace>
-    <Configurations>Debug;Release</Configurations>
     <Description>SIL.BuildTasks defines several msbuild tasks used in building our other projects.</Description>
     <AssemblyTitle>SIL.BuildTasks</AssemblyTitle>
-    <Company>SIL</Company>
-    <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018-2022 SIL International</Copyright>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Authors>SIL International</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageOutputPath>../output/$(Configuration)</PackageOutputPath>
     <IsTool>true</IsTool>
-    <AppendToReleaseNotesProperty><![CDATA[
-See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHANGELOG.md]]>
-    </AppendToReleaseNotesProperty>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
-    <FilterEntries>true</FilterEntries>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
@@ -32,9 +11,7 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
-    <PackageReference Include="GitVersion.MsBuild" Version="5.6.9" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="SIL.BuildTasks.props">
