@@ -1,5 +1,8 @@
 # SIL.ReleaseTasks package
 
+**SIL.ReleaseTasks** provides several release related tasks that can work with a
+`CHANGELOG.md` file.
+
 Tasks in the `SIL.ReleaseTasks` nuget package:
 
 ## CreateChangelogEntry task
