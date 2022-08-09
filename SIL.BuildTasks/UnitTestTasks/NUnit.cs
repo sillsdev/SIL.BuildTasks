@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -142,18 +143,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// </summary>
 		protected virtual string RealProgramName => Force32Bit ? "nunit-console-x86.exe" : "nunit-console.exe";
 
-		private static bool? _isMono;
-
-		private static bool IsMono
-		{
-			get
-			{
-				if (_isMono == null)
-					_isMono = Type.GetType("Mono.Runtime") != null;
-
-				return (bool)_isMono;
-			}
-		}
+		private static bool IsLinux => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
 		protected override string GetWorkingDirectory()
 		{
@@ -175,9 +165,12 @@ namespace SIL.BuildTasks.UnitTestTasks
 				EnsureToolPath();
 				var programNameAndPath = RealProgramNameAndPath;
 				if (!File.Exists(programNameAndPath))
+				{
+					Log.LogWarning($"Can't find {RealProgramNameAndPath}");
 					return null;
+				}
 
-				return IsMono ? "mono" : programNameAndPath;
+				return IsLinux ? "mono" : programNameAndPath;
 			}
 		}
 
@@ -188,7 +181,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 			get
 			{
 				var bldr = new StringBuilder();
-				if (IsMono)
+				if (IsLinux)
 				{
 					EnsureToolPath();
 					bldr.Append("--debug "); // cause Mono to show filenames in stack trace
