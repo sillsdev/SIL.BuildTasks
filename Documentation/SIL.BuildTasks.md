@@ -1,5 +1,7 @@
 # SIL.BuildTasks package
 
+**SIL.BuildTasks** defines several msbuild tasks used in building our other projects.
+
 Tasks in the `SIL.BuildTasks` nuget package:
 
 ## Archive task
