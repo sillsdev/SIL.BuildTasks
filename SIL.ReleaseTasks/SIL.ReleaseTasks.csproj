@@ -4,10 +4,17 @@
     <Description>Several release related tasks that can work with a CHANGELOG.md file.</Description>
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
     <BuildOutputTargetFolder>tools/$(TargetFramework)</BuildOutputTargetFolder>
+    <PackageReadmeFile>SIL.ReleaseTasks.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Markdig.Signed" Version="0.30.2" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="SIL.ReleaseTasks.Common.inc" />
+
+  <ItemGroup>
+    <None Include="../Documentation/SIL.ReleaseTasks.md" Pack="true" PackagePath="/">
+      <Link>SIL.ReleaseTasks.md</Link>
+    </None>
+  </ItemGroup>
 </Project>

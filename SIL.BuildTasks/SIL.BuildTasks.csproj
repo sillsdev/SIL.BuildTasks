@@ -3,6 +3,7 @@
     <RootNamespace>SIL.BuildTasks</RootNamespace>
     <Description>SIL.BuildTasks defines several msbuild tasks used in building our other projects.</Description>
     <AssemblyTitle>SIL.BuildTasks</AssemblyTitle>
+    <PackageReadmeFile>SIL.BuildTasks.md</PackageReadmeFile>
     <IsTool>true</IsTool>
   </PropertyGroup>
   <ItemGroup>
@@ -18,6 +19,13 @@
     <MakeDir Directories="$(PackageOutputPath)" />
     <WriteLinesToFile File="$(PackageOutputPath)/version.txt" Lines="$(GitVersion_NuGetVersion)" Overwrite="True" />
   </Target>
+
+  <ItemGroup>
+    <None Include="../Documentation/SIL.BuildTasks.md" Pack="true" PackagePath="/">
+      <Link>SIL.BuildTasks.md</Link>
+    </None>
+  </ItemGroup>
+
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
   <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
     <MakeDir Directories="$(OutputPath)/lib/net472" />
