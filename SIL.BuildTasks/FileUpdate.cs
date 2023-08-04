@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -41,24 +42,45 @@ namespace SIL.BuildTasks
 		public override bool Execute()
 		{
 			var content = System.IO.File.ReadAllText(File);
-			var newContents = System.Text.RegularExpressions.Regex.Replace(content, Regex, ReplacementText);
-
-			if(!string.IsNullOrEmpty(DatePlaceholder))
-			{
-				newContents = newContents.Replace(DatePlaceholder, DateTime.UtcNow.Date.ToString(DateFormat));
-			}
-			if(!newContents.Contains(ReplacementText))
-			{
-				SafeLogError("Did not manage to replace '{0}' with '{1}'", Regex, ReplacementText);
-				return false;//we didn't actually replace anything
-			}
-			System.IO.File.WriteAllText(File, newContents);
-			return true;
+			var newContents = GetModifiedContents(content, out var result);
+			if (result)
+				System.IO.File.WriteAllText(File, newContents);
+			return result;
 		}
 
+		internal string GetModifiedContents(string content, out bool success)
+		{
+			string newContents = null;
+			try
+			{
+				Regex regex = new Regex(Regex);
+				if (!regex.IsMatch(content))
+				{
+					SafeLogError("No replacements made. Regex: '{0}'; ReplacementText: '{1}'", Regex, ReplacementText);
+					success = false;
+				}
+				else
+				{
+					newContents = regex.Replace(content, ReplacementText);
 
+					if (!string.IsNullOrEmpty(DatePlaceholder))
+						newContents = newContents.Replace(DatePlaceholder, DateTime.UtcNow.Date.ToString(DateFormat));
 
-		private void SafeLogError(string msg, params object[] args)
+					success = true;
+				}
+			}
+			catch (Exception e)
+			{
+				if (e is ArgumentException)
+					SafeLogError("Invalid regular expression: " + e.Message);
+				else
+					SafeLogError(e.Message);
+				success = false;
+			}
+			return success ? newContents : content;
+		}
+
+		protected virtual void SafeLogError(string msg, params object[] args)
 		{
 			try
 			{
