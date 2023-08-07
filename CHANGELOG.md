@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - [SIL.ReleaseTasks] Exclude links from CHANGELOG.md file when extracting release notes (#46)
 - [SIL.BuildTasks] Fixed logging in `MakeWixForDirTree` task (#55)
+- [SIL.BuildTasks] Improved FileUpdate replacement verification and error handling (#63)
 
 ## [2.5.0] - 2021-02-24
 

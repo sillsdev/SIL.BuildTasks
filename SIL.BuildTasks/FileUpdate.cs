@@ -1,17 +1,13 @@
-// Copyright (c) 2018 SIL International
+// Copyright (c) 2023 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks
 {
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public class FileUpdate : Task
 	{
 		private string _dateFormat;
@@ -41,51 +37,49 @@ namespace SIL.BuildTasks
 
 		public override bool Execute()
 		{
-			var content = System.IO.File.ReadAllText(File);
-			var newContents = GetModifiedContents(content, out var result);
-			if (result)
-				System.IO.File.WriteAllText(File, newContents);
-			return result;
-		}
-
-		internal string GetModifiedContents(string content, out bool success)
-		{
-			string newContents = null;
 			try
 			{
-				Regex regex = new Regex(Regex);
-				if (!regex.IsMatch(content))
-				{
-					SafeLogError("No replacements made. Regex: '{0}'; ReplacementText: '{1}'", Regex, ReplacementText);
-					success = false;
-				}
-				else
-				{
-					newContents = regex.Replace(content, ReplacementText);
-
-					if (!string.IsNullOrEmpty(DatePlaceholder))
-						newContents = newContents.Replace(DatePlaceholder, DateTime.UtcNow.Date.ToString(DateFormat));
-
-					success = true;
-				}
+				var content = System.IO.File.ReadAllText(File);
+				var newContents = GetModifiedContents(content);
+				System.IO.File.WriteAllText(File, newContents);
+				return true;
 			}
 			catch (Exception e)
 			{
-				if (e is ArgumentException)
-					SafeLogError("Invalid regular expression: " + e.Message);
-				else
-					SafeLogError(e.Message);
-				success = false;
+				Console.WriteLine(e);
+				Debug.WriteLine(e.Message);
+				SafeLogError(e.Message);
+				return false;
 			}
-			return success ? newContents : content;
+			
 		}
 
-		protected virtual void SafeLogError(string msg, params object[] args)
+		internal string GetModifiedContents(string content)
 		{
 			try
 			{
-				Debug.WriteLine(msg, args);
-				Log.LogError(msg, args);
+				var regex = new Regex(Regex);
+				if (!regex.IsMatch(content))
+					throw new Exception($"No replacements made. Regex: '{Regex}'; ReplacementText: '{ReplacementText}'");
+
+				var newContents = regex.Replace(content, ReplacementText);
+
+				if (!string.IsNullOrEmpty(DatePlaceholder))
+					newContents = newContents.Replace(DatePlaceholder, DateTime.UtcNow.Date.ToString(DateFormat));
+
+				return newContents;
+			}
+			catch (ArgumentException e)
+			{
+				throw new Exception("Invalid regular expression: " + e.Message, e);
+			}
+		}
+
+		private void SafeLogError(string msg)
+		{
+			try
+			{
+				Log.LogError(msg);
 			}
 			catch (Exception)
 			{

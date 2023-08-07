@@ -1,24 +1,11 @@
 // Copyright (c) 2023 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using NUnit.Framework;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.Tests
 {
-	internal class FileUpdateWithTestErrorHandler : FileUpdate
-	{
-		internal readonly List<string> LoggedErrors = new List<string>();
-
-		protected override void SafeLogError(string msg, params object[] args)
-		{
-			LoggedErrors.Add(string.Format(msg, args));
-		}
-	}
-
 	[TestFixture]
 	public class FileUpdateTests
 	{
@@ -36,48 +23,40 @@ namespace SIL.BuildTasks.Tests
 			ExpectedResult = "There were approximately 35 frog princes.")]
 		public string GetModifiedContents_RegexTextMatched_Succeeds(string origContents, string regex, string replacement)
 		{
-			var updater = new FileUpdateWithTestErrorHandler
+			var updater = new FileUpdate
 			{
 				Regex = regex,
 				ReplacementText = replacement
 			};
 
-			var result = updater.GetModifiedContents(origContents, out var success);
-			Assert.True(success);
-			Assert.That(updater.LoggedErrors, Is.Empty);
-			return result;
+			return updater.GetModifiedContents(origContents);
 		}
 
 		[TestCase("This is the story of the frog prince.", "princess", "soup")]
 		[TestCase("This is the story of the frog prince.", "\\d+", "14")]
-		public void GetModifiedContents_RegexTextNotMatched_ReportsErrorAndReturnsOrigContents(string origContents, string regex, string replacement)
+		public void GetModifiedContents_RegexTextNotMatched_Throws(string origContents, string regex, string replacement)
 		{
-			var updater = new FileUpdateWithTestErrorHandler
+			var updater = new FileUpdate
 			{
 				Regex = regex,
 				ReplacementText = replacement
 			};
 
-			var result = updater.GetModifiedContents(origContents, out var success);
-			Assert.False(success);
-			Assert.That(updater.LoggedErrors.Single(), Is.EqualTo($"No replacements made. Regex: '{regex}'; ReplacementText: '{replacement}'"));
-			Assert.That(result, Is.EqualTo(origContents));
+			var ex = Assert.Throws<Exception>(() => updater.GetModifiedContents(origContents));
+			Assert.That(ex.Message, Is.EqualTo($"No replacements made. Regex: '{regex}'; ReplacementText: '{replacement}'"));
 		}
 
 		[Test]
-		public void GetModifiedContents_InvalidRegex_ReportsErrorAndReturnsOrigContents()
+		public void GetModifiedContents_InvalidRegex_Throws()
 		{
-			var updater = new FileUpdateWithTestErrorHandler
+			var updater = new FileUpdate
 			{
 				Regex = "(.*",
 				ReplacementText = "oops"
 			};
 
-			var result = updater.GetModifiedContents("Whatever", out var success);
-			Assert.False(success);
-			Assert.That(updater.LoggedErrors.Single(),
-				Is.EqualTo($"Invalid regular expression: parsing \"{updater.Regex}\" - Not enough )'s."));
-			Assert.That(result, Is.EqualTo("Whatever"));
+			var ex = Assert.Throws<Exception>(() => updater.GetModifiedContents("Whatever"));
+			Assert.That(ex.Message, Is.EqualTo($"Invalid regular expression: parsing \"{updater.Regex}\" - Not enough )'s."));
 		}
 	}
 }
