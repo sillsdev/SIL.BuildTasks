@@ -60,7 +60,20 @@ namespace SIL.BuildTasks
 			{
 				var regex = new Regex(Regex);
 				if (!regex.IsMatch(content))
-					throw new Exception($"No replacements made. Regex: '{Regex}'; ReplacementText: '{ReplacementText}'");
+				{
+					// This check will generally only work if ReplacementText is just a literal string.
+					// If it contains references to regex match groups, and GetModifiedContents is run
+					// against a previously modified file with the same arguments, most likely no match
+					// will be found, and the "No replacements made" error will be displayed.
+					if (content.Contains(ReplacementText))
+					{
+						// Most likely, the replacement was already done an a previous build step.
+						return content;
+					}
+
+					throw new Exception($"No replacements made. Regex: '{Regex}'; " +
+						$"ReplacementText: '{ReplacementText}'");
+				}
 
 				var newContents = regex.Replace(content, ReplacementText);
 

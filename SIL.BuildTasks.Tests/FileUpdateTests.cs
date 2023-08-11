@@ -21,6 +21,8 @@ namespace SIL.BuildTasks.Tests
 			ExpectedResult = "There were approximately 35 frog princes.")]
 		[TestCase("There were 35 frog princes.", "(?<number>\\d+)", "approximately ${number}",
 			ExpectedResult = "There were approximately 35 frog princes.")]
+		[TestCase("</TargetFrameworkProfile>\r\n    <Version>0.0.0.0</Version> <!-- Replaced by FileUpdate in build/build.proj -->    <Authors>SIL</Authors>", "<Version>0\\.0\\.0\\.0</Version>", "<Version>3.3.0</Version>",
+			ExpectedResult = "</TargetFrameworkProfile>\r\n    <Version>3.3.0</Version> <!-- Replaced by FileUpdate in build/build.proj -->    <Authors>SIL</Authors>")]
 		public string GetModifiedContents_RegexTextMatched_Succeeds(string origContents, string regex, string replacement)
 		{
 			var updater = new FileUpdate
@@ -30,6 +32,18 @@ namespace SIL.BuildTasks.Tests
 			};
 
 			return updater.GetModifiedContents(origContents);
+		}
+
+		[TestCase("</TargetFrameworkProfile>\r\n    <Version>3.3.0</Version> <!-- Previously replaced by FileUpdate in build/build.proj -->    <Authors>SIL</Authors>", "<Version>0\\.0\\.0\\.0</Version>", "<Version>3.3.0</Version>")]
+		public void GetModifiedContents_RegexTextNotMatchedButReplacementTextFound_NoChangeOrError(string origContents, string regex, string replacement)
+		{
+			var updater = new FileUpdate
+			{
+				Regex = regex,
+				ReplacementText = replacement
+			};
+
+			Assert.That(updater.GetModifiedContents(origContents), NUnit.Framework.Is.EqualTo(origContents));
 		}
 
 		[TestCase("This is the story of the frog prince.", "princess", "soup")]
