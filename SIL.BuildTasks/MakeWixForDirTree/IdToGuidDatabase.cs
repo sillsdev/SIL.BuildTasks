@@ -1,4 +1,4 @@
-// Copyright (c) 2018 SIL International
+// Copyright (c) 2018 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 /*
  * Class to represent metadata (just GUIDs at the moment) about files.
