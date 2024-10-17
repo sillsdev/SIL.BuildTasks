@@ -62,10 +62,9 @@ namespace SIL.ReleaseTasks.Tests
 		{
 			try
 			{
-				var document = node as XmlDocument;
 				string namespaceUri;
 				XmlNameTable nameTable;
-				if (document != null)
+				if (node is XmlDocument document)
 				{
 					nameTable = document.NameTable;
 					namespaceUri = document.DocumentElement?.NamespaceURI;
@@ -145,7 +144,7 @@ namespace SIL.ReleaseTasks.Tests
 		{
 			var nameSpaceManager = new XmlNamespaceManager(new NameTable());
 			var node = GetNode(xpath, nameSpaceManager);
-			Assert.IsNull(node, "Should not have matched: {0}", xpath);
+			Assert.That(node, Is.Null, "Should not have matched: {0}", xpath);
 		}
 
 		/// <summary>
@@ -154,7 +153,7 @@ namespace SIL.ReleaseTasks.Tests
 		public void HasSpecifiedNumberOfMatchesForXpath(string xpath, int count)
 		{
 			var nodes = SafeSelectNodes(NodeOrDom, xpath);
-			if (nodes==null)
+			if (nodes == null)
 			{
 				Assert.That(count, Is.EqualTo(0), $"Expected {count} but got 0 matches for {xpath}");
 			}

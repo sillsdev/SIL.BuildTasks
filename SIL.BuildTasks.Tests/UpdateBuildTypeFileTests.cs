@@ -1,6 +1,5 @@
-﻿// Copyright (c) 2018 SIL International
+// Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
-using System;
 using System.Text;
 using NUnit.Framework;
 // ReSharper disable UnusedVariable
@@ -16,11 +15,7 @@ namespace SIL.BuildTasks.Tests
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var types = UpdateBuildTypeFile.UpdateBuildTypeFile.GetVersionTypes(GetFileContentsForType("Alpha"));
-			Assert.AreEqual(4, types.Count);
-			Assert.IsTrue(types.Contains("Alpha"));
-			Assert.IsTrue(types.Contains("Beta"));
-			Assert.IsTrue(types.Contains("ReleaseCandidate"));
-			Assert.IsTrue(types.Contains("Production"));
+			Assert.That(types, NUnit.Framework.Is.EquivalentTo(new [] {"Alpha", "Beta", "ReleaseCandidate", "Production"}));
 		}
 
 		[Test]
@@ -29,12 +24,7 @@ namespace SIL.BuildTasks.Tests
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var types = UpdateBuildTypeFile.UpdateBuildTypeFile.GetVersionTypes(GetFileContents("Fred", "Wilma", "BamBam", "Fred", "Barney", "Pebbles"));
-			Assert.AreEqual(5, types.Count);
-			Assert.IsTrue(types.Contains("Wilma"));
-			Assert.IsTrue(types.Contains("BamBam"));
-			Assert.IsTrue(types.Contains("Fred"));
-			Assert.IsTrue(types.Contains("Barney"));
-			Assert.IsTrue(types.Contains("Pebbles"));
+			Assert.That(types, NUnit.Framework.Is.EquivalentTo(new [] {"Wilma", "BamBam", "Fred","Barney", "Pebbles"}));
 		}
 
 		[Test]
@@ -43,7 +33,7 @@ namespace SIL.BuildTasks.Tests
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("Alpha"), "ReleaseCandidate");
-			Assert.AreEqual(GetFileContentsForType("ReleaseCandidate"), contents);
+			Assert.That(contents, NUnit.Framework.Is.EqualTo(GetFileContentsForType("ReleaseCandidate")));
 		}
 
 		[Test]
@@ -52,7 +42,7 @@ namespace SIL.BuildTasks.Tests
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("ReleaseCandidate"), "Production");
-			Assert.AreEqual(GetFileContentsForType("Production"), contents);
+			Assert.That(contents, NUnit.Framework.Is.EqualTo(GetFileContentsForType("Production")));
 		}
 
 		[Test]
@@ -61,7 +51,7 @@ namespace SIL.BuildTasks.Tests
 			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("Bogus"), "Beta");
-			Assert.AreEqual(GetFileContentsForType("Bogus"), contents);
+			Assert.That(contents, NUnit.Framework.Is.EqualTo(GetFileContentsForType("Bogus")));
 		}
 
 		private static string GetFileContentsForType(string type)

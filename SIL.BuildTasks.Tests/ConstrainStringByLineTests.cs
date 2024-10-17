@@ -1,8 +1,9 @@
 // Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
-using System;
+
 using NUnit.Framework;
 using SIL.BuildTasks.Tests;
+using static System.Environment;
 using Is = SIL.BuildTasks.Tests.Is;
 
 namespace SIL.BuildTasks
@@ -39,14 +40,14 @@ namespace SIL.BuildTasks
 		public void Message_ActualToShort()
 		{
 			Assert.That(() => Assert.That("one", new ConstrainStringByLine("one\ntwo")),
-				Throws.TypeOf<AssertionException>().With.Message.EqualTo($"  Expected: \"two\"{Environment.NewLine}  But was:  null{Environment.NewLine}"));
+				Throws.TypeOf<AssertionException>().With.Message.EqualTo($"  Assert.That(\"one\", new ConstrainStringByLine(\"one\\ntwo\")){NewLine}  Expected: \"two\"{NewLine}  But was:  null{NewLine}"));
 		}
 
 		[Test]
 		public void Message_ActualToLong()
 		{
 			Assert.That(() => Assert.That("one\ntwo", new ConstrainStringByLine("one")),
-				Throws.TypeOf<AssertionException>().With.Message.EqualTo($"  Expected: end of string (null){Environment.NewLine}  But was:  \"two\"{Environment.NewLine}"));
+				Throws.TypeOf<AssertionException>().With.Message.EqualTo($"  Assert.That(\"one\\ntwo\", new ConstrainStringByLine(\"one\")){NewLine}  Expected: end of string (null){NewLine}  But was:  \"two\"{NewLine}"));
 		}
 
 		[Test]

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 SIL International
+// Copyright (c) 2018 SIL International
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using Microsoft.Build.Framework;
@@ -31,14 +31,14 @@ namespace SIL.BuildTasks.Tests
 		public void ExecutableName_ForTar_Tar()
 		{
 			var task = new Archive.Archive { Command = "Tar" };
-			Assert.AreEqual("tar", task.ExecutableName());
+			Assert.That(task.ExecutableName(), NUnit.Framework.Is.EqualTo("tar"));
 		}
 
 		[Test]
 		public void ExecutableName_ForUnknown_EmptyString()
 		{
 			var task = new Archive.Archive { Command = "Unknown" };
-			Assert.AreEqual(string.Empty, task.ExecutableName());
+			Assert.That(task.ExecutableName(), NUnit.Framework.Is.EqualTo(string.Empty));
 		}
 
 		[Test]
@@ -48,7 +48,7 @@ namespace SIL.BuildTasks.Tests
 				Command = "Tar",
 				OutputFileName = "MyOutputFile.tar.gz"
 			};
-			Assert.AreEqual("-cvzf MyOutputFile.tar.gz", task.Arguments());
+			Assert.That(task.Arguments(), NUnit.Framework.Is.EqualTo("-cvzf MyOutputFile.tar.gz"));
 		}
 
 		[Test]
@@ -58,7 +58,7 @@ namespace SIL.BuildTasks.Tests
 				Command = "Unknown",
 				OutputFileName = "MyOutputFile.tar.gz"
 			};
-			Assert.AreEqual(string.Empty, task.Arguments());
+			Assert.That(task.Arguments(), NUnit.Framework.Is.EqualTo(string.Empty));
 		}
 
 		[Test]
@@ -66,7 +66,7 @@ namespace SIL.BuildTasks.Tests
 		{
 			var task = new Archive.Archive { BasePath = "/trim/this/path/" };
 			var result = task.TrimBaseFromFilePath("/trim/this/path/myproject/here");
-			Assert.AreEqual("myproject/here", result);
+			Assert.That(result, NUnit.Framework.Is.EqualTo("myproject/here"));
 		}
 
 		[Test]
@@ -74,7 +74,7 @@ namespace SIL.BuildTasks.Tests
 		{
 			var task = new Archive.Archive { BasePath = "/trim/this/path" };
 			var result = task.TrimBaseFromFilePath("/trim/this/path/myproject/here");
-			Assert.AreEqual("myproject/here", result);
+			Assert.That(result, NUnit.Framework.Is.EqualTo("myproject/here"));
 		}
 
 		[Test]
@@ -87,7 +87,7 @@ namespace SIL.BuildTasks.Tests
 					InputFilePaths = EnvironmentForTest.TwoItemsWithBasePath("a.cs", "b.cs")
 				};
 				var result = task.FlattenFilePaths(task.InputFilePaths, ' ', false);
-				Assert.AreEqual("a.cs b.cs", result);
+				Assert.That(result, NUnit.Framework.Is.EqualTo("a.cs b.cs"));
 			}
 		}
 
@@ -101,7 +101,7 @@ namespace SIL.BuildTasks.Tests
 					InputFilePaths = EnvironmentForTest.TwoItemsWithBasePath("a space.cs", "b.cs")
 				};
 				var result = task.FlattenFilePaths(task.InputFilePaths, ' ', false);
-				Assert.AreEqual("\"a space.cs\" b.cs", result);
+				Assert.That(result, NUnit.Framework.Is.EqualTo("\"a space.cs\" b.cs"));
 			}
 		}
 
@@ -115,7 +115,7 @@ namespace SIL.BuildTasks.Tests
 					InputFilePaths = EnvironmentForTest.TwoItemsWithBasePath("a.cs", "b.cs")
 				};
 				var result = task.FlattenFilePaths(task.InputFilePaths, ' ', true);
-				Assert.AreEqual("\"a.cs\" \"b.cs\"", result);
+				Assert.That(result, NUnit.Framework.Is.EqualTo("\"a.cs\" \"b.cs\""));
 			}
 		}
 	}

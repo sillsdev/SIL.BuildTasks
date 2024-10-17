@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using SIL.BuildTasks.UnitTestTasks;
 
 namespace SIL.BuildTasks.Tests.UnitTestTasks
@@ -25,7 +25,7 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 				ExcludeCategory = exclude
 			};
 
-			Assert.AreEqual(result, nUnit3.AddIncludeAndExcludeArguments());
+			Assert.That(nUnit3.AddIncludeAndExcludeArguments(), NUnit.Framework.Is.EqualTo(result));
 		}
 
 		[TestCase(true)]
@@ -37,7 +37,7 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 				TeamCity = teamcity
 			};
 
-			Assert.AreEqual(teamcity, nUnit3.FailTaskIfAnyTestsFail);
+			Assert.That(nUnit3.FailTaskIfAnyTestsFail, NUnit.Framework.Is.EqualTo(teamcity));
 		}
 
 		[TestCase(true)]
@@ -49,9 +49,9 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 				TeamCity = true
 			};
 
-			Assert.AreEqual(failTaskIfAnyTestsFail, nUnit3.FailTaskIfAnyTestsFail);
+			Assert.That(nUnit3.FailTaskIfAnyTestsFail, NUnit.Framework.Is.EqualTo(failTaskIfAnyTestsFail));
 			nUnit3.TeamCity = false;
-			Assert.AreEqual(failTaskIfAnyTestsFail, nUnit3.FailTaskIfAnyTestsFail);
+			Assert.That(nUnit3.FailTaskIfAnyTestsFail, NUnit.Framework.Is.EqualTo(failTaskIfAnyTestsFail));
 		}
 	}
 }
