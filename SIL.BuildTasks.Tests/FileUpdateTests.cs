@@ -1,8 +1,10 @@
-// Copyright (c) 2023 SIL Global
+// Copyright (c) 2024 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
 using NUnit.Framework;
+// Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
+// ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace SIL.BuildTasks.Tests
 {
@@ -43,7 +45,7 @@ namespace SIL.BuildTasks.Tests
 				ReplacementText = replacement
 			};
 
-			Assert.That(updater.GetModifiedContents(origContents), NUnit.Framework.Is.EqualTo(origContents));
+			Assert.That(updater.GetModifiedContents(origContents), Is.EqualTo(origContents));
 		}
 
 		[TestCase("This is the story of the frog prince.", "princess", "soup")]

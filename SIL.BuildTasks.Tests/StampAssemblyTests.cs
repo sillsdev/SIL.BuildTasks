@@ -1,6 +1,8 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2024 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using NUnit.Framework;
+// Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
+// ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace SIL.BuildTasks.Tests
 {
@@ -18,10 +20,10 @@ namespace SIL.BuildTasks.Tests
 [assembly: AssemblyFileVersion(""1.0.0.0"")]";
 
 			var v = stamper.GetExistingAssemblyVersion(content);
-			Assert.That(v.Parts[0], NUnit.Framework.Is.EqualTo("1"));
-			Assert.That(v.Parts[1], NUnit.Framework.Is.EqualTo("*"));
-			Assert.That(v.Parts[2], NUnit.Framework.Is.EqualTo("3"));
-			Assert.That(v.Parts[3], NUnit.Framework.Is.EqualTo("44"));
+			Assert.That(v.Parts[0], Is.EqualTo("1"));
+			Assert.That(v.Parts[1], Is.EqualTo("*"));
+			Assert.That(v.Parts[2], Is.EqualTo("3"));
+			Assert.That(v.Parts[3], Is.EqualTo("44"));
 		}
 
 		[Test]

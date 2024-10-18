@@ -1,4 +1,4 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2024 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
@@ -6,6 +6,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using NUnit.Framework;
+// Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
+// ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace SIL.BuildTasks.Tests
 {
@@ -78,11 +80,11 @@ somevar.MyLocalizableFunction('~MyLocalizableString');
 
 			var pot = new MakePot.MakePot();
 			var matches = pot.MatchesInCSharpString(contents);
-			Assert.That(matches.Count, NUnit.Framework.Is.EqualTo(1));
+			Assert.That(matches.Count, Is.EqualTo(1));
 			foreach (Match match in matches)
 			{
-				Assert.That(match.Groups.Count, NUnit.Framework.Is.EqualTo(3));
-				Assert.That(match.Groups["key"].Value, NUnit.Framework.Is.EqualTo("MyLocalizableString"));
+				Assert.That(match.Groups.Count, Is.EqualTo(3));
+				Assert.That(match.Groups["key"].Value, Is.EqualTo("MyLocalizableString"));
 			}
 		}
 
@@ -95,12 +97,12 @@ somevar.MyLocalizableFunction('~MyLocalizableString', 'MyTranslationNotes');
 
 			var pot = new MakePot.MakePot();
 			var matches = pot.MatchesInCSharpString(contents);
-			Assert.That(matches.Count, NUnit.Framework.Is.EqualTo(1));
+			Assert.That(matches.Count, Is.EqualTo(1));
 			foreach (Match match in matches)
 			{
-				Assert.That(match.Groups.Count, NUnit.Framework.Is.EqualTo(3));
-				Assert.That(match.Groups["key"].Value, NUnit.Framework.Is.EqualTo("MyLocalizableString"));
-				Assert.That(match.Groups["note"].Value, NUnit.Framework.Is.EqualTo("MyTranslationNotes"));
+				Assert.That(match.Groups.Count, Is.EqualTo(3));
+				Assert.That(match.Groups["key"].Value, Is.EqualTo("MyLocalizableString"));
+				Assert.That(match.Groups["note"].Value, Is.EqualTo("MyTranslationNotes"));
 
 			}
 		}
@@ -114,12 +116,12 @@ somevar.MyLocalizableFunction(StringCatalog.Get('~MyLocalizableString', 'MyTrans
 
 			var pot = new MakePot.MakePot();
 			var matches = pot.MatchesInCSharpString(contents);
-			Assert.That(matches.Count, NUnit.Framework.Is.EqualTo(1));
+			Assert.That(matches.Count, Is.EqualTo(1));
 			foreach (Match match in matches)
 			{
-				Assert.That(match.Groups.Count, NUnit.Framework.Is.EqualTo(3));
-				Assert.That(match.Groups["key"].Value, NUnit.Framework.Is.EqualTo("MyLocalizableString"));
-				Assert.That(match.Groups["note"].Value, NUnit.Framework.Is.EqualTo("MyTranslationNotes"));
+				Assert.That(match.Groups.Count, Is.EqualTo(3));
+				Assert.That(match.Groups["key"].Value, Is.EqualTo("MyLocalizableString"));
+				Assert.That(match.Groups["note"].Value, Is.EqualTo("MyTranslationNotes"));
 
 			}
 		}
@@ -133,12 +135,12 @@ somevar.MyLocalizableFunction(StringCatalog.Get('MyLocalizableString', 'MyTransl
 
 			var pot = new MakePot.MakePot();
 			var matches = pot.MatchesInCSharpString(contents);
-			Assert.That(matches.Count, NUnit.Framework.Is.EqualTo(1));
+			Assert.That(matches.Count, Is.EqualTo(1));
 			foreach (Match match in matches)
 			{
-				Assert.That(match.Groups.Count, NUnit.Framework.Is.EqualTo(3));
-				Assert.That(match.Groups["key"].Value, NUnit.Framework.Is.EqualTo("MyLocalizableString"));
-				Assert.That(match.Groups["note"].Value, NUnit.Framework.Is.EqualTo("MyTranslationNotes"));
+				Assert.That(match.Groups.Count, Is.EqualTo(3));
+				Assert.That(match.Groups["key"].Value, Is.EqualTo("MyLocalizableString"));
+				Assert.That(match.Groups["note"].Value, Is.EqualTo("MyTranslationNotes"));
 
 			}
 		}
@@ -152,12 +154,12 @@ somevar.MyLocalizableFunction(StringCatalog.GetFormatted('MyLocalizableString {0
 
 			var pot = new MakePot.MakePot();
 			var matches = pot.MatchesInCSharpString(contents);
-			Assert.That(matches.Count, NUnit.Framework.Is.EqualTo(1));
+			Assert.That(matches.Count, Is.EqualTo(1));
 			foreach (Match match in matches)
 			{
-				Assert.That(match.Groups.Count, NUnit.Framework.Is.EqualTo(3));
-				Assert.That(match.Groups["key"].Value, NUnit.Framework.Is.EqualTo("MyLocalizableString {0}"));
-				Assert.That(match.Groups["note"].Value, NUnit.Framework.Is.EqualTo("MyTranslationNotes"));
+				Assert.That(match.Groups.Count, Is.EqualTo(3));
+				Assert.That(match.Groups["key"].Value, Is.EqualTo("MyLocalizableString {0}"));
+				Assert.That(match.Groups["note"].Value, Is.EqualTo("MyTranslationNotes"));
 
 			}
 		}
@@ -171,11 +173,11 @@ somevar.Text = 'MyLocalizableString';
 
 			var pot = new MakePot.MakePot();
 			var matches = pot.MatchesInCSharpString(contents);
-			Assert.That(matches.Count, NUnit.Framework.Is.EqualTo(1));
+			Assert.That(matches.Count, Is.EqualTo(1));
 			foreach (Match match in matches)
 			{
-				Assert.That(match.Groups.Count, NUnit.Framework.Is.EqualTo(3));
-				Assert.That(match.Groups["key"].Value, NUnit.Framework.Is.EqualTo("MyLocalizableString"));
+				Assert.That(match.Groups.Count, Is.EqualTo(3));
+				Assert.That(match.Groups["key"].Value, Is.EqualTo("MyLocalizableString"));
 
 			}
 		}
@@ -191,11 +193,11 @@ somevar.Text = 'MyLocalizableString \'InQuote\' end';
 
 			var pot = new MakePot.MakePot();
 			var matches = pot.MatchesInCSharpString(contents);
-			Assert.That(matches.Count, NUnit.Framework.Is.EqualTo(1));
+			Assert.That(matches.Count, Is.EqualTo(1));
 			foreach (Match match in matches)
 			{
-				Assert.That(match.Groups.Count, NUnit.Framework.Is.EqualTo(3));
-				Assert.That(match.Groups["key"].Value, NUnit.Framework.Is.EqualTo(expected));
+				Assert.That(match.Groups.Count, Is.EqualTo(3));
+				Assert.That(match.Groups["key"].Value, Is.EqualTo(expected));
 
 			}
 		}
@@ -207,7 +209,7 @@ somevar.Text = 'MyLocalizableString \'InQuote\' end';
 			const string expected = "don't want backslash";
 
 			var actual = MakePot.MakePot.UnescapeString(contents);
-			Assert.That(actual, NUnit.Framework.Is.EqualTo(expected));
+			Assert.That(actual, Is.EqualTo(expected));
 		}
 
 		[Test]

@@ -1,8 +1,9 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2024 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System.Text;
 using NUnit.Framework;
-// ReSharper disable UnusedVariable
+// Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
+// ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace SIL.BuildTasks.Tests
 {
@@ -12,7 +13,7 @@ namespace SIL.BuildTasks.Tests
 		[Test]
 		public void GetVersionTypes_AlphaBetaRcProduction_GetsAllFourTypes()
 		{
-			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
+			_ = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var types = UpdateBuildTypeFile.UpdateBuildTypeFile.GetVersionTypes(GetFileContentsForType("Alpha"));
 			Assert.That(types, NUnit.Framework.Is.EquivalentTo(new [] {"Alpha", "Beta", "ReleaseCandidate", "Production"}));
@@ -21,7 +22,7 @@ namespace SIL.BuildTasks.Tests
 		[Test]
 		public void GetVersionTypes_Custom_GetsAllCustomTypes()
 		{
-			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
+			_ = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var types = UpdateBuildTypeFile.UpdateBuildTypeFile.GetVersionTypes(GetFileContents("Fred", "Wilma", "BamBam", "Fred", "Barney", "Pebbles"));
 			Assert.That(types, NUnit.Framework.Is.EquivalentTo(new [] {"Wilma", "BamBam", "Fred","Barney", "Pebbles"}));
@@ -30,28 +31,28 @@ namespace SIL.BuildTasks.Tests
 		[Test]
 		public void GetFileContents_UpdateAlphaToReleaseCandidate()
 		{
-			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
+			_ = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("Alpha"), "ReleaseCandidate");
-			Assert.That(contents, NUnit.Framework.Is.EqualTo(GetFileContentsForType("ReleaseCandidate")));
+			Assert.That(contents, Is.EqualTo(GetFileContentsForType("ReleaseCandidate")));
 		}
 
 		[Test]
 		public void GetFileContents_UpdateReleaseCandidateToProduction()
 		{
-			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
+			_ = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("ReleaseCandidate"), "Production");
-			Assert.That(contents, NUnit.Framework.Is.EqualTo(GetFileContentsForType("Production")));
+			Assert.That(contents, Is.EqualTo(GetFileContentsForType("Production")));
 		}
 
 		[Test]
 		public void GetFileContents_UpdateBogusToBeta_NoReplacement()
 		{
-			var buildTypeFileMaker = new UpdateBuildTypeFile.UpdateBuildTypeFile();
+			_ = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var contents = UpdateBuildTypeFile.UpdateBuildTypeFile.GetUpdatedFileContents(GetFileContentsForType("Bogus"), "Beta");
-			Assert.That(contents, NUnit.Framework.Is.EqualTo(GetFileContentsForType("Bogus")));
+			Assert.That(contents, Is.EqualTo(GetFileContentsForType("Bogus")));
 		}
 
 		private static string GetFileContentsForType(string type)
