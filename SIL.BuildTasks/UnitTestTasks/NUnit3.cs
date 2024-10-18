@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 SIL International
+// Copyright (c) 2016-2020 SIL Global
 // This software is licensed under the MIT license (http://opensource.org/licenses/MIT)
 
 using System;

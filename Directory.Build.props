@@ -3,9 +3,9 @@
     <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <Company>SIL</Company>
-    <Authors>SIL International</Authors>
+    <Authors>SIL Global</Authors>
     <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018-2022 SIL International</Copyright>
+    <Copyright>Copyright © 2018-2024 SIL Global</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
