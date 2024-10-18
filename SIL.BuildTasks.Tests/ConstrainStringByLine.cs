@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2018 SIL Global
+// Copyright (c) 2024 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System.IO;
-using System.Linq;
 using NUnit.Framework.Constraints;
 
 namespace SIL.BuildTasks.Tests
