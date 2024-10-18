@@ -1,4 +1,4 @@
-// Copyright (c) 2018 SIL International
+// Copyright (c) 2018 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using NUnit.Framework;
 
@@ -134,7 +134,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle('SayMore')]
 [assembly: AssemblyDescription('')]
 [assembly: AssemblyConfiguration('')]
-[assembly: AssemblyCompany('SIL International')]
+[assembly: AssemblyCompany('SIL Global')]
 [assembly: AssemblyProduct('SayMore')]
 [assembly: AssemblyCopyright('')]
 [assembly: AssemblyTrademark('')]

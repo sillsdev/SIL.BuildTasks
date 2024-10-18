@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - Target .NET 4.7.2 instead of 4.6.1
+- SIL International changed to SIL Global
 
 ### Fixed
 
