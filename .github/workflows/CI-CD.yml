@@ -82,7 +82,6 @@ jobs:
       with:
         name: sil-buildtasks-nugetpackages
         path: artifacts
-        merge-multiple: true
 
     - name: Publish to Nuget
       run: dotnet nuget push artifacts/*/Release/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.SILLSDEV_PUBLISH_NUGET_ORG}} --skip-duplicate
