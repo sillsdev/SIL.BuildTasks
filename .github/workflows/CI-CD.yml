@@ -81,10 +81,6 @@ jobs:
       uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
       with:
         name: sil-buildtasks-nugetpackages
-        path: artifacts
 
     - name: Publish to Nuget
-      run: |
-        ls -al
-        ls -al artifacts
-        dotnet nuget push artifacts/*/Release/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.SILLSDEV_PUBLISH_NUGET_ORG}} --skip-duplicate
+      run: dotnet nuget push Release/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.SILLSDEV_PUBLISH_NUGET_ORG}} --skip-duplicate
