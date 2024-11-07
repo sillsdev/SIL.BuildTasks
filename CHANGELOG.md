@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.0.0] - 2024-11-07
+
 ### Added
 
 - [SIL.ReleaseTasks] Added filter option for project-specific entries (#48)
@@ -160,8 +162,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release as NuGet package
 
-[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.5.0...master
+[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.0.0...master
 
+[3.0.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.5.0...v3.0.0
 [2.5.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.3.0...v2.4.0
 [2.3.4]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.3.3...v2.3.4
