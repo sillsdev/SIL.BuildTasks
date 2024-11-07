@@ -1,6 +1,8 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2024 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using NUnit.Framework;
+// Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
+// ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace SIL.BuildTasks.Tests
 {
@@ -18,10 +20,10 @@ namespace SIL.BuildTasks.Tests
 [assembly: AssemblyFileVersion(""1.0.0.0"")]";
 
 			var v = stamper.GetExistingAssemblyVersion(content);
-			Assert.AreEqual("1", v.Parts[0]);
-			Assert.AreEqual("*", v.Parts[1]);
-			Assert.AreEqual("3", v.Parts[2]);
-			Assert.AreEqual("44", v.Parts[3]);
+			Assert.That(v.Parts[0], Is.EqualTo("1"));
+			Assert.That(v.Parts[1], Is.EqualTo("*"));
+			Assert.That(v.Parts[2], Is.EqualTo("3"));
+			Assert.That(v.Parts[3], Is.EqualTo("44"));
 		}
 
 		[Test]
@@ -67,7 +69,7 @@ namespace SIL.BuildTasks.Tests
 		}
 
 		/// <summary>
-		/// Test the situation we've seen with team city where the existing is *.*.*.*"
+		/// Test the situation we've seen with team city where the existing is "*.*.*.*"
 		/// </summary>
 		[Test]
 		public void GetModifiedContents_ExistingAllStars_UseZeroAsNeeded()
@@ -98,7 +100,7 @@ namespace SIL.BuildTasks.Tests
 
 		/// <summary>
 		/// This is actually what our build scripts do as of Sept 2010... they don't care what is in the assembly.cs.
-		/// The buid.proj file specifies something like 0.3.$(BuildCounter)
+		/// The build.proj file specifies something like 0.3.$(BuildCounter)
 		/// </summary>
 		[Test]
 		public void GetModifiedContents_ExistingHasNumbersButCallSpecifiesWholeVersion_UsesTheIncomingVersion()
@@ -192,7 +194,7 @@ using System.Runtime.InteropServices;
 		}
 		/// <summary>
 		/// This test simulates the actual configuration of the icu.net wrapper as of January 2013.
-		/// In order to have easier compatability between Palaso and FLEx which use different versions
+		/// In order to have easier compatibility between Palaso and FLEx which use different versions
 		/// we did not want the AssemblyVersion to change after each build.
 		/// </summary>
 		[Test]

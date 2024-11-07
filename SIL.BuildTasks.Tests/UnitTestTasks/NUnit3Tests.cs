@@ -1,5 +1,9 @@
-﻿using NUnit.Framework;
+// Copyright (c) 2024 SIL Global
+// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
+using NUnit.Framework;
 using SIL.BuildTasks.UnitTestTasks;
+// Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
+// ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace SIL.BuildTasks.Tests.UnitTestTasks
 {
@@ -25,7 +29,7 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 				ExcludeCategory = exclude
 			};
 
-			Assert.AreEqual(result, nUnit3.AddIncludeAndExcludeArguments());
+			Assert.That(nUnit3.AddIncludeAndExcludeArguments(), Is.EqualTo(result));
 		}
 
 		[TestCase(true)]
@@ -37,7 +41,7 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 				TeamCity = teamcity
 			};
 
-			Assert.AreEqual(teamcity, nUnit3.FailTaskIfAnyTestsFail);
+			Assert.That(nUnit3.FailTaskIfAnyTestsFail, Is.EqualTo(teamcity));
 		}
 
 		[TestCase(true)]
@@ -49,9 +53,9 @@ namespace SIL.BuildTasks.Tests.UnitTestTasks
 				TeamCity = true
 			};
 
-			Assert.AreEqual(failTaskIfAnyTestsFail, nUnit3.FailTaskIfAnyTestsFail);
+			Assert.That(nUnit3.FailTaskIfAnyTestsFail, Is.EqualTo(failTaskIfAnyTestsFail));
 			nUnit3.TeamCity = false;
-			Assert.AreEqual(failTaskIfAnyTestsFail, nUnit3.FailTaskIfAnyTestsFail);
+			Assert.That(nUnit3.FailTaskIfAnyTestsFail, Is.EqualTo(failTaskIfAnyTestsFail));
 		}
 	}
 }
