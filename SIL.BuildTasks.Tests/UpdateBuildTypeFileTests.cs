@@ -16,7 +16,7 @@ namespace SIL.BuildTasks.Tests
 			_ = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var types = UpdateBuildTypeFile.UpdateBuildTypeFile.GetVersionTypes(GetFileContentsForType("Alpha"));
-			Assert.That(types, NUnit.Framework.Is.EquivalentTo(new [] {"Alpha", "Beta", "ReleaseCandidate", "Production"}));
+			Assert.That(types, Is.EquivalentTo(new [] {"Alpha", "Beta", "ReleaseCandidate", "Production"}));
 		}
 
 		[Test]
@@ -25,7 +25,7 @@ namespace SIL.BuildTasks.Tests
 			_ = new UpdateBuildTypeFile.UpdateBuildTypeFile();
 
 			var types = UpdateBuildTypeFile.UpdateBuildTypeFile.GetVersionTypes(GetFileContents("Fred", "Wilma", "BamBam", "Fred", "Barney", "Pebbles"));
-			Assert.That(types, NUnit.Framework.Is.EquivalentTo(new [] {"Wilma", "BamBam", "Fred","Barney", "Pebbles"}));
+			Assert.That(types, Is.EquivalentTo(new [] {"Wilma", "BamBam", "Fred","Barney", "Pebbles"}));
 		}
 
 		[Test]
