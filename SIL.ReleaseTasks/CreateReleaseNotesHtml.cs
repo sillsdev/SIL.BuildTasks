@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
@@ -15,13 +15,17 @@ namespace SIL.ReleaseTasks
 	/// <inheritdoc />
 	/// <summary>
 	/// Given a markdown-style changelog file, this class will generate a release notes HTML file.
-	/// If the HTML file already exists, the task will look for a section with `class="releasenotes"`
-	/// and replace it with the current release notes.
-	/// The developer-oriented and [Unreleased] beginning will be removed from a Keep a Changelog style changelog.
+	/// If the HTML file already exists, the task will look for a section with
+	/// `class="<see cref="kReleaseNotesClassName"/>>"` and replace it with the current release
+	/// notes.
+	/// The developer-oriented and [Unreleased] beginning will be removed from a Keep a Changelog
+	/// style changelog.
 	/// </summary>
 	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 	public class CreateReleaseNotesHtml : Task
 	{
+		public const string kReleaseNotesClassName = "releasenotes";
+
 		[Required]
 		public string HtmlFile { get; set; }
 
@@ -39,26 +43,27 @@ namespace SIL.ReleaseTasks
 			try
 			{
 				string inputMarkdown = File.ReadAllText(ChangelogFile);
-				CreateReleaseNotesHtml.RemoveKeepAChangelogHeadIfPresent(ref inputMarkdown);
-				// MarkdownDeep appears to use \n for newlines. Rather than mix those with platform line-endings, just
-				// convert them to platform line-endings if needed.
+				RemoveKeepAChangelogHeadIfPresent(ref inputMarkdown);
+				// MarkDig appears to use \n for newlines. Rather than mix those with platform
+				// line-endings, just convert them to platform line-endings if needed.
 				var markdownHtml = Markdown.ToHtml(inputMarkdown).Replace("\n", Environment.NewLine);
-				if(File.Exists(HtmlFile))
+				XElement releaseNotesElement = null;
+				XDocument htmlDoc = null;
+				if (File.Exists(HtmlFile))
 				{
-					var htmlDoc = XDocument.Load(HtmlFile);
-					var releaseNotesElement = htmlDoc.XPathSelectElement("//*[@class='releasenotes']");
-					if (releaseNotesElement == null)
-						return true;
-
+					htmlDoc = XDocument.Load(HtmlFile);
+					var releaseNotesElementXpath = $"//*[@class='{kReleaseNotesClassName}']";
+					releaseNotesElement = htmlDoc.XPathSelectElement(releaseNotesElementXpath);
+				}
+				if (releaseNotesElement == null)
+					WriteBasicHtmlFromMarkdown(markdownHtml);
+				else
+				{
 					releaseNotesElement.RemoveNodes();
 					var mdDocument = XDocument.Parse($"<div>{markdownHtml}</div>");
 					// ReSharper disable once PossibleNullReferenceException - Will either throw or work
 					releaseNotesElement.Add(mdDocument.Root.Elements());
 					htmlDoc.Save(HtmlFile);
-				}
-				else
-				{
-					WriteBasicHtmlFromMarkdown(markdownHtml);
 				}
 				return true;
 			}
@@ -71,7 +76,9 @@ namespace SIL.ReleaseTasks
 
 		private void WriteBasicHtmlFromMarkdown(string markdownHtml)
 		{
-			File.WriteAllText(HtmlFile, $"<html><head></head><body><div class='releasenotes'>{Environment.NewLine}{markdownHtml}</div></body></html>");
+			File.WriteAllText(HtmlFile, "<html><head><meta charset=\"UTF-8\"/></head><body>" +
+				$"<div class='{kReleaseNotesClassName}'>" +
+				$"{Environment.NewLine}{markdownHtml}</div></body></html>");
 		}
 
 		/// <summary>
@@ -81,9 +88,7 @@ namespace SIL.ReleaseTasks
 		public static bool RemoveKeepAChangelogHeadIfPresent(ref string md)
 		{
 			if (!md.Contains("[Unreleased]"))
-			{
 				return false;
-			}
 			string unreleasedHeader = $"## [Unreleased]{Environment.NewLine}{Environment.NewLine}";
 			int unreleasedHeaderLocation = md.IndexOf(unreleasedHeader);
 			md = md.Substring(unreleasedHeaderLocation + unreleasedHeader.Length);

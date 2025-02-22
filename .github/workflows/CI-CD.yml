@@ -25,16 +25,29 @@ jobs:
         os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
+    env:
+      DOTNET_INSTALL_DIR: "./.dotnet"
+  
     steps:
     - name: Checkout
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         fetch-depth: '0'
 
+    - name: Install Mono (Linux only)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt update
+        sudo apt install -y mono-complete
+
     - name: Install .NET Core
       uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # v4.1.0
       with:
         dotnet-version: 6.0.x
+        
+    - name: Add .NET to PATH (Linux only)
+      if: matrix.os == 'ubuntu-latest'
+      run: echo "$DOTNET_INSTALL_DIR:$DOTNET_INSTALL_DIR/tools" >> $GITHUB_PATH
 
     - name: Set up Visual Studio shell
       uses: egor-tensin/vs-shell@9a932a62d05192eae18ca370155cf877eecc2202 # v2
