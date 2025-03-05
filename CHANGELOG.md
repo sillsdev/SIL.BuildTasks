@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.1.0] - 2025-02-22
+
+### Added
+
+- [SIL.ReleaseTasks] Added code to `CreateReleaseNotesHtml` to set the charset
+  in a metadata element in the HTML head so that special characters such
+  as the TM mark do not render as garbled text (#72)
+
 ## [3.0.0] - 2024-11-07
 
 ### Added
@@ -162,8 +170,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release as NuGet package
 
-[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.0.0...master
+[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.0...master
 
+[3.1.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.5.0...v3.0.0
 [2.5.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.3.0...v2.4.0
