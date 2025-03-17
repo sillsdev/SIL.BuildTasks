@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.110.50" IncludeAssets="All" PrivateAssets="All" />
+    <PackageReference Include="Markdig.Signed" Version="0.37.0" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
