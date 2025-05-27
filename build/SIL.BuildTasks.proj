@@ -23,7 +23,7 @@
 	<Target Name="RestoreBuildTasks" DependsOnTargets="CheckPrerequisites">
 		<Message Text="RestartBuild=$(RestartBuild)" />
 		<!-- Install NUnit.Console which has the required extensions (and NUnit.ConsoleRunner itself) as dependencies -->
-		<Exec Command='$(NuGetCommand) install NUnit.Console -excludeVersion -version 3.18.3 -solutionDirectory "$(RootDir)"' />
+		<Exec Command='$(NuGetCommand) install NUnit.Console -excludeVersion -version 3.20.0 -solutionDirectory "$(RootDir)"' />
 	</Target>
 
 	<Target Name="Build" DependsOnTargets="RestoreBuildTasks">

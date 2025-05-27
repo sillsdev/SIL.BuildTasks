@@ -14,8 +14,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Markdig.Signed" Version="0.37.0" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.11.4" />
+    <PackageReference Include="Markdig.Signed" Version="0.41.1" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.8" />
   </ItemGroup>
   <Import Project="..\SIL.ReleaseTasks\SIL.ReleaseTasks.Common.inc" />
 </Project>
