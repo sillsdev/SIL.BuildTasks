@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Markdig.Signed" Version="0.41.1" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.8" />
+    <PackageReference Include="SIL.Core" Version="7.0.0" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>

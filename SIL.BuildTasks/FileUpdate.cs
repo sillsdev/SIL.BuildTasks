@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using SIL.Providers;
 using static System.IO.File;
 using static System.Text.RegularExpressions.RegexOptions;
 
@@ -117,6 +118,7 @@ namespace SIL.BuildTasks
 				if (!string.IsNullOrEmpty(DatePlaceholder))
 				{
 					var culture = GetCultureFromFileName() ?? CultureInfo.CurrentCulture;
+					var currentDate = DateTimeProvider.Current.UtcNow.Date;
 
 					if (DatePlaceholder.Equals("_DATE(*)_", StringComparison.Ordinal))
 					{
@@ -127,12 +129,12 @@ namespace SIL.BuildTasks
 							var format = m.Groups["dateFormat"].Success
 								? m.Groups["dateFormat"].Value
 								: DateFormat;
-							return DateTime.UtcNow.Date.ToString(format, culture);
+							return currentDate.ToString(format, culture);
 						});
 					}
 					else
 					{
-						var formattedDate = DateTime.UtcNow.Date.ToString(DateFormat, culture);
+						var formattedDate = currentDate.ToString(DateFormat, culture);
 						newContents = newContents.Replace(DatePlaceholder, formattedDate);
 					}
 				}
