@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- [SIL.BuildTasks.AWS] Changed case of text in log message from "Publishing Sourcefiles" "Publishing SourceFiles". If anything is doing a case-sensitive parse of the log file, looking for this text, this could be a breaking change.
 - [SIL.BuildTasks] Changed FileUpdate.DatePlaceholder to allow the caller to specify a special placeholder `_DATE(*)_` that will look not only for `_DATE_` but also variants that include a date format specifier, such as `_DATE(MMM d, yyyy)_` or `_DATE(MM/yyyy)_` and will use the date format specified instead of the DateFormat.
 
 ### Deprecated
