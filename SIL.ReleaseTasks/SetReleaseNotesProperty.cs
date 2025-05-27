@@ -1,18 +1,16 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
-using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.ReleaseTasks
 {
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[PublicAPI]
 	public class SetReleaseNotesProperty : Task
 	{
 		[Required]
@@ -220,7 +218,7 @@ namespace SIL.ReleaseTasks
 					// if we have something like
 					// ## [Unreleased]
 					// ## [1.5]
-					// we're currently at version 1.5 but we want to return the previous version.
+					// We're currently at version 1.5, but we want to return the previous version.
 					// Skip this heading
 					_currentIndex = i;
 					continue;
@@ -235,7 +233,7 @@ namespace SIL.ReleaseTasks
 
 		private bool SkipHeader(int index)
 		{
-			//exclude unnecessary headers from changelog file
+			// Exclude unnecessary headers from changelog file.
 			for (int i = index + 1; i < _markdownLines.Length; i++)
 			{
 				var line = _markdownLines[i];

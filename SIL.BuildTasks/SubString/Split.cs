@@ -1,16 +1,13 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
-using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.SubString
 {
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public class Split : Task
 	{
 		public Split()
@@ -21,7 +18,6 @@ namespace SIL.BuildTasks.SubString
 			MaxSplit = 999;
 
 			ReturnValue = "";
-
 		}
 
 		[Required]

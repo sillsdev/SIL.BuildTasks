@@ -1,13 +1,13 @@
-// Copyright (c) 2012-2020 SIL Global
+// Copyright (c) 2012-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Microsoft.Win32;
@@ -18,10 +18,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 	/// <summary>
 	/// Run NUnit on a test assembly.
 	/// </summary>
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
+	[PublicAPI]
 	public class NUnit : TestTask
 	{
 		public NUnit()

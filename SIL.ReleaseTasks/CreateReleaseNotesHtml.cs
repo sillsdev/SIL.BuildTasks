@@ -2,10 +2,10 @@
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using JetBrains.Annotations;
 using Markdig;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -21,7 +21,7 @@ namespace SIL.ReleaseTasks
 	/// The developer-oriented and [Unreleased] beginning will be removed from a Keep a Changelog
 	/// style changelog.
 	/// </summary>
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[PublicAPI]
 	public class CreateReleaseNotesHtml : Task
 	{
 		public const string kReleaseNotesClassName = "releasenotes";

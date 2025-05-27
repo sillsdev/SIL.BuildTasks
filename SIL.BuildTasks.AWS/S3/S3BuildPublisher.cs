@@ -1,4 +1,4 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 /*
  * Original code from https://code.google.com/archive/p/snowcode/
@@ -9,8 +9,8 @@
  */
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Amazon.Runtime;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 
 namespace SIL.BuildTasks.AWS.S3
@@ -19,9 +19,7 @@ namespace SIL.BuildTasks.AWS.S3
 	/// MSBuild task to publish a set of files to a S3 bucket.
 	/// </summary>
 	/// <remarks>If made public the files will be available at https://s3.amazonaws.com/bucket_name/folder/file_name</remarks>
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public class S3BuildPublisher : AwsTaskBase
 	{
 		#region Properties
@@ -51,7 +49,7 @@ namespace SIL.BuildTasks.AWS.S3
 		public string DestinationBucket { get; set; }
 
 		/// <summary>
-		/// Gets or sets if the files should be publically readable
+		/// Gets or sets if the files should be publicly readable
 		/// </summary>
 		public bool IsPublicRead { get; set; }
 
@@ -83,7 +81,7 @@ namespace SIL.BuildTasks.AWS.S3
 
 		private bool ProcessFiles()
 		{
-			Log.LogMessage(MessageImportance.Normal, "Publishing Sourcefiles={0} to {1}", Join(SourceFiles), DestinationBucket);
+			Log.LogMessage(MessageImportance.Normal, "Publishing SourceFiles={0} to {1}", Join(SourceFiles), DestinationBucket);
 
 			ShowAclWarnings();
 

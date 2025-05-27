@@ -1,9 +1,9 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -16,9 +16,7 @@ namespace SIL.BuildTasks
 	/// may be sent in clear.
 	/// Adapted from http://stackoverflow.com/questions/1089452/how-can-i-use-msbuild-to-download-a-file
 	/// </summary>
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public class DownloadFile : Task
 	{
 		/// <summary>
@@ -45,9 +43,9 @@ namespace SIL.BuildTasks
 
 		public override bool Execute()
 		{
-			// This doesn't seem to work reliably..can return true even when only network cable is unplugged.
-			// Left in in case it works in some cases. But the main way of dealing with disconnect is the
-			// same algorithm in the WebException handler.
+			// This doesn't seem to work reliably. It can return true even when only network cable
+			// is unplugged. Left it in just in case it works in some cases. But the main way of
+			// dealing with disconnect is the same algorithm in the WebException handler.
 			if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
 			{
 				if (File.Exists(LocalFilename))
@@ -60,8 +58,7 @@ namespace SIL.BuildTasks
 				return false; // Presumably can't continue
 			}
 
-			bool success;
-			var read = DoDownloadFile(Address, LocalFilename, Username, Password, out success);
+			var read = DoDownloadFile(Address, LocalFilename, Username, Password, out var success);
 
 			if (success)
 				Log.LogMessage(MessageImportance.Low, "{0} bytes written", read);

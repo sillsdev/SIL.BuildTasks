@@ -1,10 +1,10 @@
-// Copyright (c) 2016-2020 SIL Global
+// Copyright (c) 2016-2025 SIL Global
 // This software is licensed under the MIT license (http://opensource.org/licenses/MIT)
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace SIL.BuildTasks.UnitTestTasks
 {
@@ -12,9 +12,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 	/// <summary>
 	/// Run NUnit3 on a test assembly.
 	/// </summary>
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public class NUnit3 : NUnit
 	{
 		private bool? _useNUnit3Xml;

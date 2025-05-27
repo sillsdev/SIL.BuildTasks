@@ -1,8 +1,9 @@
-// Copyright (c) 2020 SIL Global
+// Copyright (c) 2020-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -12,6 +13,7 @@ namespace SIL.BuildTasks
 	/// Crowdin includes country codes either always or never. Country codes are required for Chinese, but mostly get in the way for other languages.
 	/// This task removes country codes from all locales except Chinese. It expects to work with paths in the form of /%locale%/filename.%locale.extension
 	/// </summary>
+	[PublicAPI]
 	public class NormalizeLocales : Task
 	{
 		/// <summary>The directory whose subdirectories are locale names and contain localizations</summary>

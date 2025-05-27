@@ -17,13 +17,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
+
 - [SIL.BuildTasks] Added FileUpdate.FileLocalePattern (optional param) to infer a locale (e.g., for a localized release notes file) to use when doing date insertion involving month names or abbreviations.
 
 ### Changed
 
 - [SIL.BuildTasks] Changed FileUpdate.DatePlaceholder to allow the caller to specify a special placeholder `_DATE(*)_` that will look not only for `_DATE_` but also variants that include a date format specifier, such as `_DATE(MMM d, yyyy)_` or `_DATE(MM/yyyy)_` and will use the date format specified instead of the DateFormat.
 
+### Deprecated
+
+- [SIL.BuildTasks] Deprecated `AbandondedSuites` in favor of correctly spelled `AbandonedSuites`.
+
 ## [3.1.1] - 2025-03-18
+
 ### Changed
 
 - [SIL.BuildTasks] Upgraded dependency on Markdig.Signed to version 0.37.0 (to be consistent with SIL.ReleaseTasks)

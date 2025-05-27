@@ -1,13 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net472</TargetFrameworks>
-    <RootNamespace>SIL.BuildTasks</RootNamespace>
+    <RootNamespace>SIL.BuildTasks.AWS</RootNamespace>
     <Description>SIL.BuildTasks.AWS defines a S3BuildPublisher msbuild task to publish a set of files to a S3 bucket.</Description>
     <AssemblyTitle>SIL.BuildTasks.AWS</AssemblyTitle>
     <IsTool>true</IsTool>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.3.110.50" IncludeAssets="All" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Markdig.Signed" Version="0.41.1" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.8" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />

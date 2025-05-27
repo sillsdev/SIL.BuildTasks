@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2014-2018 SIL Global
+// Copyright (c) 2014-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 // Parts based on code by MJ Hutchinson http://mjhutchinson.com/journal/2010/01/25/integrating_gtk_application_mac
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -35,9 +35,7 @@ namespace SIL.BuildTasks
 	//     </PropertyGroup>
 	//   </Target>
 	// </Project>
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public class UnixName : Task
 	{
 		public override bool Execute()

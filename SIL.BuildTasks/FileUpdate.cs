@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using SIL.Providers;
@@ -13,6 +14,7 @@ using static System.Text.RegularExpressions.RegexOptions;
 
 namespace SIL.BuildTasks
 {
+	[PublicAPI]
 	public class FileUpdate : Task
 	{
 		private string _dateFormat;
