@@ -16,7 +16,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Deprecated
+
+- [SIL.BuildTasks] Deprecated `AbandondedSuites` in favor of correctly spelled `AbandonedSuites`.
+
 ## [3.1.1] - 2025-03-18
+
 ### Changed
 
 - [SIL.BuildTasks] Upgraded dependency on Markdig.Signed to version 0.37.0 (to be consistent with SIL.ReleaseTasks)

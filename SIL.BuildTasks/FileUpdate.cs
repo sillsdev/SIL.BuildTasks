@@ -3,11 +3,13 @@
 using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks
 {
+	[PublicAPI]
 	public class FileUpdate : Task
 	{
 		private string _dateFormat;

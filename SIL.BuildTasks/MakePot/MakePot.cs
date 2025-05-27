@@ -1,18 +1,17 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.MakePot
 {
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public class MakePot: Task
 	{
 		private readonly Dictionary<string, List<string>> _entries = new Dictionary<string, List<string>>();
@@ -182,7 +181,7 @@ namespace SIL.BuildTasks.MakePot
 				}
 				var comments = "#: " + filePath;
 
-				//catch the second parameter from calls like this:
+				// Catch the second parameter from calls like this:
 				//            StringCataGet("~Note", "The label for the field showing a note.");
 
 				if (!string.IsNullOrEmpty(match.Groups["note"].Value))
@@ -214,16 +213,16 @@ namespace SIL.BuildTasks.MakePot
 
 		public static string EscapeString(string s)
 		{
-			var result = s.Replace("\\", "\\\\"); // This must be first
+			var result = s.Replace(@"\", @"\\"); // This must be first
 			result = result.Replace("\"", "\\\"");
 			return result;
 		}
 
 		public static string UnescapeString(string s)
 		{
-			var result = s.Replace("\\'", "'");
-			result = result.Replace("\\\"", "\"");
-			result = result.Replace("\\\\", "\\");
+			var result = s.Replace(@"\'", "'");
+			result = result.Replace(@"\""", "\"");
+			result = result.Replace(@"\\", @"\");
 			return result;
 		}
 	}

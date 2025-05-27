@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 /*
  * Original code from https://code.google.com/archive/p/snowcode/
@@ -9,16 +9,15 @@
  */
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.AWS
 {
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public abstract class AwsTaskBase : Task
 	{
 		/// <summary>
@@ -33,8 +32,7 @@ namespace SIL.BuildTasks.AWS
 		/// <returns></returns>
 		protected AWSCredentials GetAwsCredentials()
 		{
-			AWSCredentials awsCredentials;
-			if (!new CredentialProfileStoreChain().TryGetAWSCredentials(CredentialStoreProfileName, out awsCredentials))
+			if (!new CredentialProfileStoreChain().TryGetAWSCredentials(CredentialStoreProfileName, out var awsCredentials))
 				throw new ApplicationException("Unable to get AWS credentials from the credential profile store");
 
 			Log.LogMessage(MessageImportance.Normal, "Connecting to AWS using AwsAccessKeyId: {0}",

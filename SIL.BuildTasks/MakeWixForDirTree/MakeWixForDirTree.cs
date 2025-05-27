@@ -1,4 +1,4 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 /*
  * A custom task that walks a directory tree and creates a WiX fragment containing
@@ -13,20 +13,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 
 namespace SIL.BuildTasks.MakeWixForDirTree
 {
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public class MakeWixForDirTree : Task, ILogger
 	{
 		private const string FileNameOfGuidDatabase = ".guidsForInstaller.xml";
@@ -84,7 +82,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		}
 
 		/// <summary>
-		/// Whether to just check that all the metadata is uptodate or not. If this is true then no file is output.
+		/// Whether to just check that all the metadata is up-to-date or not. If this is true then no file is output.
 		/// </summary>
 		public bool CheckOnly { get; set; }
 
@@ -112,7 +110,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			if (!string.IsNullOrEmpty(InstallerSourceDirectory))
 				InstallerSourceDirectory = Path.GetFullPath(InstallerSourceDirectory);
 
-			/* hatton removed this... it would leave deleted files referenced in the wxs file
+			/* Hatton removed this... it would leave deleted files referenced in the wxs file
 			 if (File.Exists(_outputFilePath))
 			{
 				DateTime curFileDate = File.GetLastWriteTime(_outputFilePath);
@@ -190,7 +188,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 		private void WriteDomToFile(XmlNode doc)
 		{
-			// write the XML out onlystringles have been modified
+			// write the XML out only if modified
 			if (CheckOnly || !_filesChanged)
 				return;
 
@@ -342,11 +340,11 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		private string GetSafeDirectoryId(string directoryPath, string parentDirectoryId)
 		{
 			var id = parentDirectoryId;
-			//bit of a hack... we don't want our id to have this prefix.dir form fo the top level,
-			//where it is going to be referenced by other wix files, that will just be expecting the id
-			//the msbuild target gave for the id of this directory
+			// This is a bit of a hack... we don't want our id to have this prefix.dir form for the
+			// top level, where it is going to be referenced by other WIX files; that will just be
+			// expecting the id the MSBuild target gave for the id of this directory.
 
-			//I don't have it quite right, though. See the test file, where you get
+			// I don't have it quite right, though. See the test file, where you get
 			// <Component Id="common.bin.bin" (the last bin is undesirable)
 
 			if (Path.GetFullPath(RootDirectory) != directoryPath)
@@ -361,14 +359,14 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		private void ProcessFile(XmlNode parent, string path, XmlDocument doc, IdToGuidDatabase guidDatabase, bool isFirst, string directoryId)
 		{
 			var name = Path.GetFileName(path);
-			var id = directoryId+"."+name; //includ the parent directory id so that files with the same name (e.g. "index.html") found twice in the system will get different ids.
+			var id = directoryId+"."+name; // Include the parent directory id so that files with the same name (e.g. "index.html") found twice in the system will get different ids.
 
-			const int kMaxLength = 50; //I have so far not found out what the max really is
+			const int kMaxLength = 50; // I have so far not found out what the max really is.
 			if (id.Length > kMaxLength)
 			{
-				id = id.Substring(id.Length - kMaxLength, kMaxLength); //get the last chunk of it
+				id = id.Substring(id.Length - kMaxLength, kMaxLength); // Get the last chunk of it.
 			}
-			if (!char.IsLetter(id[0]) && id[0] != '_')//probably not needed now that we're prepending the parent directory id, accept maybe at the root?
+			if (!char.IsLetter(id[0]) && id[0] != '_') // Probably not needed now that we're prepending the parent directory id, except maybe at the root?
 				id = '_' + id;
 			id = Regex.Replace(id, @"[^\p{Lu}\p{Ll}\p{Nd}._]", "_");
 
@@ -423,10 +421,10 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 		private static void AddPermissionElement(XmlDocument doc, XmlNode elementToAddPermissionTo)
 		{
-			var persmission = doc.CreateElement("Permission", Xmlns);
-			persmission.SetAttribute("GenericAll", "yes");
-			persmission.SetAttribute("User", "Everyone");
-			elementToAddPermissionTo.AppendChild(persmission);
+			var permission = doc.CreateElement("Permission", Xmlns);
+			permission.SetAttribute("GenericAll", "yes");
+			permission.SetAttribute("User", "Everyone");
+			elementToAddPermissionTo.AppendChild(permission);
 		}
 
 		public void LogMessage(MessageImportance importance, string message)
