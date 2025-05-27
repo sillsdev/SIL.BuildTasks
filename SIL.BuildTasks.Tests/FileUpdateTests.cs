@@ -1,9 +1,11 @@
-// Copyright (c) 2024 SIL Global
+// Copyright (c) 2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Globalization;
 using NUnit.Framework;
+using SIL.Providers;
+using SIL.TestUtilities.Providers;
+
 // Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
 // ReSharper disable AccessToStaticMemberViaDerivedType
 
@@ -12,6 +14,19 @@ namespace SIL.BuildTasks.Tests
 	[TestFixture]
 	public class FileUpdateTests
 	{
+		[SetUp]
+		public void Setup()
+		{
+			DateTimeProvider.SetProvider(
+				new ReproducibleDateTimeProvider(new DateTime(2026, 4, 16)));
+		}
+		
+		[TearDown]
+		public void TearDown()
+		{
+			DateTimeProvider.ResetToDefault();
+		}
+
 		[TestCase("This is the story of the frog prince.", "frog", "monkey",
 			ExpectedResult = "This is the story of the monkey prince.")]
 		[TestCase("This is the story of the frog prince.", "f[^ ]+g", "toad",
@@ -63,14 +78,14 @@ namespace SIL.BuildTasks.Tests
 			Assert.That(ex.Message, Is.EqualTo($"No replacements made. Regex: '{regex}'; ReplacementText: '{replacement}'"));
 		}
 
-		[TestCase("_DATE_ _VERSION_\r\nStuff", "_DATE_", "M/yyyy", "{0} 3.2.1\r\nStuff")]
-		[TestCase("_DATE_ _VERSION_\r\nStuff done before _DATE_", "_DATE_", "M/yyyy", "{0} 3.2.1\r\nStuff done before {0}")]
-		[TestCase("&DATE; _VERSION_\r\n- point #1", "&DATE;", "dd-MM-yy", "{0} 3.2.1\r\n- point #1")]
-		[TestCase("DATE _VERSION_", "DATE", "dd MMMM, yyyy", "{0} 3.2.1")]
-		[TestCase("DATE _VERSION_", "DATE", null, "{0} 3.2.1")]
+		[TestCase("_DATE_ _VERSION_\r\nStuff", "_DATE_", "M/yyyy", "4/2026 3.2.1\r\nStuff")]
+		[TestCase("_DATE_ _VERSION_\r\nStuff done before _DATE_", "_DATE_", "M/yyyy", "4/2026 3.2.1\r\nStuff done before 4/2026")]
+		[TestCase("&DATE; _VERSION_\r\n- point #1", "&DATE;", "dd-MM-yy", "16-04-26 3.2.1\r\n- point #1")]
+		[TestCase("DATE _VERSION_", "DATE", "dd MMMM, yyyy", "16 April, 2026 3.2.1")]
+		[TestCase("DATE _VERSION_", "DATE", null, "16/Apr/2026 3.2.1")] // Uses default date format
 		public void GetModifiedContents_DateLiteral_InsertsDateWithSpecifiedDateFormat(
 			string origContents, string datePlaceholder, string dateFormat,
-			string expectedResultFormat)
+			string expectedResult)
 		{
 			var updater = new FileUpdate
 			{
@@ -80,17 +95,14 @@ namespace SIL.BuildTasks.Tests
 				DateFormat = dateFormat
 			};
 
-			var currentDate = DateTime.UtcNow.Date.ToString(dateFormat ?? updater.DateFormat);
-
 			var result = updater.GetModifiedContents(origContents);
-			var expectedResult = string.Format(expectedResultFormat, currentDate);
 			Assert.That(result, Is.EqualTo(expectedResult));
 		}
 
-		[TestCase("_DATE_ _VERSION_\r\nStuff", "M/yyyy", "{0} 3.2.1\r\nStuff")]
-		[TestCase("_DATE_ _VERSION_\r\nStuff done before _DATE_", "dd-MM-yy", "{0} 3.2.1\r\nStuff done before {0}")]
+		[TestCase("_DATE_ _VERSION_\r\nStuff", "M/yyyy", "4/2026 3.2.1\r\nStuff")]
+		[TestCase("_DATE_ _VERSION_\r\nStuff done before _DATE_", "dd-MM-yy", "16-04-26 3.2.1\r\nStuff done before 16-04-26")]
 		public void GetModifiedContents_SpecialDatePlaceholderButFileDoesNotSpecifyFormat_InsertsDateWithSpecifiedDateFormat(
-			string origContents, string dateFormat, string expectedResultFormat)
+			string origContents, string dateFormat, string expectedResult)
 		{
 			var updater = new FileUpdate
 			{
@@ -100,10 +112,7 @@ namespace SIL.BuildTasks.Tests
 				DateFormat = dateFormat
 			};
 			
-			var currentDate = DateTime.UtcNow.Date.ToString(dateFormat ?? updater.DateFormat);
-
 			var result = updater.GetModifiedContents(origContents);
-			var expectedResult = string.Format(expectedResultFormat, currentDate);
 			Assert.That(result, Is.EqualTo(expectedResult));
 		}
 
@@ -121,7 +130,7 @@ namespace SIL.BuildTasks.Tests
 				DatePlaceholder = "_DATE(*)_",
 			};
 
-			var currentDate = DateTime.UtcNow.Date.ToString(format);
+			var currentDate = DateTimeProvider.Current.UtcNow.ToString(format);
 
 			var result = updater.GetModifiedContents(origContents);
 			Assert.That(result, Is.EqualTo($"{currentDate}\r\nStuff"));
@@ -141,17 +150,18 @@ namespace SIL.BuildTasks.Tests
 				DatePlaceholder = "_DATE(*)_",
 			};
 
-			var currentDate1 = DateTime.UtcNow.Date.ToString(format1);
-			var currentDateInDefaultFmt = DateTime.UtcNow.Date.ToString(updater.DateFormat);
-			var currentDate2 = DateTime.UtcNow.Date.ToString(format2);
+			var currentDate = DateTimeProvider.Current.UtcNow;
+			var currentDate1 = currentDate.ToString(format1);
+			var currentDate2 = currentDate.ToString(format2);
 
 			var result = updater.GetModifiedContents(origContents);
-			Assert.That(result, Is.EqualTo($"First {currentDate1}\r\nSecond {currentDateInDefaultFmt}\r\nLast {currentDate2}"));
+			Assert.That(result, Is.EqualTo($"First {currentDate1}\r\nSecond 16/Apr/2026\r\nLast {currentDate2}"));
 		}
 
-		[TestCase("es")]
-		[TestCase("fr")]
-		public void GetModifiedContents_SpecialDatePlaceholderWithLocalizedFileSpecifyingFormat_InsertsLocaleSpecificDateWithFormatFromFile(string locale)
+		[TestCase("es", "abril")]
+		[TestCase("fr", "avril")]
+		public void GetModifiedContents_SpecialDatePlaceholderWithLocalizedFileSpecifyingFormat_InsertsLocaleSpecificDateWithFormatFromFile(
+			string locale, string localizedMonthName)
 		{
 			var origContents = "_DATE(d MMMM yyyy)_\r\nStuff";
 
@@ -164,17 +174,8 @@ namespace SIL.BuildTasks.Tests
 				DatePlaceholder = "_DATE(*)_",
 			};
 
-			var currentDate = string.Format(DateTime.UtcNow.Date.ToString("d {0} yyyy"),
-				GetMonthName(locale, DateTime.UtcNow.Month));
-
 			var result = updater.GetModifiedContents(origContents);
-			Assert.That(result, Is.EqualTo($"{currentDate}\r\nStuff"));
-		}
-
-		private string GetMonthName(string locale, int month)
-		{
-			var culture = new CultureInfo(locale);
-			return culture.DateTimeFormat.GetMonthName(month);
+			Assert.That(result, Is.EqualTo($"16 {localizedMonthName} 2026\r\nStuff"));
 		}
 
 		[Test]

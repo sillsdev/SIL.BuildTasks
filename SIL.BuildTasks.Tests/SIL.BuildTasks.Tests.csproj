@@ -20,6 +20,7 @@
     <!-- Don't remove NUnit.Runners.Net4 - this is needed for the NUnitTests fixture! -->
     <PackageReference Include="NUnit.Runners.Net4" Version="2.6.4" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="SIL.TestUtilities" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SIL.BuildTasks\SIL.BuildTasks.csproj" />
