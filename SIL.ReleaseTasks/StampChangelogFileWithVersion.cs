@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -18,7 +18,7 @@ namespace SIL.ReleaseTasks
 	/// (Assumes that a temporary line is currently at the top: e.g. ## DEV_VERSION_NUMBER: DEV_RELEASE_DATE
 	/// or that the file contains a `## [Unreleased]` line.)
 	/// </summary>
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+	[PublicAPI]
 	public class StampChangelogFileWithVersion : Task
 	{
 		[Required]

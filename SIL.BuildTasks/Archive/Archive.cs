@@ -1,17 +1,16 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks.Archive
 {
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	[PublicAPI]
 	public class Archive : Task
 	{
 		[Required]

@@ -1,12 +1,12 @@
-// Copyright (c) 2018 SIL Global
+// Copyright (c) 2018-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -20,11 +20,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 	/// timeouts.  In fact, anything based on ToolTask (at least in Mono 10.4) didn't handle
 	/// timeouts properly in my testing.  This code does handle timeouts properly.
 	/// </remarks>
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	[SuppressMessage("ReSharper", "MemberCanBeProtected.Global")]
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
+	[PublicAPI]
 	public abstract class TestTask : Task
 	{
 		private StreamReader _stdError;
@@ -83,7 +79,18 @@ namespace SIL.BuildTasks.UnitTestTasks
 		/// Contains the names of test suites that got a timeout or that crashed
 		/// </summary>
 		[Output]
-		public ITaskItem[] AbandondedSuites { get; protected set; }
+		[Obsolete("Use correctly spelled AbandonedSuites")]
+		public ITaskItem[] AbandondedSuites
+		{
+			get => AbandonedSuites;
+			protected set => AbandonedSuites = value;
+		}
+
+		/// <summary>
+		/// Contains the names of test suites that got a timeout or that crashed
+		/// </summary>
+		[Output]
+		public ITaskItem[] AbandonedSuites { get; protected set; }
 
 		public override bool Execute()
 		{
@@ -269,9 +276,7 @@ namespace SIL.BuildTasks.UnitTestTasks
 					}
 
 					if (Verbose)
-					{
-					Log.LogMessage(Importance, logContents);
-					}
+						Log.LogMessage(Importance, logContents);
 
 					// ensure only one thread writes to the log at any time
 					lock (LockObject)
@@ -304,16 +309,17 @@ namespace SIL.BuildTasks.UnitTestTasks
 					}
 
 					// "The standard error stream is the default destination for error messages and other diagnostic warnings."
-					// By default log the message as it is most likely a warning.
+					// By default, log the message as it is most likely a warning.
 					// If the stderr message includes error, crash or fail then log it as an error
 					// and investigate.
-					// If looks like an error but includes induce or simulator then log as warning instead of error
+					// If it looks like an error but includes induce or simulator, then log as
+					// warning instead of error.
 					// Change this if it is still too broad.
-					string[] toerror = { "error", "crash", "fail" };
-					string[] noterror = { "induce", "simulator", "Gdk-CRITICAL **:", "Gtk-CRITICAL **:" };
+					string[] toError = { "error", "crash", "fail" };
+					string[] notError = { "induce", "simulator", "Gdk-CRITICAL **:", "Gtk-CRITICAL **:" };
 
-					if (toerror.Any(err => logContents.IndexOf(err, StringComparison.OrdinalIgnoreCase) >= 0) &&
-						!noterror.Any(err => logContents.IndexOf(err, StringComparison.OrdinalIgnoreCase) >= 0))
+					if (toError.Any(err => logContents.IndexOf(err, StringComparison.OrdinalIgnoreCase) >= 0) &&
+						!notError.Any(err => logContents.IndexOf(err, StringComparison.OrdinalIgnoreCase) >= 0))
 					{
 						Log.LogError(logContents);
 					}

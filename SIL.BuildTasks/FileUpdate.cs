@@ -1,13 +1,15 @@
-// Copyright (c) 2023 SIL Global
+// Copyright (c) 2023-2025 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace SIL.BuildTasks
 {
+	[PublicAPI]
 	public class FileUpdate : Task
 	{
 		private string _dateFormat;
