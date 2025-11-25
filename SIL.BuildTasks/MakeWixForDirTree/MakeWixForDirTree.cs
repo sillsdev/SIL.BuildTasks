@@ -87,6 +87,11 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		public bool CheckOnly { get; set; }
 
 		/// <summary>
+		/// Whether to add Win64="yes" (for use in 64-bit installer).
+		/// </summary>
+		public bool SetWin64 { get; set; }
+
+		/// <summary>
 		/// Directory where the installer source (.wixproj) is located.
 		/// If provided, is used to determine relative path of the components
 		/// </summary>
@@ -391,6 +396,8 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				_filesChanged = true;        // this file is new
 			else
 				elemComp.SetAttribute("Guid", guid.ToUpper());
+			if (SetWin64)
+				elemComp.SetAttribute("Win64", "yes");
 			parent.AppendChild(elemComp);
 
 			var elemFile = doc.CreateElement("File", Xmlns);

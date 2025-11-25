@@ -11,7 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Markdig.Signed" Version="0.41.1" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.8" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
     <PackageReference Include="NUnit" Version="4.3.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />

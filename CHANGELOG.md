@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - [SIL.BuildTasks] Added FileUpdate.FileLocalePattern (optional param) to infer a locale (e.g., for a localized release notes file) to use when doing date insertion involving month names or abbreviations.
+- [SIL.BuildTasks] Added MakeWixForDirTree.SetWin64 (optional Boolean param) to set the Win64 attribute to "yes" when building wxs file to be used in a 64-bit installer.
 
 ### Changed
 
