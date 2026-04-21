@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Don't update NUnit to 3.x - that'll require refactoring the NUnitTests fixture! -->
-    <PackageReference Include="NUnit" Version="2.6.5" />
+    <PackageReference Include="NUnit" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ForceCrash\**" />

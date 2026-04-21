@@ -25,8 +25,8 @@ See full changelog at https://github.com/sillsdev/SIL.BuildTasks/blob/master/CHA
   </ItemGroup>
 
     <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.10.3" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="GitVersion.MsBuild" Version="6.7.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.201" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
