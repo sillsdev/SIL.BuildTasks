@@ -116,6 +116,40 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			return guid?.ToUpper();
 		}
 
+		/// <summary>
+		/// Copies in every entry this database does not already have, and saves if
+		/// anything was added. Used to consolidate the per-directory files into a
+		/// single one: File Ids encode the whole relative path (for example
+		/// "mercurial.lib.dulwich._pack.pyd"), so they are unique across the tree
+		/// and the existing GUIDs can be merged without renaming anything.
+		/// </summary>
+		public void ImportMissingFrom(IdToGuidDatabase other)
+		{
+			if (other == null || ReferenceEquals(other, this))
+				return;
+
+			var added = false;
+			foreach (var pair in other._guids)
+			{
+				var existing = this[pair.Key];
+				if (existing == null)
+				{
+					this[pair.Key] = pair.Value;
+					added = true;
+				}
+				else if (!string.Equals(existing, pair.Value, StringComparison.OrdinalIgnoreCase))
+				{
+					// Cannot happen while Ids stay path-derived, but silently preferring
+					// one GUID over another would be a nasty way to find out otherwise.
+					_logger.LogError(string.Format(
+						"Conflicting GUIDs for {0}: {1} (from {2}) and {3} (from {4}). Keeping the first.",
+						pair.Key, existing, _filename, pair.Value, other._filename));
+				}
+			}
+
+			if (added) Write();
+		}
+
 		private void Write()
 		{
 			var settings = new XmlWriterSettings {

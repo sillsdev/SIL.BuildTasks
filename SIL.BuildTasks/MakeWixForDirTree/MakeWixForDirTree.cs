@@ -39,6 +39,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		private readonly Dictionary<string, int> _suffixes = new Dictionary<string, int>();
 		private readonly DateTime _refDate = DateTime.MinValue;
 		private bool _filesChanged;
+		private IdToGuidDatabase _sharedGuidDatabase;
 
 		private const string Xmlns = "http://schemas.microsoft.com/wix/2006/wi";
 
@@ -95,6 +96,23 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		/// </summary>
 		public string InstallerSourceDirectory { get; set; }
 
+		/// <summary>
+		/// Optional path to a single file holding the GUIDs for the whole tree,
+		/// instead of a .guidsForInstaller.xml in every directory.
+		///
+		/// The per-directory default becomes unwieldy for large payloads: a tree
+		/// with a hundred directories needs a hundred files, all of which must be
+		/// kept in version control forever, because an entry has to outlive the
+		/// file it describes so that upgrades can still remove it.
+		///
+		/// On the first run with this set, any per-directory files still present
+		/// under RootDirectory are merged in, so existing GUIDs carry over
+		/// unchanged and installed components keep their identity. The old files
+		/// are left on disk; delete them from version control once the merge has
+		/// been verified. This file itself is never emitted as a component.
+		/// </summary>
+		public string ConsolidatedGuidFile { get; set; }
+
 		[Output, Required]
 		public string OutputFilePath { get; set; }
 
@@ -135,6 +153,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			}
 
 			SetupExclusions();
+			SetupConsolidatedGuidFile();
 
 			try
 			{
@@ -258,6 +277,47 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			Log.LogWarning(s);
 		}
 
+		/// <summary>
+		/// Opens the consolidated GUID file, if one was asked for, and seeds it from
+		/// any per-directory files left over from before the switch.
+		/// </summary>
+		private void SetupConsolidatedGuidFile()
+		{
+			if (string.IsNullOrEmpty(ConsolidatedGuidFile))
+				return;
+
+			ConsolidatedGuidFile = Path.GetFullPath(ConsolidatedGuidFile);
+			_sharedGuidDatabase = IdToGuidDatabase.Create(ConsolidatedGuidFile, this);
+
+			foreach (var legacy in Directory.GetFiles(Path.GetFullPath(RootDirectory),
+				FileNameOfGuidDatabase, SearchOption.AllDirectories))
+			{
+				if (string.Equals(legacy, ConsolidatedGuidFile, StringComparison.OrdinalIgnoreCase))
+					continue;
+
+				LogMessage(MessageImportance.Normal,
+					"Merging GUIDs from {0} into {1}", legacy, ConsolidatedGuidFile);
+				_sharedGuidDatabase.ImportMissingFrom(IdToGuidDatabase.Create(legacy, this));
+			}
+		}
+
+		private IdToGuidDatabase GetGuidDatabaseFor(string dirPath)
+		{
+			return _sharedGuidDatabase
+				?? IdToGuidDatabase.Create(Path.Combine(dirPath, FileNameOfGuidDatabase), this);
+		}
+
+		private bool IsGuidDatabaseFile(string path)
+		{
+			if (path.Contains(FileNameOfGuidDatabase))
+				return true;
+
+			if (string.IsNullOrEmpty(ConsolidatedGuidFile))
+				return false;
+
+			return string.Equals(Path.GetFullPath(path), ConsolidatedGuidFile, StringComparison.OrdinalIgnoreCase);
+		}
+
 		private void ProcessDir(XmlNode parent, string dirPath, string outerDirectoryId)
 		{
 			LogMessage(MessageImportance.Low, "Processing dir {0}", dirPath);
@@ -265,7 +325,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			var doc = parent.OwnerDocument;
 			var files = new List<string>();
 
-			var guidDatabase = IdToGuidDatabase.Create(Path.Combine(dirPath, FileNameOfGuidDatabase), this);
+			var guidDatabase = GetGuidDatabaseFor(dirPath);
 
 			SetupDirectoryPermissions(parent, outerDirectoryId, doc, guidDatabase);
 
@@ -274,7 +334,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			foreach (var f in Directory.GetFiles(dirPath))
 			{
 				if (_fileMatchPattern.IsMatch(f) && !_ignoreFilePattern.IsMatch(f) && !_ignoreFilePattern.IsMatch(Path.GetFileName(f)) && !_exclude.ContainsKey(f.ToLower())
-					&& !f.Contains(FileNameOfGuidDatabase) )
+					&& !IsGuidDatabaseFile(f) )
 					files.Add(f);
 			}
 
