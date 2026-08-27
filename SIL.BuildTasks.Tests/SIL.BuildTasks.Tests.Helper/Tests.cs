@@ -1,4 +1,3 @@
-// Copyright (c) 2016-2018 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
@@ -18,7 +17,7 @@ namespace SIL.BuildTasks.Tests.Helper
 		[Category("Success")]
 		public void Success()
 		{
-			Assert.True(true, "This test always passes");
+			Assert.Pass("This test always passes");
 		}
 
 		[Test]
@@ -35,25 +34,22 @@ namespace SIL.BuildTasks.Tests.Helper
 			throw new ApplicationException("This test throws an exception");
 		}
 
-		[DllImport("ForceCrash")]
-		private static extern void ForceCrash();
-
 		[Test]
 		[Category("Crash")]
 		public void Crash()
 		{
-			ForceCrash();
+			// Force the process to crash with an access violation (mimics a native
+			// crash) by writing through a null pointer. This is not a regular,
+			// .NET exception that can be caught- it terminates the process.
+			Marshal.WriteInt32(IntPtr.Zero, 42);
 			Assert.Fail("Should have crashed");
 		}
-
-		[DllImport("ForceCrash")]
-		private static extern void OutputOnStderr();
 
 		[Test]
 		[Category("Stderr")]
 		public void Stderr()
 		{
-			OutputOnStderr();
+			Console.Error.Write("Just testing");
 		}
 
 		[Test]
