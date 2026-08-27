@@ -1,4 +1,3 @@
-// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using NUnit.Framework;
 // Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
 // ReSharper disable AccessToStaticMemberViaDerivedType

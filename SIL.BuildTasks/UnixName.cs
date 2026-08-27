@@ -1,4 +1,3 @@
-// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 // Parts based on code by MJ Hutchinson http://mjhutchinson.com/journal/2010/01/25/integrating_gtk_application_mac
 
 using System;

@@ -1,4 +1,3 @@
-// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 using NUnit.Framework;
 using SIL.BuildTasks.UnitTestTasks;
 // Sadly, Resharper wants to change Is.EqualTo to NUnit.Framework.Is.EqualTo
