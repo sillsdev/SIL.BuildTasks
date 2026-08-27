@@ -11,26 +11,9 @@
     <PackageReference Include="NUnit" Version="2.6.5" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="ForceCrash\**" />
-    <EmbeddedResource Remove="ForceCrash\**" />
-    <None Remove="ForceCrash\**" />
     <None Remove="app.config" Condition="'$(OS)'=='Windows_NT'" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-  <Target Name="BuildUnmanaged" AfterTargets="DispatchToInnerBuilds">
-    <RemoveDir Directories="$(MSBuildProjectDirectory)/ForceCrash/$(Configuration)" Condition="Exists('$(MSBuildProjectDirectory)/ForceCrash/$(Configuration)')" />
-    <Exec Command="make" WorkingDirectory="$(MSBuildProjectDirectory)/ForceCrash" Condition="'$(OS)'!='Windows_NT'" />
-    <Exec Command="cl /DFORCECRASH_EXPORTS /D_USRDLL /D_WINDOWS /DWIN32 ForceCrash.c /link /dll /out:$(MSBuildProjectDirectory)/ForceCrash/ForceCrash.dll" WorkingDirectory="$(MSBuildProjectDirectory)/ForceCrash/" Condition="'$(OS)'=='Windows_NT'" />
-    <ItemGroup>
-      <SourceFiles Include="$(MSBuildProjectDirectory)/ForceCrash/libForceCrash.so" Condition="'$(OS)'!='Windows_NT'" />
-      <SourceFiles Include="$(MSBuildProjectDirectory)/ForceCrash/ForceCrash.dll" Condition="'$(OS)'=='Windows_NT'" />
-    </ItemGroup>
-    <PropertyGroup>
-      <Destination Condition="$(OutputPath.Contains('net472'))">$(OutputPath)</Destination>
-      <Destination Condition="!$(OutputPath.Contains('net472'))">$(OutputPath)/net472</Destination>
-    </PropertyGroup>
-    <Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(Destination)" />
-  </Target>
 </Project>

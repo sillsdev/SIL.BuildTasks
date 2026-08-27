@@ -20,13 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionF
 		GitVersion.yml = GitVersion.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ForceCrash", "ForceCrash", "{D41379D9-7E82-4793-BDC0-2D7C89C1F7BF}"
-	ProjectSection(SolutionItems) = preProject
-		SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\ForceCrash.c = SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\ForceCrash.c
-		SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\ForceCrash.vcxproj = SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\ForceCrash.vcxproj
-		SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\Makefile = SIL.BuildTasks.Tests\SIL.BuildTasks.Tests.Helper\ForceCrash\Makefile
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIL.ReleaseTasks", "SIL.ReleaseTasks\SIL.ReleaseTasks.csproj", "{F572E587-1520-4604-BBB9-F903CDCEFC69}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIL.ReleaseTasks.Tests", "SIL.ReleaseTasks.Tests\SIL.ReleaseTasks.Tests.csproj", "{373A33F5-A46B-4CE7-B5D3-5AC39C16B2BC}"
