@@ -5,7 +5,7 @@
     <Company>SIL</Company>
     <Authors>SIL Global</Authors>
     <Product>Palaso Library</Product>
-    <Copyright>Copyright © 2018-2024 SIL Global</Copyright>
+    <Copyright>Copyright © 2018-2026 SIL Global</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/sillsdev/SIL.BuildTasks</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
