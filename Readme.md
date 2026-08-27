@@ -38,7 +38,7 @@ Several useful msbuild tasks.
 
 ### Windows or Linux
 
-Install .NET 6.0 SDK from https://dot.net/core-sdk-vscode .
+Install the latest .NET SDK from https://dotnet.microsoft.com/download .
 
 Build and run tests:
 
