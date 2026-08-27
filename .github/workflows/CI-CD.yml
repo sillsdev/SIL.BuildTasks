@@ -43,7 +43,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # v4.1.0
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 9.0.x
         
     - name: Add .NET to PATH (Linux only)
       if: matrix.os == 'ubuntu-latest'
