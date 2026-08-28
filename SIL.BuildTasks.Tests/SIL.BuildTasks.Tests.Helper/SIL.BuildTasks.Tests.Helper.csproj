@@ -11,9 +11,6 @@
     <PackageReference Include="NUnit" Version="2.6.5" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="app.config" Condition="'$(OS)'=='Windows_NT'" />
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 </Project>
