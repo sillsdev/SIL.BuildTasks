@@ -1,5 +1,3 @@
-// Copyright (c) 2018-2025 SIL Global
-// This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 /*
  * Original code from https://code.google.com/archive/p/snowcode/
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
