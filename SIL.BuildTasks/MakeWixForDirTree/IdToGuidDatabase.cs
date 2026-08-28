@@ -122,8 +122,10 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		/// single one: File Ids encode the whole relative path (for example
 		/// "mercurial.lib.dulwich._pack.pyd"), so they are unique across the tree
 		/// and the existing GUIDs can be merged without renaming anything.
+		/// With justCheckDontCreate the entries are still merged in memory, so that
+		/// GetGuid finds them, but nothing is written to disk.
 		/// </summary>
-		public void ImportMissingFrom(IdToGuidDatabase other)
+		public void ImportMissingFrom(IdToGuidDatabase other, bool justCheckDontCreate)
 		{
 			if (other == null || ReferenceEquals(other, this))
 				return;
@@ -147,7 +149,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				}
 			}
 
-			if (added) Write();
+			if (added && !justCheckDontCreate) Write();
 		}
 
 		private void Write()

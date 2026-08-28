@@ -297,7 +297,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 
 				LogMessage(MessageImportance.Normal,
 					"Merging GUIDs from {0} into {1}", legacy, ConsolidatedGuidFile);
-				_sharedGuidDatabase.ImportMissingFrom(IdToGuidDatabase.Create(legacy, this));
+				_sharedGuidDatabase.ImportMissingFrom(IdToGuidDatabase.Create(legacy, this), CheckOnly);
 			}
 		}
 
