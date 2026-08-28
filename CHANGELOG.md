@@ -30,6 +30,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - [SIL.BuildTasks] Deprecated `AbandondedSuites` in favor of correctly spelled `AbandonedSuites`.
 
+### Security
+
+- Upgraded Microsoft.Build.Tasks.Core/Microsoft.Build.Utilities.Core from 17.14.28 to 18.9.6 and SIL.Core from 7.0.0 to 17.0.0 to address vulnerabilities in the older versions.
+
 ## [3.1.1] - 2025-03-18
 
 ### Changed
