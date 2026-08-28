@@ -21,6 +21,9 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		private readonly ILogger _logger;
 		private readonly string _filename;
 		private readonly Dictionary<string, string> _guids = new Dictionary<string, string>();
+		// Where each GUID came from. Usually _filename, but entries merged in by
+		// ImportMissingFrom keep pointing at the file that actually supplied them.
+		private readonly Dictionary<string, string> _origins = new Dictionary<string, string>();
 
 
 		#region Construction
@@ -63,7 +66,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 						if (id == null || guid == null)
 							throw new XmlException("Unexpected format");
 
-						m[id] = guid;
+						m.Set(id, guid, filename);
 					}
 					else if (rdr.NodeType == XmlNodeType.EndElement)
 					{
@@ -87,7 +90,18 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				string ret;
 				return _guids.TryGetValue(id, out ret) ? ret : null;
 			}
-			set => _guids[id] = value;
+		}
+
+		private void Set(string id, string guid, string origin)
+		{
+			_guids[id] = guid;
+			_origins[id] = origin;
+		}
+
+		private string OriginOf(string id)
+		{
+			string origin;
+			return _origins.TryGetValue(id, out origin) ? origin : _filename;
 		}
 
 
@@ -109,7 +123,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			{
 				_logger.LogMessage(MessageImportance.Low, "No GUID for " + id + " in " + _filename);
 				guid = Guid.NewGuid().ToString();
-				this[id] = guid;
+				Set(id, guid, _filename);
 				Write();
 			}
 
@@ -136,7 +150,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				var existing = this[pair.Key];
 				if (existing == null)
 				{
-					this[pair.Key] = pair.Value;
+					Set(pair.Key, pair.Value, other._filename);
 					added = true;
 				}
 				else if (!string.Equals(existing, pair.Value, StringComparison.OrdinalIgnoreCase))
@@ -145,11 +159,40 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 					// one GUID over another would be a nasty way to find out otherwise.
 					_logger.LogError(string.Format(
 						"Conflicting GUIDs for {0}: {1} (from {2}) and {3} (from {4}). Keeping the first.",
-						pair.Key, existing, _filename, pair.Value, other._filename));
+						pair.Key, existing, OriginOf(pair.Key), pair.Value, other._filename));
 				}
 			}
 
 			if (added && !justCheckDontCreate) Write();
+		}
+
+		/// <summary>
+		/// Logs an error for every entry this database holds only in memory, because it
+		/// was merged in from another file rather than read from its own. Deleting those
+		/// files without a run that writes this one would lose the GUIDs.
+		///
+		/// Only meaningful after a run that has not written: once Write() has run, the
+		/// entries are in the file even though _origins still records where they began.
+		/// </summary>
+		public void ReportEntriesMissingFromFile()
+		{
+			var sources = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+			var count = 0;
+			foreach (var pair in _origins)
+			{
+				if (string.Equals(pair.Value, _filename, StringComparison.OrdinalIgnoreCase))
+					continue;
+
+				sources.Add(pair.Value);
+				count++;
+			}
+
+			if (count == 0)
+				return;
+
+			_logger.LogError(string.Format(
+				"{0} is missing {1} GUID(s) still only held in {2}. Run without CheckOnly to write them, and commit the result, before deleting those files.",
+				_filename, count, string.Join(", ", sources)));
 		}
 
 		private void Write()

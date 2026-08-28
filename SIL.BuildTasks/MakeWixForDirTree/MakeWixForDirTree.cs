@@ -147,7 +147,9 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			*/
 			//instead, start afresh every time.
 
-			if(File.Exists(OutputFilePath))
+			// A check-only run outputs nothing, so it must not delete the file it would
+			// otherwise have regenerated.
+			if(!CheckOnly && File.Exists(OutputFilePath))
 			{
 				File.Delete(OutputFilePath);
 			}
@@ -299,6 +301,12 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 					"Merging GUIDs from {0} into {1}", legacy, ConsolidatedGuidFile);
 				_sharedGuidDatabase.ImportMissingFrom(IdToGuidDatabase.Create(legacy, this), CheckOnly);
 			}
+
+			// The merge above satisfies every GetGuid lookup from memory, so without this
+			// a check-only run would report the metadata up-to-date while the consolidated
+			// file on disk is still empty or stale.
+			if (CheckOnly)
+				_sharedGuidDatabase.ReportEntriesMissingFromFile();
 		}
 
 		private IdToGuidDatabase GetGuidDatabaseFor(string dirPath)

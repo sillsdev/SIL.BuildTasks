@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- [SIL.BuildTasks] Added MakeWixForDirTree.ConsolidatedGuidFile (optional param) naming a single file to hold the GUIDs for the whole tree, instead of a `.guidsForInstaller.xml` in every directory. Any per-directory files still present under RootDirectory are merged into it, so existing GUIDs carry over unchanged and installed components keep their identity; delete them from version control once the merged file has been committed. With CheckOnly the merge happens in memory only and the task reports an error naming the files whose GUIDs are not yet in the consolidated file.
+
+### Fixed
+
+- [SIL.BuildTasks] Fixed MakeWixForDirTree.CheckOnly deleting the previously generated wxs file. A check-only run outputs nothing, so it now leaves the existing file alone.
+
 ## [3.2.1] - 2026-08-31
 
 ### Security
