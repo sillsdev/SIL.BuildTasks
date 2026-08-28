@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-08-31
+
 ### Added
 
 - [SIL.BuildTasks] Added FileUpdate.FileLocalePattern (optional param) to infer a locale (e.g., for a localized release notes file) to use when doing date insertion involving month names or abbreviations.
@@ -194,8 +196,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release as NuGet package
 
-[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.1...master
+[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.0...master
 
+[3.2.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v2.5.0...v3.0.0
