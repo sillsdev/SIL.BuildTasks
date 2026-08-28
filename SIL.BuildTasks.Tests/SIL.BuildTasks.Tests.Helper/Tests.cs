@@ -1,7 +1,6 @@
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace SIL.BuildTasks.Tests.Helper
@@ -38,10 +37,9 @@ namespace SIL.BuildTasks.Tests.Helper
 		[Category("Crash")]
 		public void Crash()
 		{
-			// Force the process to crash with an access violation (mimics a native
-			// crash) by writing through a null pointer. This is not a regular,
-			// .NET exception that can be caught- it terminates the process.
-			Marshal.WriteInt32(IntPtr.Zero, 42);
+			// FailFast bypasses all managed exception handling and immediately
+			// terminates the process, mimicking the native crash this replaces.
+			Environment.FailFast("Forced crash for testing purposes");
 			Assert.Fail("Should have crashed");
 		}
 
