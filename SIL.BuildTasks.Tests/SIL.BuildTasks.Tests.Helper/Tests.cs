@@ -1,8 +1,6 @@
-// Copyright (c) 2016-2018 SIL Global
 // This software is licensed under the MIT License (http://opensource.org/licenses/MIT)
 
 using System;
-using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace SIL.BuildTasks.Tests.Helper
@@ -18,7 +16,7 @@ namespace SIL.BuildTasks.Tests.Helper
 		[Category("Success")]
 		public void Success()
 		{
-			Assert.True(true, "This test always passes");
+			Assert.Pass("This test always passes");
 		}
 
 		[Test]
@@ -35,25 +33,21 @@ namespace SIL.BuildTasks.Tests.Helper
 			throw new ApplicationException("This test throws an exception");
 		}
 
-		[DllImport("ForceCrash")]
-		private static extern void ForceCrash();
-
 		[Test]
 		[Category("Crash")]
 		public void Crash()
 		{
-			ForceCrash();
+			// FailFast bypasses all managed exception handling and immediately
+			// terminates the process, mimicking the native crash this replaces.
+			Environment.FailFast("Forced crash for testing purposes");
 			Assert.Fail("Should have crashed");
 		}
-
-		[DllImport("ForceCrash")]
-		private static extern void OutputOnStderr();
 
 		[Test]
 		[Category("Stderr")]
 		public void Stderr()
 		{
-			OutputOnStderr();
+			Console.Error.Write("Just testing");
 		}
 
 		[Test]
