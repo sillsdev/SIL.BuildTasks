@@ -20,11 +20,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - [SIL.BuildTasks] Added FileUpdate.FileLocalePattern (optional param) to infer a locale (e.g., for a localized release notes file) to use when doing date insertion involving month names or abbreviations.
 - [SIL.BuildTasks] Added MakeWixForDirTree.SetWin64 (optional Boolean param) to set the Win64 attribute to "yes" when building wxs file to be used in a 64-bit installer.
+- [SIL.BuildTasks] Added MakeWixForDirTree.ConsolidatedGuidFile (optional param) naming a single file to hold the GUIDs for the whole tree, instead of a `.guidsForInstaller.xml` in every directory. Any per-directory files still present under RootDirectory are merged into it, so existing GUIDs carry over unchanged and installed components keep their identity; delete them from version control once the merged file has been committed. With CheckOnly the merge happens in memory only and the task reports an error naming the files whose GUIDs are not yet in the consolidated file.
 
 ### Changed
 
 - [SIL.BuildTasks.AWS] Changed case of text in log message from "Publishing Sourcefiles" "Publishing SourceFiles". If anything is doing a case-sensitive parse of the log file, looking for this text, this could be a breaking change.
 - [SIL.BuildTasks] Changed FileUpdate.DatePlaceholder to allow the caller to specify a special placeholder `_DATE(*)_` that will look not only for `_DATE_` but also variants that include a date format specifier, such as `_DATE(MMM d, yyyy)_` or `_DATE(MM/yyyy)_` and will use the date format specified instead of the DateFormat.
+
+### Fixed
+
+- [SIL.BuildTasks] Fixed MakeWixForDirTree.CheckOnly deleting the previously generated wxs file. A check-only run outputs nothing, so it now leaves the existing file alone.
 
 ### Deprecated
 
