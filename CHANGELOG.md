@@ -16,6 +16,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Security
+
+- Reverted SIL.Core from 17.0.0 to 9.0.0. 17.0.0's dependency on Mono.Unix
+  (which has never had a stable, non-prerelease NuGet release) broke restore
+  for consumers using classic `nuget.exe install` without `-Prerelease`.
+  This reintroduces a build-time-only dependency on Newtonsoft.Json 11.0.1
+  (GHSA-5crp-9r3c-p9vr, DoS via deeply-nested JSON) until libpalaso resolves
+  the Mono.Unix situation upstream — SIL.BuildTasks never processes
+  untrusted JSON and isn't shipped in consumers' compiled output (IsTool),
+  so this is scanner noise rather than a real exploit path.
+
 ## [3.2.1] - 2026-08-31
 
 ### Security
