@@ -16,7 +16,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [3.2.0] - 2026-08-31
+## [3.2.1] - 2026-08-31
+
+### Security
+
+- Upgraded Microsoft.Build.Tasks.Core/Microsoft.Build.Utilities.Core from 17.14.28 to 18.9.6 and SIL.Core from 7.0.0 to 17.0.0 to address vulnerabilities in the older versions.
+
+## [3.2.0] - 2025-11-25
 
 ### Added
 
@@ -31,10 +37,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Deprecated
 
 - [SIL.BuildTasks] Deprecated `AbandondedSuites` in favor of correctly spelled `AbandonedSuites`.
-
-### Security
-
-- Upgraded Microsoft.Build.Tasks.Core/Microsoft.Build.Utilities.Core from 17.14.28 to 18.9.6 and SIL.Core from 7.0.0 to 17.0.0 to address vulnerabilities in the older versions.
 
 ## [3.1.1] - 2025-03-18
 
@@ -196,8 +198,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release as NuGet package
 
-[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.0...master
+[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.1...master
 
+[3.2.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.0.0...v3.1.0
