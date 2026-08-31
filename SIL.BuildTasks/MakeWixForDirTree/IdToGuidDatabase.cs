@@ -135,9 +135,11 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		/// <summary>
 		/// Copies in every entry this database does not already have, and saves if
 		/// anything was added. Used to consolidate the per-directory files into a
-		/// single one: File Ids encode the whole relative path (for example
-		/// "mercurial.lib.dulwich._pack.pyd"), so they are unique across the tree
-		/// and the existing GUIDs can be merged without renaming anything.
+		/// single one: File Ids encode the last 50 chars of the relative path (for
+		/// example "mercurial.lib.dulwich._pack.pyd"), so they are highly likely to
+		/// be unique across the tree (unless a really long filename is reused), and
+		/// suffixes to file IDs help ensure uniqueness, allowing existing GUIDs to
+		/// be merged without renaming anything.
 		/// With justCheckDontCreate the entries are still merged in memory, so that
 		/// GetGuid finds them, but nothing is written to disk.
 		/// </summary>
