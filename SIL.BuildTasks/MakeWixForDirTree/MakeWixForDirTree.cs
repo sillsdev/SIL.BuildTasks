@@ -155,10 +155,11 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			}
 
 			SetupExclusions();
-			SetupConsolidatedGuidFile();
 
 			try
 			{
+				SetupConsolidatedGuidFile();
+
 				var doc = new XmlDocument();
 				var elemWix = doc.CreateElement("Wix", Xmlns);
 				doc.AppendChild(elemWix);
@@ -301,6 +302,9 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 					"Merging GUIDs from {0} into {1}", legacy, ConsolidatedGuidFile);
 				_sharedGuidDatabase.ImportMissingFrom(IdToGuidDatabase.Create(legacy, this), CheckOnly);
 			}
+
+			// Ensure shared GUID database is fully written after importing, if needed
+			_sharedGuidDatabase.FinalizeImport(CheckOnly);
 
 			// The merge above satisfies every GetGuid lookup from memory, so without this
 			// a check-only run would report the metadata up-to-date while the consolidated
