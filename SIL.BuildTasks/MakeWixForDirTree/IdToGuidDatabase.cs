@@ -27,7 +27,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		// ImportMissingFrom keep pointing at the file that actually supplied them.
 		private readonly Dictionary<string, string> _origins = new Dictionary<string, string>();
 		// Whether the GUID database has new data needing to be written
-		private readonly bool _dirty;
+		private bool _dirty;
 
 
 		#region Construction
