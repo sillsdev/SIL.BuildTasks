@@ -13,7 +13,7 @@
     <PackageReference Include="Markdig.Signed" Version="0.41.1" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.9.6" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" Condition="'$(TargetFramework)'=='netstandard2.0'" />
-    <PackageReference Include="SIL.Core" Version="17.0.0" />
+    <PackageReference Include="SIL.Core" Version="9.0.0" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
