@@ -242,10 +242,17 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				}
 				writer.WriteEndElement(); // end InstallerMetadata
 			}
-			File.Replace(tempFilename, _filename, backupFilename);
-			// If that didn't throw an exception, it's now safe to delete the backup file
-			// Catch and suppress any errors caused by deleting the backup file; if that ever happens it should not fail builds
-			try { File.Delete(backupFilename); } catch { }
+			if (File.Exists(_filename))
+			{
+				File.Replace(tempFilename, _filename, backupFilename);
+				// If that didn't throw an exception, it's now safe to delete the backup file
+				// Catch and suppress any errors caused by deleting the backup file; if that ever happens it should not fail builds
+				try { File.Delete(backupFilename); } catch { }
+			}
+			else
+			{
+				File.Move(tempFilename, _filename);
+			}
 		}
 
 		#endregion
