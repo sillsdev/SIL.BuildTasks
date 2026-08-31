@@ -26,28 +26,32 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		// Where each GUID came from. Usually _filename, but entries merged in by
 		// ImportMissingFrom keep pointing at the file that actually supplied them.
 		private readonly Dictionary<string, string> _origins = new Dictionary<string, string>();
+		// Whether the GUID database has new data needing to be written
+		private readonly bool _dirty;
 
 
 		#region Construction
 
-		private IdToGuidDatabase(string filename, ILogger logger)
+		private IdToGuidDatabase(string filename, ILogger logger, bool dirty = false)
 		{
 			_filename = filename;
 			_logger = logger;
+			_dirty = dirty;
 		}
 
 		public static IdToGuidDatabase Create(string filename, ILogger owner)
 		{
 			if (!File.Exists(filename))
-				return new IdToGuidDatabase(filename, owner);
+				return new IdToGuidDatabase(filename, owner, dirty: true);
 
-			var settings = new XmlReaderSettings {
+			var settings = new XmlReaderSettings
+			{
 				IgnoreComments = true,
 				IgnoreWhitespace = true
 			};
 			using (var rdr = XmlReader.Create(filename, settings))
 			{
-				var m = new IdToGuidDatabase(filename, owner);
+				var m = new IdToGuidDatabase(filename, owner, dirty: false);
 
 				// skip XML declaration
 				do
@@ -126,6 +130,8 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				_logger.LogMessage(MessageImportance.Low, "No GUID for " + id + " in " + _filename);
 				guid = Guid.NewGuid().ToString();
 				Set(id, guid, _filename);
+				// MarkDirty() is not enough here. This GUID is about to be saved in the
+				// generated .wxs file, so we *must* ensure that it's persisted.
 				Write();
 			}
 
@@ -167,7 +173,12 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				}
 			}
 
-			if (added && !justCheckDontCreate) Write();
+			if (added && !justCheckDontCreate) MarkDirty();
+		}
+
+		public void FinalizeImport(bool justCheckDontCreate)
+		{
+			if (!justCheckDontCreate) Flush();
 		}
 
 		/// <summary>
@@ -199,6 +210,17 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				_filename, count, string.Join(", ", sources)));
 		}
 
+		private void MarkDirty()
+		{
+			_dirty = true;
+		}
+
+		public void Flush()
+		{
+			if (_dirty) Write();
+			_dirty = false;
+		}
+
 		private void Write()
 		{
 			var settings = new XmlWriterSettings {
@@ -207,7 +229,9 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				Encoding = Encoding.UTF8
 			};
 
-			using (var writer = XmlWriter.Create(_filename, settings))
+			var tempFilename = _filename + ".tmp";
+			var backupFilename = _filename + ".bak";
+			using (var writer = XmlWriter.Create(tempFilename, settings))
 			{
 				writer.WriteComment("This file is generated and then updated by an MSBuild task.  It preserves the automatically-generated guids assigned files that will be installed on user machines. So it should be held in source control.");
 				writer.WriteStartElement("InstallerMetadata");
@@ -220,6 +244,9 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				}
 				writer.WriteEndElement(); // end InstallerMetadata
 			}
+			File.Replace(tempFilename, _filename, backupFilename);
+			// If that didn't throw an exception, it's now safe to delete the backup file
+			File.Delete(backupFilename);
 		}
 
 		#endregion
