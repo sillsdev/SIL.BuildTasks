@@ -213,7 +213,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			_dirty = true;
 		}
 
-		public void Flush()
+		private void Flush()
 		{
 			if (_dirty) Write();
 			_dirty = false;
