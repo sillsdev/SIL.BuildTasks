@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.2.2] - 2026-09-01
+
 ### Security
 
 - Reverted SIL.Core from 17.0.0 to 9.0.0. 17.0.0's dependency on Mono.Unix
@@ -209,8 +211,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release as NuGet package
 
-[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.1...master
+[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.2...master
 
+[3.2.2]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.1...v3.2.2
 [3.2.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.0...v3.1.1
