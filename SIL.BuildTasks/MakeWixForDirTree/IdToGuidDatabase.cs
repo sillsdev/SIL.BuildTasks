@@ -21,28 +21,35 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 		private readonly ILogger _logger;
 		private readonly string _filename;
 		private readonly Dictionary<string, string> _guids = new Dictionary<string, string>();
+		// Where each GUID came from. Usually _filename, but entries merged in by
+		// ImportMissingFrom keep pointing at the file that actually supplied them.
+		private readonly Dictionary<string, string> _origins = new Dictionary<string, string>();
+		// Whether the GUID database has new data needing to be written
+		private bool _dirty;
 
 
 		#region Construction
 
-		private IdToGuidDatabase(string filename, ILogger logger)
+		private IdToGuidDatabase(string filename, ILogger logger, bool dirty = false)
 		{
 			_filename = filename;
 			_logger = logger;
+			_dirty = dirty;
 		}
 
 		public static IdToGuidDatabase Create(string filename, ILogger owner)
 		{
 			if (!File.Exists(filename))
-				return new IdToGuidDatabase(filename, owner);
+				return new IdToGuidDatabase(filename, owner, dirty: true);
 
-			var settings = new XmlReaderSettings {
+			var settings = new XmlReaderSettings
+			{
 				IgnoreComments = true,
 				IgnoreWhitespace = true
 			};
 			using (var rdr = XmlReader.Create(filename, settings))
 			{
-				var m = new IdToGuidDatabase(filename, owner);
+				var m = new IdToGuidDatabase(filename, owner, dirty: false);
 
 				// skip XML declaration
 				do
@@ -63,7 +70,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 						if (id == null || guid == null)
 							throw new XmlException("Unexpected format");
 
-						m[id] = guid;
+						m.Set(id, guid, filename);
 					}
 					else if (rdr.NodeType == XmlNodeType.EndElement)
 					{
@@ -87,7 +94,18 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				string ret;
 				return _guids.TryGetValue(id, out ret) ? ret : null;
 			}
-			set => _guids[id] = value;
+		}
+
+		private void Set(string id, string guid, string origin)
+		{
+			_guids[id] = guid;
+			_origins[id] = origin;
+		}
+
+		private string OriginOf(string id)
+		{
+			string origin;
+			return _origins.TryGetValue(id, out origin) ? origin : _filename;
 		}
 
 
@@ -109,11 +127,96 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 			{
 				_logger.LogMessage(MessageImportance.Low, "No GUID for " + id + " in " + _filename);
 				guid = Guid.NewGuid().ToString();
-				this[id] = guid;
+				Set(id, guid, _filename);
+				// MarkDirty() is not enough here. This GUID is about to be saved in the
+				// generated .wxs file, so we *must* ensure that it's persisted.
 				Write();
 			}
 
 			return guid?.ToUpper();
+		}
+
+		/// <summary>
+		/// Copies in every entry this database does not already have, and saves if
+		/// anything was added. Used to consolidate the per-directory files into a
+		/// single one: File Ids encode the last 50 chars of the relative path (for
+		/// example "mercurial.lib.dulwich._pack.pyd"), so they are highly likely to
+		/// be unique across the tree (unless a really long filename is reused), and
+		/// suffixes to file IDs help ensure uniqueness, allowing existing GUIDs to
+		/// be merged without renaming anything.
+		/// With justCheckDontCreate the entries are still merged in memory, so that
+		/// GetGuid finds them, but nothing is written to disk.
+		/// </summary>
+		public void ImportMissingFrom(IdToGuidDatabase other, bool justCheckDontCreate)
+		{
+			if (other == null || ReferenceEquals(other, this))
+				return;
+
+			var added = false;
+			foreach (var pair in other._guids)
+			{
+				var existing = this[pair.Key];
+				if (existing == null)
+				{
+					Set(pair.Key, pair.Value, other._filename);
+					added = true;
+				}
+				else if (!string.Equals(existing, pair.Value, StringComparison.OrdinalIgnoreCase))
+				{
+					// Cannot happen while Ids stay path-derived, but silently preferring
+					// one GUID over another would be a nasty way to find out otherwise.
+					_logger.LogError(string.Format(
+						"Conflicting GUIDs for {0}: {1} (from {2}) and {3} (from {4}). Keeping the first.",
+						pair.Key, existing, OriginOf(pair.Key), pair.Value, other._filename));
+				}
+			}
+
+			if (added && !justCheckDontCreate) MarkDirty();
+		}
+
+		public void FinalizeImport(bool justCheckDontCreate)
+		{
+			if (!justCheckDontCreate) Flush();
+		}
+
+		/// <summary>
+		/// Logs an error for every entry this database holds only in memory, because it
+		/// was merged in from another file rather than read from its own. Deleting those
+		/// files without a run that writes this one would lose the GUIDs.
+		///
+		/// Only meaningful after a run that has not written: once Write() has run, the
+		/// entries are in the file even though _origins still records where they began.
+		/// </summary>
+		public void ReportEntriesMissingFromFile()
+		{
+			var sources = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+			var count = 0;
+			foreach (var pair in _origins)
+			{
+				if (string.Equals(pair.Value, _filename, StringComparison.OrdinalIgnoreCase))
+					continue;
+
+				sources.Add(pair.Value);
+				count++;
+			}
+
+			if (count == 0)
+				return;
+
+			_logger.LogError(string.Format(
+				"{0} is missing {1} GUID(s) still only held in {2}. Run without CheckOnly to write them, and commit the result, before deleting those files.",
+				_filename, count, string.Join(", ", sources)));
+		}
+
+		private void MarkDirty()
+		{
+			_dirty = true;
+		}
+
+		private void Flush()
+		{
+			if (_dirty) Write();
+			_dirty = false;
 		}
 
 		private void Write()
@@ -124,7 +227,9 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				Encoding = Encoding.UTF8
 			};
 
-			using (var writer = XmlWriter.Create(_filename, settings))
+			var tempFilename = _filename + ".tmp";
+			var backupFilename = _filename + ".bak";
+			using (var writer = XmlWriter.Create(tempFilename, settings))
 			{
 				writer.WriteComment("This file is generated and then updated by an MSBuild task.  It preserves the automatically-generated guids assigned files that will be installed on user machines. So it should be held in source control.");
 				writer.WriteStartElement("InstallerMetadata");
@@ -136,6 +241,25 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 					writer.WriteEndElement();
 				}
 				writer.WriteEndElement(); // end InstallerMetadata
+			}
+			if (File.Exists(_filename))
+			{
+				File.Replace(tempFilename, _filename, backupFilename);
+				// If that didn't throw an exception, it's now safe to delete the backup file
+				// Catch and suppress any errors caused by deleting the backup file; if that ever happens it should not fail builds
+				try
+				{
+					File.Delete(backupFilename);
+				}
+				catch (Exception e)
+				{
+					_logger.LogMessage(MessageImportance.Normal, "Warning: deleting backup file " + backupFilename + " caused exception: " + e.Message);
+					_logger.LogMessage(MessageImportance.Normal, "Continuing, but this might be a sign of filesystem issues. Investigate if possible.");
+				}
+			}
+			else
+			{
+				File.Move(tempFilename, _filename);
 			}
 		}
 
