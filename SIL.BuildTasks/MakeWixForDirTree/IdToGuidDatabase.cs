@@ -247,7 +247,15 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				File.Replace(tempFilename, _filename, backupFilename);
 				// If that didn't throw an exception, it's now safe to delete the backup file
 				// Catch and suppress any errors caused by deleting the backup file; if that ever happens it should not fail builds
-				try { File.Delete(backupFilename); } catch { }
+				try
+				{
+					File.Delete(backupFilename);
+				}
+				catch (e)
+				{
+					_logger.LogMessage("Warning: deleting backup file " + backupFilename + " caused exception: " + e.Message);
+					_logger.LogMessage("Continuing, but this might be a sign of filesystem issues. Investigate if possible.");
+				}
 			}
 			else
 			{
