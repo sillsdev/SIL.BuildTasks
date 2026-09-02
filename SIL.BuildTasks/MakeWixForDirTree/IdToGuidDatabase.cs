@@ -251,7 +251,7 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				{
 					File.Delete(backupFilename);
 				}
-				catch (e)
+				catch (Exception e)
 				{
 					_logger.LogMessage("Warning: deleting backup file " + backupFilename + " caused exception: " + e.Message);
 					_logger.LogMessage("Continuing, but this might be a sign of filesystem issues. Investigate if possible.");
