@@ -253,8 +253,8 @@ namespace SIL.BuildTasks.MakeWixForDirTree
 				}
 				catch (Exception e)
 				{
-					_logger.LogMessage("Warning: deleting backup file " + backupFilename + " caused exception: " + e.Message);
-					_logger.LogMessage("Continuing, but this might be a sign of filesystem issues. Investigate if possible.");
+					_logger.LogMessage(MessageImportance.Normal, "Warning: deleting backup file " + backupFilename + " caused exception: " + e.Message);
+					_logger.LogMessage(MessageImportance.Normal, "Continuing, but this might be a sign of filesystem issues. Investigate if possible.");
 				}
 			}
 			else
