@@ -16,6 +16,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Stopped exporting `Microsoft.Build.Tasks.Core` as a public package dependency of
+  SIL.BuildTasks, SIL.BuildTasks.AWS and SIL.ReleaseTasks. MSBuild is supplied by the
+  host, and these packages already ship the assemblies they need under `tools/`, so the
+  dependency only served to push MSBuild's own transitive graph onto consumers: a `net48`
+  consumer of SIL.ReleaseTasks 3.3.0 picked up 24 packages (including System.Text.Json,
+  System.Resources.Extensions and System.Configuration.ConfigurationManager 10.0.8),
+  against 6 for 3.1.1. It is now marked `PrivateAssets="All"`, restoring the 3.1.1
+  dependency surface with the `tools/` payload unchanged. Consumers that were relying on
+  the transitive reference must reference `Microsoft.Build.Tasks.Core` directly.
+
 ## [3.3.0] - 2026-09-02
 
 ### Added

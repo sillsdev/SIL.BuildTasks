@@ -11,7 +11,8 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Markdig.Signed" Version="0.41.1" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.9.6" />
+    <!-- PrivateAssets: MSBuild is supplied by the host; exporting it floods consumers' graphs. -->
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.9.6" PrivateAssets="All" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="SIL.ReleaseTasks.Common.inc" />
