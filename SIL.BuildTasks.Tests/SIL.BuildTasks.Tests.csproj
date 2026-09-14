@@ -23,12 +23,8 @@
     <!-- Don't remove NUnit.Runners.Net4 - this is needed for the NUnitTests fixture! -->
     <PackageReference Include="NUnit.Runners.Net4" Version="2.6.4" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
-    <!-- SIL.BuildTasks intentionally exports no public dependencies (see
-         SuppressDependenciesWhenPacking in its csproj); pin the version it's built
-         against explicitly here rather than relying on transitive flow through the
-         ProjectReference. SIL.TestUtilities 7.0.0 otherwise pulls SIL.Core 7.0.0. -->
     <PackageReference Include="SIL.Core" Version="9.0.0" />
-    <PackageReference Include="SIL.TestUtilities" Version="7.0.0" />
+    <PackageReference Include="SIL.TestUtilities" Version="9.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SIL.BuildTasks\SIL.BuildTasks.csproj" />
