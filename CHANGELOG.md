@@ -16,6 +16,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- BREAKING DEPENDENCY CHANGE: SIL.BuildTasks, SIL.BuildTasks.AWS, and SIL.ReleaseTasks no longer export any public package dependencies. Each package's job is to carry its own build-time
+  tooling under `tools/`, so its dependency graph is now suppressed wholesale via `SuppressDependenciesWhenPacking` instead of marking individual references `PrivateAssets="All"`.
+  Consumers that were relying on the transitive references (`Microsoft.Build.Tasks.Core`, `SIL.Core`, `Markdig.Signed`, `Microsoft.Win32.Registry`) must reference those packages directly.
+
+### Security
+
+- Dropping the public `SIL.Core` dependency (above) also removes Newtonsoft.Json 11.0.1
+  (GHSA-5crp-9r3c-p9vr) from consumers' dependency graphs. It still ships under `tools/`
+  for the tasks' own use, where SIL.BuildTasks never processes untrusted JSON.
+
 ## [3.3.0] - 2026-09-02
 
 ### Added
@@ -219,9 +231,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release as NuGet package
 
-[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.2...master
+[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.3.0...master
 
-[3.2.2]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.1...v3.2.2
+[3.3.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.1...v3.3.0
 [3.2.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.0...v3.1.1

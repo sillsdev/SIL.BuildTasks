@@ -5,6 +5,12 @@
     <AssemblyTitle>SIL.ReleaseTasks</AssemblyTitle>
     <BuildOutputTargetFolder>tools/$(TargetFramework)</BuildOutputTargetFolder>
     <PackageReadmeFile>SIL.ReleaseTasks.md</PackageReadmeFile>
+    <!-- This package's only purpose is to carry its own build-time tooling under tools/;
+         it should never export a dependency graph to consumers. -->
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <!-- NU5128: pack omits the dependencies group entirely rather than emitting it empty
+         per-TFM, which nuget's lib/dependency-group consistency check flags; harmless here. -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2024.3.0">
