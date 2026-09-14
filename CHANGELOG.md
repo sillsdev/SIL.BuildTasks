@@ -16,17 +16,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Fixed
+### Changed
 
-- Stopped exporting `Microsoft.Build.Tasks.Core` (SIL.BuildTasks, SIL.BuildTasks.AWS,
-  SIL.ReleaseTasks) and `SIL.Core` (SIL.BuildTasks) as public package dependencies.
-  MSBuild is supplied by the host, and these packages already ship the assemblies they
-  need under `tools/`, so the dependencies only served to push their transitive graphs
-  onto consumers: a `net472` consumer of SIL.BuildTasks 3.3.0 picked up 26 packages, and
-  a `net48` consumer of SIL.ReleaseTasks 3.3.0 picked up 24, against 6 apiece before
-  these references were made public. Both are now marked `PrivateAssets="All"`, with the
-  `tools/` payloads unchanged. Consumers that were relying on the transitive references
-  must reference those packages directly.
+- BREAKING DEPENDENCY CHANGE: SIL.BuildTasks, SIL.BuildTasks.AWS, and SIL.ReleaseTasks no longer export any public package dependencies. Each package's job is to carry its own build-time
+  tooling under `tools/`, so its dependency graph is now suppressed wholesale via `SuppressDependenciesWhenPacking` instead of marking individual references `PrivateAssets="All"`.
+  Consumers that were relying on the transitive references (`Microsoft.Build.Tasks.Core`, `SIL.Core`, `Markdig.Signed`, `Microsoft.Win32.Registry`) must reference those packages directly.
 
 ### Security
 
