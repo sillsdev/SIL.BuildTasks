@@ -18,15 +18,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- Stopped exporting `Microsoft.Build.Tasks.Core` as a public package dependency of
-  SIL.BuildTasks, SIL.BuildTasks.AWS and SIL.ReleaseTasks. MSBuild is supplied by the
-  host, and these packages already ship the assemblies they need under `tools/`, so the
-  dependency only served to push MSBuild's own transitive graph onto consumers: a `net48`
-  consumer of SIL.ReleaseTasks 3.3.0 picked up 24 packages (including System.Text.Json,
-  System.Resources.Extensions and System.Configuration.ConfigurationManager 10.0.8),
-  against 6 for 3.1.1. It is now marked `PrivateAssets="All"`, restoring the 3.1.1
-  dependency surface with the `tools/` payload unchanged. Consumers that were relying on
-  the transitive reference must reference `Microsoft.Build.Tasks.Core` directly.
+- Stopped exporting `Microsoft.Build.Tasks.Core` (SIL.BuildTasks, SIL.BuildTasks.AWS,
+  SIL.ReleaseTasks) and `SIL.Core` (SIL.BuildTasks) as public package dependencies.
+  MSBuild is supplied by the host, and these packages already ship the assemblies they
+  need under `tools/`, so the dependencies only served to push their transitive graphs
+  onto consumers: a `net472` consumer of SIL.BuildTasks 3.3.0 picked up 26 packages, and
+  a `net48` consumer of SIL.ReleaseTasks 3.3.0 picked up 24, against 6 apiece before
+  these references were made public. Both are now marked `PrivateAssets="All"`, with the
+  `tools/` payloads unchanged. Consumers that were relying on the transitive references
+  must reference those packages directly.
+
+### Security
+
+- Dropping the public `SIL.Core` dependency (above) also removes Newtonsoft.Json 11.0.1
+  (GHSA-5crp-9r3c-p9vr) from consumers' dependency graphs. It still ships under `tools/`
+  for the tasks' own use, where SIL.BuildTasks never processes untrusted JSON.
 
 ## [3.3.0] - 2026-09-02
 
