@@ -5,7 +5,7 @@ Several useful msbuild tasks.
 [![NuGet version (SIL.BuildTasks)](https://img.shields.io/nuget/v/SIL.BuildTasks.svg?style=flat-square)](https://www.nuget.org/packages/SIL.BuildTasks/)
 [![Build, Test and Pack](https://github.com/sillsdev/SIL.BuildTasks/actions/workflows/CI-CD.yml/badge.svg)](https://github.com/sillsdev/SIL.BuildTasks/actions/workflows/CI-CD.yml)
 
-Upgrading from version 1? See the [migration guide](Documentation/Migration.md).
+Upgrading from version 1 to version 2? See the [migration guide](Documentation/Migration.md).
 
 ## Current Tasks
 

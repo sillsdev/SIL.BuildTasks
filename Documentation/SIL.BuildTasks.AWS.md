@@ -25,7 +25,8 @@ Files made public are served from `https://s3.amazonaws.com/<bucket>/<folder>/<f
   not both
 
 - `DestinationFolder`: The folder within the bucket. Must not begin with `/` or `\`, or end
-  with `\`
+  with `\`. Only checked with `SourceFiles`; with `SourceFolder` a leading slash silently
+  becomes part of the object key
 
 - `IsPublicRead`: Whether the uploaded files are publicly readable. Defaults to `false`
 
