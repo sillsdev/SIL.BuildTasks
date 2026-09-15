@@ -24,9 +24,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Security
 
-- Dropping the public `SIL.Core` dependency (above) also removes Newtonsoft.Json 11.0.1
-  (GHSA-5crp-9r3c-p9vr) from consumers' dependency graphs. It still ships under `tools/`
-  for the tasks' own use, where SIL.BuildTasks never processes untrusted JSON.
+- Upgraded `SIL.Core` (SIL.BuildTasks) from 9.0.0 to 10.0.0, which upgrades Newtonsoft.Json
+  from 11.0.1 to 13.0.1 — past the GHSA-5crp-9r3c-p9vr fix. Combined with no longer
+  exporting `SIL.Core` as a public dependency at all (above), the `tools/` payload now
+  carries a non-vulnerable Newtonsoft.Json, and consumers never see either package. This
+  reverses the downgrade from 3.3.0: `SIL.Core` 10.0.0 depends on `Mono.Unix`, which has
+  never had a stable NuGet release and broke `nuget.exe`-based consumer restores back when
+  `SIL.Core` was public. Now that it's private and build-time-only, consumers never see
+  `Mono.Unix` either, and our own `PackageReference`-based restore resolves the pinned
+  prerelease version without issue.
 
 ## [3.3.0] - 2026-09-02
 
