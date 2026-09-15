@@ -4,6 +4,7 @@
     <RootNamespace>SIL.BuildTasks.AWS</RootNamespace>
     <Description>SIL.BuildTasks.AWS defines a S3BuildPublisher msbuild task to publish a set of files to a S3 bucket.</Description>
     <AssemblyTitle>SIL.BuildTasks.AWS</AssemblyTitle>
+    <PackageReadmeFile>SIL.BuildTasks.AWS.md</PackageReadmeFile>
     <IsTool>true</IsTool>
     <!-- This package's only purpose is to carry its own build-time tooling under tools/;
          it should never export a dependency graph to consumers. -->
@@ -21,6 +22,12 @@
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.9.6" />
     <PackageReference Include="SIL.ReleaseTasks.Dogfood" Version="[2.3.3-*,)" PrivateAssets="All" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="../Documentation/SIL.BuildTasks.AWS.md" Pack="true" PackagePath="/">
+      <Link>SIL.BuildTasks.AWS.md</Link>
+    </None>
+  </ItemGroup>
+
   <!-- Collect all dependencies and include them in the package itself, next to the Task assembly. -->
   <Target Name="CollectRuntimeOutputs" BeforeTargets="_GetPackageFiles">
     <MakeDir Directories="$(OutputPath)/lib/net472" />
