@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-09-16
+
 ### Changed
 
 - BREAKING DEPENDENCY CHANGE: SIL.BuildTasks, SIL.BuildTasks.AWS, and SIL.ReleaseTasks no longer export any public package dependencies. Each package's job is to carry its own build-time
@@ -237,8 +239,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - First release as NuGet package
 
-[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.3.0...master
+[Unreleased]: https://github.com/sillsdev/SIL.BuildTasks/compare/v4.0.0...master
 
+[4.0.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.3.0...v4.0.0
 [3.3.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.1...v3.3.0
 [3.2.1]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.2.0...v3.2.1
 [3.2.0]: https://github.com/sillsdev/SIL.BuildTasks/compare/v3.1.1...v3.2.0
